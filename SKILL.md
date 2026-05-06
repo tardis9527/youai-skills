@@ -1,0 +1,56 @@
+---
+name: youai-skills
+description: AI Skills for product development workflow — 4 structured skills covering project analysis, product discovery, market research, and PRD generation. Helps you make the right product decisions before writing the first line of code.
+---
+
+# YouAI Skills — 产品开发 AI 技能包
+
+> 🍊 GitHub: https://github.com/tardis9527/youai-skills
+
+在写第一行代码之前，先用 AI 把产品方向想清楚。
+
+## 包含 4 个 Skill
+
+### 1. 项目理解与分析（Project Analysis）
+系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
+- 适用场景：接手新项目、代码审查、技术尽调
+- 产出：8 节结构化报告
+
+### 2. 产品需求探索与定义（Product Discovery）
+六阶段交互式引导，将模糊想法转化为结构化产品简报（Product Brief）。
+- 适用场景：0-1 产品构思、Hackathon、MVP 定义
+- 产出：Product Brief（含用户画像、MVP 功能清单、可行性评估）
+
+### 3. 产品市场调研分析（Market Research）
+系统性竞品分析、市场规模估算、用户洞察、风险评估。
+- 适用场景：评估赛道、融资前分析、验证产品方向
+- 产出：3000-5000 字调研报告（含数据可信度标注）
+
+### 4. PRD 文档生成（PRD Generation）
+将实施方案转化为可落地的 PRD，含功能规格、数据模型、API 设计、迭代规划。
+- 适用场景：方案转 PRD、输出开发文档
+- 产出：13 章完整 PRD（含验收标准、Mermaid 流程图）
+
+## 使用方式
+
+1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
+2. **Windsurf**：将 `platforms/windsurf/workflows/` 下的文件复制到项目的 `.windsurf/workflows/`
+3. **Cursor**：将 `platforms/cursor/rules/` 下的文件复制到项目的 `.cursor/rules/`
+
+## 工作流串联
+
+```
+新产品从 0 开始：  产品探索 → 市场调研 → PRD 生成
+接手已有项目：    项目分析 → PRD 生成
+验证产品方向：    产品探索 → 市场调研 → 决策
+```
+
+## 核心特性
+
+- 🔗 链式可组合 — 每个 Skill 的产出物可直接作为下一个的输入
+- 📐 结构化输出 — 定义明确的输出格式和质量标准
+- 🛡️ 行为约束 — 内置角色设定、禁止行为、自检清单
+- 🔄 交互式引导 — 分阶段推进，每步确认
+- 🏗️ 技术栈灵活 — 默认技术栈可替换
+
+详细文档和示例请访问 GitHub 仓库。
