@@ -1,0 +1,103 @@
+# 🍊 YouAI Skills
+
+**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD. Compatible with mainstream AI IDEs.
+
+[中文](./README.md) | English
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
+[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
+
+---
+
+## ✨ Why This Project?
+
+Most AI coding prompts focus on "how to write code", but **deciding what to build matters far more than how to code it**.
+
+This Skill Pack covers the **critical decision-making stages before coding** — helping you use AI to go from a vague idea to a production-ready PRD. **Get the direction right before writing the first line of code.**
+
+---
+
+## 🔗 Workflow Overview
+
+Four Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      YouAI Skills                              │
+│                                                                 │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
+│  │ 01 Project│    │ 02 Product│    │ 03 Market │    │ 04 PRD   │  │
+│  │ Analysis  │    │ Discovery │───▶│ Research  │───▶│Generation│  │
+│  └──────────┘    └──────────┘    └──────────┘    └──────────┘  │
+│       │                │                               ▲        │
+│       │ Existing       │ New product                   │        │
+│       │ project        │                               │        │
+│       └────────────────┴───────────────────────────────┘        │
+│                                                                 │
+│  Path A: New product from scratch ──▶ 02 → 03 → 04             │
+│  Path B: Existing project         ──▶ 01 → 04                  │
+│  Path C: Validate direction       ──▶ 02 → 03 → Decision       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Skill Catalog
+
+| # | Skill | Use Case | Input | Output |
+|---|-------|----------|-------|--------|
+| 01 | [Project Analysis](./skills/01_project-analysis.md) | Onboarding, code review, tech due diligence | Existing codebase | Structured project report |
+| 02 | [Product Discovery](./skills/02_product-discovery.md) | 0-to-1 product ideation, MVP definition | Vague product idea | Product Brief |
+| 03 | [Market Research](./skills/03_market-research.md) | Market validation, competitor analysis | Product direction | Research report |
+| 04 | [PRD Generation](./skills/04_prd-generation.md) | Implementation plan → PRD | Implementation doc | Complete PRD |
+
+> Note: Skill content is currently in Chinese. English translations are on the roadmap.
+
+---
+
+## 🚀 Quick Start
+
+### Option 1: Direct Use (Any AI Tool)
+
+1. Open the corresponding Skill file in [`skills/`](./skills/)
+2. Copy the full content into your AI conversation (ChatGPT / Claude / any AI)
+3. Follow the guided interaction in the prompt
+
+### Option 2: Windsurf
+
+```bash
+cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
+```
+
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`
+
+### Option 3: Cursor
+
+```bash
+cp -r platforms/cursor/rules/ your-project/.cursor/rules/
+```
+
+Rules auto-load as context in relevant conversations.
+
+---
+
+## 📋 Key Features
+
+- **🔗 Chainable** — 4 Skills form a pipeline, outputs feed into next stage
+- **📐 Structured Output** — Every Skill defines clear output format and quality standards
+- **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
+- **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints
+- **🏗️ Flexible Tech Stack** — PRD Skill includes preferred tech stack with alternatives
+- **📱 Multi-platform** — Supports Web + Mobile (React Native) product design
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## 📄 License
+
+[MIT License](./LICENSE)
