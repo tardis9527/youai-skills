@@ -21,6 +21,5 @@
     "cursor",
     "windsurf"
   ],
-  "skills": "./skills/",
-  "rules": "./rules/"
+  "skills": "./skills/"
 }
