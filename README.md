@@ -105,6 +105,7 @@ cp -r platforms/cursor/rules/ your-project/.cursor/rules/
 
 ```
 youai-skills/
+├── .plugin/plugin.json       # Open Plugins 标准清单
 ├── README.md                 # 项目介绍（中文）
 ├── README_en.md              # 项目介绍（English）
 ├── LICENSE                   # MIT 开源协议
@@ -114,7 +115,13 @@ youai-skills/
 │   ├── 01_project-analysis.md
 │   ├── 02_product-discovery.md
 │   ├── 03_market-research.md
-│   └── 04_prd-generation.md
+│   ├── 04_prd-generation.md
+│   ├── project-analysis/     # Open Plugins SKILL.md 格式
+│   ├── product-discovery/
+│   ├── market-research/
+│   └── prd-generation/
+│
+├── rules/                    # Cursor Rules（.mdc 格式）
 │
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
@@ -123,7 +130,8 @@ youai-skills/
 ├── examples/                 # 使用示例（产出样例）
 │
 └── docs/                     # 文档
-    └── usage-guide.md        # 详细使用指南
+    ├── usage-guide.md        # 详细使用指南
+    └── distribution-guide.md # 分发指南
 ```
 
 ---

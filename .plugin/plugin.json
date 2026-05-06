@@ -1,0 +1,26 @@
+{
+  "name": "youai-skills",
+  "version": "1.0.0",
+  "description": "AI Skills for product development workflow — from project analysis to PRD generation. Covers the critical decision-making process before writing the first line of code.",
+  "author": {
+    "name": "tardis9527",
+    "url": "https://github.com/tardis9527"
+  },
+  "homepage": "https://github.com/tardis9527/youai-skills",
+  "repository": "https://github.com/tardis9527/youai-skills",
+  "license": "MIT",
+  "keywords": [
+    "youai",
+    "ai-skills",
+    "prompt-engineering",
+    "product-management",
+    "prd",
+    "project-analysis",
+    "market-research",
+    "product-discovery",
+    "cursor",
+    "windsurf"
+  ],
+  "skills": "./skills/",
+  "rules": "./rules/"
+}
