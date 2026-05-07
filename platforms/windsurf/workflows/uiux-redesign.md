@@ -8,7 +8,7 @@ description: 结合产品背景与用户画像，对项目进行 UI/UX 设计风
 
 ## 步骤
 
-1. **阅读 Skill 定义**：打开并完整阅读 `skills/05_uiux-redesign.md`，理解角色设定、执行步骤和输出结构要求。如果该文件不存在，请从项目 README 中的链接获取，或直接按以下核心流程执行。
+1. **阅读 Skill 定义**：先尝试打开本地 `skills/05_uiux-redesign.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/05_uiux-redesign.md 。阅读后理解角色设定、执行步骤和输出结构要求。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **产品上下文理解**：采集产品定位、商业模式、核心目标、用户群体画像信息。如果项目中存在「01_project-analysis」报告或「02_product-discovery」的 Product Brief，优先从中提取。否则向用户提问获取。
 
