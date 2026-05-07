@@ -21,25 +21,26 @@ This Skill Pack covers the **critical decision-making stages before coding** —
 
 ## 🔗 Workflow Overview
 
-Four Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
+Five Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      YouAI Skills                              │
-│                                                                 │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
-│  │ 01 Project│    │ 02 Product│    │ 03 Market │    │ 04 PRD   │  │
-│  │ Analysis  │    │ Discovery │───▶│ Research  │───▶│Generation│  │
-│  └──────────┘    └──────────┘    └──────────┘    └──────────┘  │
-│       │                │                               ▲        │
-│       │ Existing       │ New product                   │        │
-│       │ project        │                               │        │
-│       └────────────────┴───────────────────────────────┘        │
-│                                                                 │
-│  Path A: New product from scratch ──▶ 02 → 03 → 04             │
-│  Path B: Existing project         ──▶ 01 → 04                  │
-│  Path C: Validate direction       ──▶ 02 → 03 → Decision       │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           YouAI Skills                                  │
+│                                                                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│  │ 01 Project│  │ 02 Product│  │ 03 Market │  │ 04 PRD   │  │ 05 UI/UX │  │
+│  │ Analysis  │  │ Discovery │─▶│ Research  │─▶│Generation│  │ Redesign │  │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
+│       │              │                            ▲            ▲         │
+│       │ Existing     │ New product                │       ┌────┘         │
+│       └──────────────┴────────────────────────────┘       │             │
+│                                                   01/02 outputs          │
+│                                                                          │
+│  Path A: New product from scratch  ──▶ 02 → 03 → 04                     │
+│  Path B: Existing project          ──▶ 01 → 04                           │
+│  Path C: Validate direction        ──▶ 02 → 03 → Decision                │
+│  Path D: UI/UX design optimization ──▶ 01 → 05 (or 02 → 05)              │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -52,6 +53,7 @@ Four Skills form a complete product development pipeline. Each Skill's output se
 | 02 | [Product Discovery](./skills/02_product-discovery.md) | 0-to-1 product ideation, MVP definition | Vague product idea | Product Brief |
 | 03 | [Market Research](./skills/03_market-research.md) | Market validation, competitor analysis | Product direction | Research report |
 | 04 | [PRD Generation](./skills/04_prd-generation.md) | Implementation plan → PRD | Implementation doc | Complete PRD |
+| 05 | [UI/UX Redesign](./skills/05_uiux-redesign.md) | UI style optimization, brand upgrade, design system | Existing project + product context | UI/UX redesign plan |
 
 > Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
@@ -71,7 +73,7 @@ Four Skills form a complete product development pipeline. Each Skill's output se
 cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`
 
 ### Option 3: Cursor
 
@@ -85,7 +87,7 @@ Rules auto-load as context in relevant conversations.
 
 ## 📋 Key Features
 
-- **🔗 Chainable** — 4 Skills form a pipeline, outputs feed into next stage
+- **🔗 Chainable** — 5 Skills form a pipeline, outputs feed into next stage
 - **📐 Structured Output** — Every Skill defines clear output format and quality standards
 - **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
 - **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints

@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: AI Skills for product development workflow — 4 structured skills covering project analysis, product discovery, market research, and PRD generation. Helps you make the right product decisions before writing the first line of code.
+description: AI Skills for product development workflow — 5 structured skills covering project analysis, product discovery, market research, PRD generation, and UI/UX design optimization. Helps you make the right product decisions before writing the first line of code.
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
@@ -9,7 +9,7 @@ description: AI Skills for product development workflow — 4 structured skills 
 
 在写第一行代码之前，先用 AI 把产品方向想清楚。
 
-## 包含 4 个 Skill
+## 包含 5 个 Skill
 
 ### 1. 项目理解与分析（Project Analysis）
 系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
@@ -31,6 +31,11 @@ description: AI Skills for product development workflow — 4 structured skills 
 - 适用场景：方案转 PRD、输出开发文档
 - 产出：13 章完整 PRD（含验收标准、Mermaid 流程图）
 
+### 5. UI/UX 设计风格重塑（UI/UX Redesign）
+结合产品背景与用户画像，系统性审计现有界面并输出完整设计重塑方案。
+- 适用场景：界面风格优化、品牌升级、设计系统重构
+- 产出：设计重塑方案（含配色/排版/组件规范、实施路线图）
+
 ## 使用方式
 
 1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
@@ -40,14 +45,15 @@ description: AI Skills for product development workflow — 4 structured skills 
 ## 工作流串联
 
 ```
-新产品从 0 开始：  产品探索 → 市场调研 → PRD 生成
-接手已有项目：    项目分析 → PRD 生成
-验证产品方向：    产品探索 → 市场调研 → 决策
+新产品从 0 开始：    产品探索 → 市场调研 → PRD 生成
+接手已有项目：      项目分析 → PRD 生成
+验证产品方向：      产品探索 → 市场调研 → 决策
+UI/UX 设计优化：   项目分析 → 设计重塑（或 产品探索 → 设计重塑）
 ```
 
 ## 核心特性
 
-- 🔗 链式可组合 — 每个 Skill 的产出物可直接作为下一个的输入
+- 🔗 链式可组合 — 每个 Skill 的产出物可直接作为其他 Skill 的输入
 - 📐 结构化输出 — 定义明确的输出格式和质量标准
 - 🛡️ 行为约束 — 内置角色设定、禁止行为、自检清单
 - 🔄 交互式引导 — 分阶段推进，每步确认
