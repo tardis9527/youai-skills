@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
-  "version": "1.1.0",
-  "description": "AI Skills for product development workflow — from project analysis to UI/UX redesign and PRD generation. 5 skills covering the critical decision-making and design process before writing the first line of code.",
+  "version": "1.2.0",
+  "description": "AI Skills for product development workflow — from project analysis to UI/UX redesign, PRD generation, and investor BP generation. 6 skills covering the critical decision-making, design, and fundraising material process before writing the first line of code.",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -19,6 +19,10 @@
     "market-research",
     "product-discovery",
     "uiux-redesign",
+    "investor-bp",
+    "business-plan",
+    "pitch-deck",
+    "fundraising",
     "cursor",
     "windsurf"
   ],

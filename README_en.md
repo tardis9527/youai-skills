@@ -1,6 +1,6 @@
 # 🍊 YouAI Skills
 
-**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD. Compatible with mainstream AI IDEs.
+**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD and investor BP materials. Compatible with mainstream AI IDEs.
 
 [中文](./README.md) | English
 
@@ -15,13 +15,13 @@
 
 Most AI coding prompts focus on "how to write code", but **deciding what to build matters far more than how to code it**.
 
-This Skill Pack covers the **critical decision-making stages before coding** — helping you use AI to go from a vague idea to a production-ready PRD. **Get the direction right before writing the first line of code.**
+This Skill Pack covers the **critical decision-making stages before coding** — helping you use AI to go from a vague idea to a production-ready PRD and investor-facing BP materials. **Get the direction right before writing the first line of code.**
 
 ---
 
 ## 🔗 Workflow Overview
 
-Five Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
+Six Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -31,15 +31,21 @@ Five Skills form a complete product development pipeline. Each Skill's output se
 │  │ 01 Project│  │ 02 Product│  │ 03 Market │  │ 04 PRD   │  │ 05 UI/UX │  │
 │  │ Analysis  │  │ Discovery │─▶│ Research  │─▶│Generation│  │ Redesign │  │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-│       │              │                            ▲            ▲         │
-│       │ Existing     │ New product                │       ┌────┘         │
-│       └──────────────┴────────────────────────────┘       │             │
-│                                                   01/02 outputs          │
+│       │              │             │              │            │         │
+│       │ Existing     │ New product │ Pre-funding  │ Product    │ Brand    │
+│       └──────────────┴─────────────┴──────────────┴────────────┘         │
+│                              ▼                                           │
+│                       ┌──────────┐                                       │
+│                       │ 06       │                                       │
+│                       │ Investor │                                       │
+│                       │ BP       │                                       │
+│                       └──────────┘                                       │
 │                                                                          │
 │  Path A: New product from scratch  ──▶ 02 → 03 → 04                     │
 │  Path B: Existing project          ──▶ 01 → 04                           │
 │  Path C: Validate direction        ──▶ 02 → 03 → Decision                │
 │  Path D: UI/UX design optimization ──▶ 01 → 05 (or 02 → 05)              │
+│  Path E: Investor BP preparation   ──▶ 02/03/04 → 06                     │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -54,6 +60,7 @@ Five Skills form a complete product development pipeline. Each Skill's output se
 | 03 | [Market Research](./skills/03_market-research.md) | Market validation, competitor analysis | Product direction | Research report |
 | 04 | [PRD Generation](./skills/04_prd-generation.md) | Implementation plan → PRD | Implementation doc | Complete PRD |
 | 05 | [UI/UX Redesign](./skills/05_uiux-redesign.md) | UI style optimization, brand upgrade, design system | Existing project + product context | UI/UX redesign plan |
+| 06 | [Investor BP Generation](./skills/06_investor-bp-generation.md) | Fundraising, investor meetings, pitch materials | Product Brief + PRD/market/competitor docs | Markdown BP or HTML pitch deck + oral pitch |
 
 > Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
@@ -73,7 +80,7 @@ Five Skills form a complete product development pipeline. Each Skill's output se
 cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`
 
 ### Option 3: Cursor
 
@@ -87,7 +94,7 @@ Rules auto-load as context in relevant conversations.
 
 ## 📋 Key Features
 
-- **🔗 Chainable** — 5 Skills form a pipeline, outputs feed into next stage
+- **🔗 Chainable** — 6 Skills form a pipeline, outputs feed into next stage
 - **📐 Structured Output** — Every Skill defines clear output format and quality standards
 - **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
 - **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints

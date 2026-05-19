@@ -11,7 +11,7 @@
   - [方式一：直接复制到任意 AI 工具](#方式一直接复制到任意-ai-工具)
   - [方式二：Windsurf（推荐）](#方式二windsurf推荐)
   - [方式三：Cursor](#方式三cursor)
-- [四个 Skill 详解](#四个-skill-详解)
+- [六个 Skill 详解](#六个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
 - [最佳实践](#最佳实践)
 - [常见问题](#常见问题)
@@ -82,6 +82,8 @@ cp platforms/windsurf/workflows/*.md your-project/.windsurf/workflows/
 | `/product-discovery` | 产品需求探索与定义 |
 | `/market-research` | 市场调研分析 |
 | `/prd-generation` | PRD 文档生成 |
+| `/uiux-redesign` | UI/UX 设计风格重塑 |
+| `/investor-bp-generation` | 投资人BP商业计划报告生成 |
 
 **提示**：
 - Windsurf Workflow 中的 Skill 已针对 Cascade 做了格式适配
@@ -99,7 +101,7 @@ Cursor 的 Rules 功能可以将 Skill 作为上下文自动加载。
 mkdir -p .cursor/rules/
 
 # 将 YouAI Skills 的 Cursor 适配文件复制过去
-cp platforms/cursor/rules/*.mdc your-project/.cursor/rules/
+cp platforms/cursor/rules/*.md your-project/.cursor/rules/
 ```
 
 **使用**：
@@ -107,12 +109,12 @@ cp platforms/cursor/rules/*.mdc your-project/.cursor/rules/
 在 Cursor 中开始新对话时，Rules 会自动作为上下文加载。你可以直接描述你的需求，AI 会按 Skill 中定义的流程执行。
 
 **提示**：
-- Cursor Rules 使用 `.mdc` 格式，已做适配
+- Cursor Rules 已做适配，按平台目录复制对应文件即可
 - 如果多个 Rules 同时加载可能造成冲突，建议按需启用
 
 ---
 
-## 四个 Skill 详解
+## 六个 Skill 详解
 
 ### 01 项目理解与分析
 
@@ -232,6 +234,49 @@ cp platforms/cursor/rules/*.mdc your-project/.cursor/rules/
 
 ---
 
+### 05 UI/UX 设计风格重塑
+
+> 📂 文件：`skills/05_uiux-redesign.md`
+
+**何时使用**：
+- 已有项目界面需要风格优化或品牌升级
+- 需要系统性审计 UI/UX 问题
+- 需要建立配色、排版、组件、动效等设计规范
+
+**输入**：已有项目代码仓库 + 产品背景信息（可来自 01/02 的产出）。
+
+**产出**：UI/UX 设计重塑方案，包含设计背景、现状审计、设计策略、设计规范、实施方案、风险策略和附录。
+
+**使用技巧**：
+- AI 会先理解产品上下文，再审计现有 UI 实现
+- 设计建议应回溯到用户群体和产品目标
+- 产出可作为 PRD 或前端改版的设计约束输入
+
+---
+
+### 06 投资人BP商业计划报告生成
+
+> 📂 文件：`skills/06_investor-bp-generation.md`
+
+**何时使用**：
+- 已有产品简报，需要生成融资 BP 或商业计划书
+- 准备投资人初次沟通、Demo Day 或路演材料
+- 希望把 PRD、市场调研、竞品分析整合成投资人能快速理解的材料
+
+**输入**：Product Brief 为主，可选 PRD、市场调研报告、竞品分析、项目理解报告、团队/财务/融资资料。
+
+**产出**：
+1. Markdown 完整 BP 报告，保存到 `doc/BP商业计划报告_{产品名称}_{YYYYMMDD}.md`
+2. 或 HTML PPT 演示版，保存到 `doc/BP_{产品名称}_{YYYYMMDD}/`
+3. AI 聊天界面额外输出 500 字以内口述版项目 BP 介绍
+
+**使用技巧**：
+- 先确认输出 Markdown、HTML，还是两者都要
+- HTML 版本会拆分 `index.html`、`assets/css/style.css`、`assets/js/main.js`，可直接复制目录到 Nginx 静态访问
+- 融资、收入、市场规模、客户名称等数据不能编造，缺失时会标注 `[待补充]`
+
+---
+
 ## 工作流组合指南
 
 ### 场景 A：新产品从 0 开始
@@ -269,6 +314,17 @@ cp platforms/cursor/rules/*.mdc your-project/.cursor/rules/
 - 只用 01 做代码审查
 - 只用 03 做竞品分析
 - 只用 04 把已有方案转为 PRD
+- 只用 06 把已有 Product Brief 转为融资 BP
+
+### 场景 E：融资 BP 准备
+
+```
+02 产品需求探索 → 03 市场调研 → 06 投资人BP生成
+```
+
+1. 用 02 明确产品定位、目标用户、MVP 和核心价值
+2. 用 03 补充市场空间、竞品格局和风险判断
+3. 将 Product Brief、市场调研、PRD、团队/财务资料一起提供给 06，生成 Markdown BP 或 HTML 路演演示版
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: AI Skills for product development workflow — 5 structured skills covering project analysis, product discovery, market research, PRD generation, and UI/UX design optimization. Helps you make the right product decisions before writing the first line of code.
+description: AI Skills for product development workflow — 6 structured skills covering project analysis, product discovery, market research, PRD generation, UI/UX design optimization, and investor BP generation. Helps you make the right product and fundraising decisions before writing the first line of code.
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
@@ -9,7 +9,7 @@ description: AI Skills for product development workflow — 5 structured skills 
 
 在写第一行代码之前，先用 AI 把产品方向想清楚。
 
-## 包含 5 个 Skill
+## 包含 6 个 Skill
 
 ### 1. 项目理解与分析（Project Analysis）
 系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
@@ -36,6 +36,11 @@ description: AI Skills for product development workflow — 5 structured skills 
 - 适用场景：界面风格优化、品牌升级、设计系统重构
 - 产出：设计重塑方案（含配色/排版/组件规范、实施路线图）
 
+### 6. 投资人BP商业计划报告生成（Investor BP Generation）
+基于产品简报、PRD、市场调研和竞品分析，生成面向投资人的 BP 商业计划报告或 HTML 路演演示版。
+- 适用场景：融资路演、Demo Day、投资人初次沟通、商业计划书准备
+- 产出：Markdown BP 报告或 HTML PPT 演示版 + 500字以内口述版项目BP介绍
+
 ## 使用方式
 
 1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
@@ -49,6 +54,7 @@ description: AI Skills for product development workflow — 5 structured skills 
 接手已有项目：      项目分析 → PRD 生成
 验证产品方向：      产品探索 → 市场调研 → 决策
 UI/UX 设计优化：   项目分析 → 设计重塑（或 产品探索 → 设计重塑）
+融资BP准备：       产品探索/市场调研/PRD → 投资人BP
 ```
 
 ## 核心特性
