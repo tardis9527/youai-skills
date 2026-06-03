@@ -88,16 +88,17 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 - `/uiux-redesign` — UI/UX 设计风格重塑
 - `/investor-bp-generation` — 投资人BP商业计划报告生成
 
-### 方式三：Cursor
+### 方式三：Cursor（推荐）
 
-将 `platforms/cursor/rules/` 下的文件复制到你项目的 `.cursor/rules/` 目录：
+将 `platforms/cursor/skills/` 下的 Skill 目录复制到你项目的 `.cursor/skills/` 目录：
 
 ```bash
-# 复制 Cursor rules
-cp -r platforms/cursor/rules/ your-project/.cursor/rules/
+# 复制 Cursor Agent Skills
+mkdir -p your-project/.cursor/skills/
+cp -r platforms/cursor/skills/* your-project/.cursor/skills/
 ```
 
-在 Cursor 中开始对话时，相关 Skill 会自动作为上下文加载。
+在 Cursor Agent 对话中通过 **@Skill** 选择对应 Skill 触发（如 `@project-analysis`）。Skill 定义会从 GitHub 远程拉取，无需拷贝完整 `skills/` 源文件。
 
 ---
 
@@ -136,11 +137,9 @@ youai-skills/
 │   ├── uiux-redesign/
 │   └── investor-bp-generation/
 │
-├── rules/                    # Cursor Rules（.mdc 格式）
-│
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
-│   └── cursor/rules/         # Cursor rules 格式
+│   └── cursor/skills/        # Cursor Agent Skills（复制到 .cursor/skills/）
 │
 ├── examples/                 # 使用示例（产出样例）
 │

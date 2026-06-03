@@ -90,27 +90,37 @@ cp platforms/windsurf/workflows/*.md your-project/.windsurf/workflows/
 - 使用 `/project-analysis` 时，确保当前工作区已打开目标项目
 - 使用 `/prd-generation` 时，建议先把实施方案文档放在项目的 `doc/` 目录下
 
-### 方式三：Cursor
+### 方式三：Cursor（推荐）
 
-Cursor 的 Rules 功能可以将 Skill 作为上下文自动加载。
+Cursor 的 **Agent Skills** 功能（`.cursor/skills/{skill-name}/SKILL.md`）是 Skill 的正确使用方式，与 Rules 不同——Skill 由用户通过 @Skill 显式触发，适合产品开发这类阶段性工作流。
 
 **安装**：
 
 ```bash
-# 在你的项目根目录下创建 .cursor/rules/ 目录
-mkdir -p .cursor/rules/
+# 在你的项目根目录下创建 .cursor/skills/ 目录
+mkdir -p .cursor/skills/
 
-# 将 YouAI Skills 的 Cursor 适配文件复制过去
-cp platforms/cursor/rules/*.md your-project/.cursor/rules/
+# 将 YouAI Skills 的 Cursor 适配目录复制过去
+cp -r platforms/cursor/skills/* your-project/.cursor/skills/
+```
+
+Windows PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .cursor\skills
+Copy-Item -Recurse platforms\cursor\skills\* .cursor\skills\
 ```
 
 **使用**：
 
-在 Cursor 中开始新对话时，Rules 会自动作为上下文加载。你可以直接描述你的需求，AI 会按 Skill 中定义的流程执行。
+1. 在 Cursor Agent 对话中输入 `@`，选择对应 Skill（如 `@project-analysis`、`@prd-generation`）
+2. 描述你的需求，Agent 会先拉取 GitHub 上的完整 Skill 定义，再按流程执行
+3. 一次对话建议只启用一个 Skill，避免工作流冲突
 
 **提示**：
-- Cursor Rules 已做适配，按平台目录复制对应文件即可
-- 如果多个 Rules 同时加载可能造成冲突，建议按需启用
+- Skill 入口文件轻量，完整定义从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
+- 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
+- 不要将 Skill 放入 `.cursor/rules/`，Rules 用于持久性编码规范，不适合阶段性产品工作流
 
 ---
 
@@ -369,7 +379,7 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 解决方法：
 - 在新对话中重新开始
 - 提醒 AI："请按照 Skill 定义的格式输出"
-- 使用 Windsurf/Cursor 的 Workflow/Rules 功能，格式更稳定
+- 使用 Windsurf Workflow 或 Cursor @Skill 触发，格式更稳定
 
 ### Q: 项目太大，AI 分析不完怎么办？
 

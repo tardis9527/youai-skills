@@ -22,35 +22,15 @@
 youai-skills/
 ├── .plugin/
 │   └── plugin.json          # Open Plugins 标准清单（含 GitHub 链接）
-├── skills/                   # 🎯 核心 Skill 源文件
+├── skills/                   # 🎯 核心 Skill 源文件 + Open Plugins 格式
 │   ├── 01_project-analysis.md
-│   ├── 02_product-discovery.md
-│   ├── 03_market-research.md
-│   ├── 04_prd-generation.md
-│   ├── 05_uiux-redesign.md
-│   ├── 06_investor-bp-generation.md
-│   ├── project-analysis/     # Open Plugins SKILL.md 格式
-│   │   └── SKILL.md
-│   ├── product-discovery/
-│   │   └── SKILL.md
-│   ├── market-research/
-│   │   └── SKILL.md
-│   ├── prd-generation/
-│   │   └── SKILL.md
-│   ├── uiux-redesign/
-│   │   └── SKILL.md
-│   └── investor-bp-generation/
-│       └── SKILL.md
-├── rules/                    # Cursor Rules (.mdc 格式)
-│   ├── project-analysis.mdc
-│   ├── product-discovery.mdc
-│   ├── market-research.mdc
-│   ├── prd-generation.mdc
-│   ├── uiux-redesign.mdc
-│   └── investor-bp-generation.mdc
+│   ├── ...
+│   ├── project-analysis/
+│   │   └── SKILL.md          # Cursor Agent Skill（与 platforms/cursor 同步）
+│   └── ...
 ├── platforms/                # 各平台原生适配版本
 │   ├── windsurf/workflows/
-│   └── cursor/rules/
+│   └── cursor/skills/        # 复制到业务项目 .cursor/skills/
 └── ...
 ```
 
@@ -58,7 +38,6 @@ cursor.directory 自动检测以下路径：
 
 | 组件类型 | 检测路径 | 状态 |
 |---------|---------|------|
-| Rules | `rules/*.mdc` | ✅ 已创建 |
 | Skills | `skills/*/SKILL.md` | ✅ 已创建 |
 | Plugin 清单 | `.plugin/plugin.json` | ✅ 已创建 |
 
@@ -74,8 +53,7 @@ cursor.directory 自动检测以下路径：
 2. 使用 GitHub 或 Google 账号登录
 3. 粘贴仓库 URL：`https://github.com/tardis9527/youai-skills`
 4. 网站会自动检测仓库中的组件：
-   - `rules/*.mdc` → 6 条 Rules
-   - `skills/*/SKILL.md` → 6 个 Skills
+   - `skills/*/SKILL.md` → 6 个 Agent Skills
    - `.plugin/plugin.json` → 插件元信息（含 GitHub 链接 = 自动宣传）
 5. 点击 **Submit**
 
@@ -138,7 +116,7 @@ cursor.directory 自动检测以下路径：
 |------|---------|
 | `.plugin/plugin.json` | `homepage` + `repository` 字段 |
 | `skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
-| `rules/*.mdc` | 每个 description 中的 GitHub 链接 |
+| `platforms/cursor/skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
 
 ### 额外宣传渠道（手动）
 

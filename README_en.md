@@ -82,13 +82,14 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 
 Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`
 
-### Option 3: Cursor
+### Option 3: Cursor (Recommended)
 
 ```bash
-cp -r platforms/cursor/rules/ your-project/.cursor/rules/
+mkdir -p your-project/.cursor/skills/
+cp -r platforms/cursor/skills/* your-project/.cursor/skills/
 ```
 
-Rules auto-load as context in relevant conversations.
+Invoke Skills in Cursor Agent via **@Skill** (e.g. `@project-analysis`). Full skill definitions are fetched from GitHub remotely — no need to copy the entire `skills/` source files.
 
 ---
 
