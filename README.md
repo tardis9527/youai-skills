@@ -8,6 +8,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
 [![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
 
 ---
 
@@ -100,6 +101,25 @@ cp -r platforms/cursor/skills/* your-project/.cursor/skills/
 
 在 Cursor Agent 对话中通过 **@Skill** 选择对应 Skill 触发（如 `@project-analysis`）。Skill 定义会从 GitHub 远程拉取，无需拷贝完整 `skills/` 源文件。
 
+### 方式四：Claude Code（推荐）
+
+将 `platforms/claude-code/skills/` 下的 Skill 目录复制到你项目的 `.claude/skills/` 目录：
+
+```bash
+# 复制 Claude Code Agent Skills
+mkdir -p your-project/.claude/skills/
+cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+```
+
+Windows PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .claude\skills
+Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
+```
+
+在 Claude Code 对话中通过 `/` 命令触发对应 Skill（如 `/project-analysis`）。Skill 入口轻量，完整定义优先读本地 `skills/`，否则从 GitHub 远程拉取。
+
 ---
 
 ## 📋 Skill 特点
@@ -139,7 +159,8 @@ youai-skills/
 │
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
-│   └── cursor/skills/        # Cursor Agent Skills（复制到 .cursor/skills/）
+│   ├── cursor/skills/        # Cursor Agent Skills（复制到 .cursor/skills/）
+│   └── claude-code/skills/   # Claude Code Agent Skills（复制到 .claude/skills/）
 │
 ├── examples/                 # 使用示例（产出样例）
 │

@@ -1,0 +1,34 @@
+---
+name: project-analysis
+description: Analyze a codebase systematically and output a structured project understanding report covering architecture, code quality, tech stack, and improvement suggestions. Use when joining a new project, doing code review, technical due diligence, or when the user asks to understand or analyze the current project.
+disable-model-invocation: true
+---
+
+# 项目理解与分析
+
+> 🍊 来自 [YouAI Skills](https://github.com/tardis9527/youai-skills) — 为创造者准备的 AI 技能包
+
+请按照以下步骤系统性地分析当前项目：
+
+## 步骤
+
+1. **阅读 Skill 定义**：先尝试打开本地 `skills/01_project-analysis.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/01_project-analysis.md 。阅读后理解角色设定、执行步骤和报告结构要求。如果 URL 也无法访问，则直接按以下核心流程执行。
+
+2. **宏观扫描**：浏览项目根目录、README、配置文件、依赖管理文件（package.json / requirements.txt 等），建立整体认知。
+
+3. **核心代码分析**：定位入口文件，梳理核心模块及依赖关系，追踪主要业务流程的代码执行链路。
+
+4. **输出报告（第1-6节）**：按 Skill 定义的报告结构，输出项目概览、产品功能、技术架构、代码结构、核心实现逻辑、构建与部署。
+
+5. **征求确认**：询问用户是否需要继续输出第7-8节（代码质量评估 + 改进建议）。
+
+6. **输出报告（第7-8节）**：用户确认后，输出代码质量与技术债评估、改进建议。
+
+7. **保存报告**：将报告保存为 `doc/项目理解报告_{项目名称}_{YYYYMMDD}.md`。
+
+## 关键规则
+
+- **角色**：资深全栈架构师兼技术咨询顾问
+- **大型项目**（>50 个源码文件）：先输出 1-6 节，确认后再输出 7-8 节
+- **不确定的内容**：标注「待确认」，不做猜测
+- **输出语言**：中文

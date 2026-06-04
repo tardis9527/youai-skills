@@ -25,7 +25,7 @@
    ---
    ```
 3. 内容结构建议包含：角色设定、执行步骤、输出格式、质量要求、禁止行为
-4. 同步创建 `platforms/windsurf/workflows/` 和 `platforms/cursor/skills/{skill-name}/SKILL.md` 下的适配版本
+4. 同步创建 `platforms/windsurf/workflows/`、`platforms/cursor/skills/{skill-name}/SKILL.md` 和 `platforms/claude-code/skills/{skill-name}/SKILL.md` 下的适配版本
 
 ### 🌐 翻译
 

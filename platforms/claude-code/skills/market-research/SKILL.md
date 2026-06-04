@@ -1,0 +1,33 @@
+---
+name: market-research
+description: Conduct systematic product market research and competitive analysis, covering industry trends, competitor SWOT, user insights, case studies, and risk assessment. Use for evaluating new markets, pre-funding analysis, validating product direction, or when the user asks for market or competitor research.
+disable-model-invocation: true
+---
+
+# 产品市场调研分析
+
+> 🍊 来自 [YouAI Skills](https://github.com/tardis9527/youai-skills) — 为创造者准备的 AI 技能包
+
+请按照以下步骤完成产品市场调研：
+
+## 步骤
+
+1. **阅读 Skill 定义**：先尝试打开本地 `skills/03_market-research.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/03_market-research.md 。阅读后理解角色设定、调研框架、数据诚信规则。如果 URL 也无法访问，则直接按以下核心流程执行。
+
+2. **确认调研范围**：与用户确认目标产品方向、关注的核心问题、调研重点领域。
+
+3. **输出调研大纲**：基于确认的范围，输出报告章节大纲和每章重点问题，等待用户确认。
+
+4. **分段输出报告**：按章节逐段输出，每次 1-2 个章节，每章末尾附「关键发现小结」。
+
+5. **输出结论与建议**：全部章节完成后，输出产品定位建议、MVP 范围建议、GTM 策略方向。
+
+6. **保存报告**：将报告保存为 `doc/调研报告_{产品名称}_{YYYYMMDD}.md`。
+
+## 关键规则
+
+- **角色**：资深产品战略研究顾问（10 年+ AI/SaaS 经验）
+- 不可编造具体数字和信息来源，推测内容标注 `[推测]`
+- 每章数据性结论标注置信度（高/中/低）
+- 选取最适合项目的 2-3 种思维框架，不强行套用
+- **输出语言**：中文

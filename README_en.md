@@ -8,6 +8,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
 [![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
 
 ---
 
@@ -90,6 +91,15 @@ cp -r platforms/cursor/skills/* your-project/.cursor/skills/
 ```
 
 Invoke Skills in Cursor Agent via **@Skill** (e.g. `@project-analysis`). Full skill definitions are fetched from GitHub remotely — no need to copy the entire `skills/` source files.
+
+### Option 4: Claude Code (Recommended)
+
+```bash
+mkdir -p your-project/.claude/skills/
+cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+```
+
+Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The lightweight entry resolves the full definition from local `skills/` first, then falls back to GitHub remotely.
 
 ---
 

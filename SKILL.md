@@ -46,6 +46,7 @@ description: AI Skills for product development workflow — 6 structured skills 
 1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
 2. **Windsurf**：将 `platforms/windsurf/workflows/` 下的文件复制到项目的 `.windsurf/workflows/`
 3. **Cursor**：将 `platforms/cursor/skills/` 下的目录复制到项目的 `.cursor/skills/`，通过 @Skill 触发
+4. **Claude Code**：将 `platforms/claude-code/skills/` 下的目录复制到项目的 `.claude/skills/`，通过 `/` 命令触发
 
 ## 工作流串联
 

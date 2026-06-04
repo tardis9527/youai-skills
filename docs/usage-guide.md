@@ -11,6 +11,7 @@
   - [方式一：直接复制到任意 AI 工具](#方式一直接复制到任意-ai-工具)
   - [方式二：Windsurf（推荐）](#方式二windsurf推荐)
   - [方式三：Cursor](#方式三cursor)
+  - [方式四：Claude Code](#方式四claude-code)
 - [六个 Skill 详解](#六个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
 - [最佳实践](#最佳实践)
@@ -121,6 +122,38 @@ Copy-Item -Recurse platforms\cursor\skills\* .cursor\skills\
 - Skill 入口文件轻量，完整定义从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
 - 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
 - 不要将 Skill 放入 `.cursor/rules/`，Rules 用于持久性编码规范，不适合阶段性产品工作流
+
+### 方式四：Claude Code
+
+Claude Code 的 **Agent Skills** 功能（`.claude/skills/{skill-name}/SKILL.md`）与 Cursor 一致，由用户通过 `/` 命令显式触发，适合产品开发这类阶段性工作流。每个 Skill 入口都设置了 `disable-model-invocation: true`，表示仅在用户主动调用时执行，不会被模型自动触发。
+
+**安装**：
+
+```bash
+# 在你的项目根目录下创建 .claude/skills/ 目录
+mkdir -p .claude/skills/
+
+# 将 YouAI Skills 的 Claude Code 适配目录复制过去
+cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+```
+
+Windows PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .claude\skills
+Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
+```
+
+**使用**：
+
+1. 在 Claude Code 对话中输入 `/`，选择对应 Skill（如 `/project-analysis`、`/prd-generation`）
+2. 描述你的需求，Claude Code 会先读取本地 `skills/0X_*.md`（不存在则从 GitHub 远程拉取）的完整定义，再按流程执行
+3. 一次对话建议只启用一个 Skill，避免工作流冲突
+
+**提示**：
+- Skill 入口文件轻量，完整定义优先读本地 `skills/`，否则从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
+- 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
+- Skill 适合阶段性产品工作流，长期编码规范请使用 `CLAUDE.md` 而非 Skill
 
 ---
 

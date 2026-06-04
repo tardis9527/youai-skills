@@ -30,7 +30,8 @@ youai-skills/
 │   └── ...
 ├── platforms/                # 各平台原生适配版本
 │   ├── windsurf/workflows/
-│   └── cursor/skills/        # 复制到业务项目 .cursor/skills/
+│   ├── cursor/skills/        # 复制到业务项目 .cursor/skills/
+│   └── claude-code/skills/   # 复制到业务项目 .claude/skills/
 └── ...
 ```
 
