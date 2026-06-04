@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: AI Skills for product development workflow — 6 structured skills covering project analysis, product discovery, market research, PRD generation, UI/UX design optimization, and investor BP generation. Helps you make the right product and fundraising decisions before writing the first line of code.
+description: 面向产品开发全流程的 AI 技能包 —— 包含 6 个结构化技能，覆盖项目分析、产品探索、市场调研、PRD 生成、UI/UX 设计优化与投资人 BP 生成。帮助你在写下第一行代码之前，做出正确的产品与融资决策。
 ---
 
 # YouAI Skills — 产品开发 AI 技能包

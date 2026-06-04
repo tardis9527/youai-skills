@@ -1,6 +1,6 @@
 ---
 name: project-analysis
-description: Analyze a codebase systematically and output a structured project understanding report covering architecture, code quality, tech stack, and improvement suggestions. Use when joining a new project, doing code review, technical due diligence, or when the user asks to understand or analyze the current project.
+description: 系统性分析代码库，输出涵盖技术架构、代码质量、技术栈与改进建议的结构化项目理解报告。适用于接手新项目、代码审查、技术尽调，或当用户需要理解或分析当前项目时使用。
 disable-model-invocation: true
 ---
 

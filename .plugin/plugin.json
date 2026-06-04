@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.2.0",
-  "description": "AI Skills for product development workflow — from project analysis to UI/UX redesign, PRD generation, and investor BP generation. 6 skills covering the critical decision-making, design, and fundraising material process before writing the first line of code.",
+  "description": "面向产品开发全流程的 AI 技能包 —— 从项目分析到 UI/UX 重塑、PRD 生成与投资人 BP 生成。6 个技能覆盖写下第一行代码之前的关键决策、设计与融资材料准备流程。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"

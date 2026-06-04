@@ -1,6 +1,6 @@
 ---
 name: market-research
-description: Conduct systematic product market research and competitive analysis, covering industry trends, competitor SWOT, user insights, case studies, and risk assessment. Use for evaluating new markets, pre-funding analysis, validating product direction, or when the user asks for market or competitor research.
+description: 系统性开展产品市场调研与竞品分析，涵盖行业趋势、竞品 SWOT、用户洞察、案例研究与风险评估。适用于评估新市场、融资前分析、验证产品方向，或当用户需要市场或竞品调研时使用。
 disable-model-invocation: true
 ---
 

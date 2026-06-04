@@ -1,6 +1,6 @@
 ---
 name: prd-generation
-description: Transform an implementation plan or product brief into a complete, actionable PRD with functional specs, data models, API design, tech architecture, UI/UX standards, and iteration planning. Use when the user needs a PRD, product requirements document, or developer-ready specs from an existing plan.
+description: 将实施方案或产品简报转化为完整、可落地的 PRD，包含功能规格、数据模型、API 设计、技术架构、UI/UX 规范与迭代规划。适用于当用户需要根据现有方案输出 PRD、产品需求文档或开发就绪的规格说明时使用。
 disable-model-invocation: true
 ---
 

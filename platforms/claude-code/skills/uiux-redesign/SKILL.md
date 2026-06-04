@@ -1,6 +1,6 @@
 ---
 name: uiux-redesign
-description: Redesign and optimize UI/UX design style for an existing project by understanding product background, business goals, and user personas. Outputs a comprehensive design system specification with implementation roadmap. Use when upgrading visual identity, improving user experience, building a design system, or when the user asks for UI/UX redesign.
+description: 通过理解产品背景、商业目标与用户画像，对现有项目进行 UI/UX 设计风格重塑与优化，输出包含实施路线图的完整设计系统规范。适用于升级视觉品牌、改善用户体验、搭建设计系统，或当用户需要 UI/UX 设计重塑时使用。
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: investor-bp-generation
-description: Generate investor-facing BP business plan materials from a Product Brief and related project docs. Outputs Markdown business plan or HTML pitch-deck presentation plus a concise oral pitch summary. Use for fundraising, Demo Day, investor meetings, or when the user asks for a business plan or pitch deck.
+description: 基于产品简报及相关项目文档，生成面向投资人的 BP 商业计划材料。输出 Markdown 商业计划书或 HTML 路演演示版，并附一段精简的口述版项目介绍。适用于融资、Demo Day、投资人会议，或当用户需要商业计划书或路演 PPT 时使用。
 disable-model-invocation: true
 ---
 

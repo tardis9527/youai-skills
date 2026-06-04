@@ -1,6 +1,6 @@
 ---
 name: product-discovery
-description: Guide the user through a 6-stage interactive process to transform a vague product idea into a structured Product Brief, covering user personas, MVP definition, user journeys, and feasibility assessment. Use for 0-to-1 product ideation, hackathon planning, MVP scoping, or when the user has a new product idea to define.
+description: 通过六阶段交互式引导，将模糊的产品想法转化为结构化的产品简报（Product Brief），涵盖用户画像、MVP 定义、用户旅程与可行性评估。适用于 0-1 产品构思、Hackathon 规划、MVP 范围界定，或当用户有新产品想法需要定义时使用。
 disable-model-invocation: true
 ---
 
