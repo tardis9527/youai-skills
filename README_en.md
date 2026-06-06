@@ -1,6 +1,6 @@
 # 🍊 YouAI Skills
 
-**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD and investor BP materials. Compatible with mainstream AI IDEs.
+**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD, prototype design mockups, and investor BP materials. Compatible with mainstream AI IDEs.
 
 [中文](./README.md) | English
 
@@ -22,7 +22,7 @@ This Skill Pack covers the **critical decision-making stages before coding** —
 
 ## 🔗 Workflow Overview
 
-Six Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
+Seven Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -36,17 +36,18 @@ Six Skills form a complete product development pipeline. Each Skill's output ser
 │       │ Existing     │ New product │ Pre-funding  │ Product    │ Brand    │
 │       └──────────────┴─────────────┴──────────────┴────────────┘         │
 │                              ▼                                           │
-│                       ┌──────────┐                                       │
-│                       │ 06       │                                       │
-│                       │ Investor │                                       │
-│                       │ BP       │                                       │
-│                       └──────────┘                                       │
+│                  ┌──────────┐   ┌──────────┐                            │
+│                  │ 06       │   │ 07       │                            │
+│                  │ Investor │   │Prototype │                            │
+│                  │ BP       │   │ & Design │                            │
+│                  └──────────┘   └──────────┘                            │
 │                                                                          │
 │  Path A: New product from scratch  ──▶ 02 → 03 → 04                     │
 │  Path B: Existing project          ──▶ 01 → 04                           │
 │  Path C: Validate direction        ──▶ 02 → 03 → Decision                │
 │  Path D: UI/UX design optimization ──▶ 01 → 05 (or 02 → 05)              │
 │  Path E: Investor BP preparation   ──▶ 02/03/04 → 06                     │
+│  Path F: Prototype & design specs  ──▶ 04 → 07 (or 02 → 07)              │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -62,6 +63,7 @@ Six Skills form a complete product development pipeline. Each Skill's output ser
 | 04 | [PRD Generation](./skills/04_prd-generation.md) | Implementation plan → PRD | Implementation doc | Complete PRD |
 | 05 | [UI/UX Redesign](./skills/05_uiux-redesign.md) | UI style optimization, brand upgrade, design system | Existing project + product context | UI/UX redesign plan |
 | 06 | [Investor BP Generation](./skills/06_investor-bp-generation.md) | Fundraising, investor meetings, pitch materials | Product Brief + PRD/market/competitor docs | Markdown BP or HTML pitch deck + oral pitch |
+| 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
 
 > Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
@@ -81,7 +83,7 @@ Six Skills form a complete product development pipeline. Each Skill's output ser
 cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`
 
 ### Option 3: Cursor (Recommended)
 

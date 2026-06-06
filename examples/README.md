@@ -10,5 +10,6 @@
 | [example-product-discovery.md](./example-product-discovery.md) | 02_产品需求探索与定义 | 产品简报 Product Brief |
 | [example-market-research.md](./example-market-research.md) | 03_产品市场调研分析 | 调研分析报告（节选） |
 | [example-prd-generation.md](./example-prd-generation.md) | 04_PRD文档生成 | PRD 文档（节选） |
+| [example-prototype-design.md](./example-prototype-design.md) | 07_产品原型与界面设计图提示词生成 | 全局风格基准 + 原型草图 + AI 出图提示词（节选） |
 
 > ⚠️ 以下示例为**精简版**，实际使用 Skill 产出的完整报告会更详细。这里仅展示结构和风格参考。

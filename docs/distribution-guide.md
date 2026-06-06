@@ -54,7 +54,7 @@ cursor.directory 自动检测以下路径：
 2. 使用 GitHub 或 Google 账号登录
 3. 粘贴仓库 URL：`https://github.com/tardis9527/youai-skills`
 4. 网站会自动检测仓库中的组件：
-   - `skills/*/SKILL.md` → 6 个 Agent Skills
+   - `skills/*/SKILL.md` → 7 个 Agent Skills
    - `.plugin/plugin.json` → 插件元信息（含 GitHub 链接 = 自动宣传）
 5. 点击 **Submit**
 
@@ -74,7 +74,7 @@ cursor.directory 自动检测以下路径：
 
 1. 访问 [skillsdirectory.com/submit](https://www.skillsdirectory.com/submit)
 2. 使用 GitHub 账号登录
-3. 为每个 Skill 分别提交（6 个 Skill = 6 次提交）
+3. 为每个 Skill 分别提交（7 个 Skill = 7 次提交）
 4. 每个提交中：
    - 粘贴对应 Skill 的完整内容（如 `skills/01_project-analysis.md`）
    - 添加描述，包含 GitHub 仓库链接

@@ -1,6 +1,6 @@
 # 🍊 YouAI Skills — 柚子AI Skills
 
-**为创造者准备的 AI 技能包** — 一套覆盖从产品构思、PRD 落地到融资 BP 准备的结构化 AI 提示词，适配主流 AI IDE。
+**为创造者准备的 AI 技能包** — 一套覆盖从产品构思、PRD 落地、原型设计图到融资 BP 准备的结构化 AI 提示词，适配主流 AI IDE。
 
 [English](./README_en.md) | 中文
 
@@ -22,7 +22,7 @@
 
 ## 🔗 工作流全景
 
-六个 Skill 形成一条完整的产品开发链路，每个 Skill 的产出物可直接作为下一个 Skill 的输入：
+七个 Skill 形成一条完整的产品开发链路，每个 Skill 的产出物可直接作为下一个 Skill 的输入：
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -36,16 +36,17 @@
 │       │ 已有项目      │ 新产品       │ 融资前分析    │ 产品方案    │ 品牌表达 │
 │       └──────────────┴─────────────┴──────────────┴────────────┘         │
 │                              ▼                                           │
-│                       ┌──────────┐                                       │
-│                       │ 06 投资人 │                                       │
-│                       │ BP 生成   │                                       │
-│                       └──────────┘                                       │
+│                  ┌──────────┐   ┌──────────┐                            │
+│                  │ 06 投资人 │   │ 07 原型与 │                            │
+│                  │ BP 生成   │   │ 设计图    │                            │
+│                  └──────────┘   └──────────┘                            │
 │                                                                          │
 │  场景A：新产品从0开始      ──▶ 02 → 03 → 04                              │
 │  场景B：接手已有项目      ──▶ 01 → 04                                    │
 │  场景C：验证产品方向      ──▶ 02 → 03 → 决策                             │
 │  场景D：UI/UX 设计优化   ──▶ 01 → 05（或 02 → 05）                      │
 │  场景E：融资BP准备       ──▶ 02/03/04 → 06                              │
+│  场景F：原型与设计图出图  ──▶ 04 → 07（或 02 → 07）                      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -61,6 +62,7 @@
 | 04 | [PRD 文档生成](./skills/04_prd-generation.md) | 实施方案转PRD、功能详细设计 | 实施方案文档 | 完整可落地的PRD |
 | 05 | [UI/UX 设计风格重塑](./skills/05_uiux-redesign.md) | 界面风格优化、品牌升级、设计系统重构 | 已有项目 + 产品背景 | UI/UX 设计重塑方案 |
 | 06 | [投资人BP商业计划报告生成](./skills/06_investor-bp-generation.md) | 融资路演、投资人沟通、商业计划书准备 | Product Brief + PRD/市场/竞品资料 | Markdown BP 或 HTML 演示版 + 口述版 |
+| 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
 
 ---
 
@@ -88,6 +90,7 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 - `/prd-generation` — PRD 文档生成
 - `/uiux-redesign` — UI/UX 设计风格重塑
 - `/investor-bp-generation` — 投资人BP商业计划报告生成
+- `/prototype-design` — 产品原型与界面设计图提示词生成
 
 ### 方式三：Cursor（推荐）
 
@@ -150,12 +153,14 @@ youai-skills/
 │   ├── 04_prd-generation.md
 │   ├── 05_uiux-redesign.md
 │   ├── 06_investor-bp-generation.md
+│   ├── 07_prototype-design.md
 │   ├── project-analysis/     # Open Plugins SKILL.md 格式
 │   ├── product-discovery/
 │   ├── market-research/
 │   ├── prd-generation/
 │   ├── uiux-redesign/
-│   └── investor-bp-generation/
+│   ├── investor-bp-generation/
+│   └── prototype-design/
 │
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
