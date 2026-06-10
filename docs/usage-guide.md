@@ -12,7 +12,8 @@
   - [方式二：Windsurf（推荐）](#方式二windsurf推荐)
   - [方式三：Cursor](#方式三cursor)
   - [方式四：Claude Code](#方式四claude-code)
-- [六个 Skill 详解](#六个-skill-详解)
+  - [方式五：Codex](#方式五codex)
+- [七个 Skill 详解](#七个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
 - [最佳实践](#最佳实践)
 - [常见问题](#常见问题)
@@ -157,7 +158,70 @@ Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
 
 ---
 
-## 六个 Skill 详解
+### 方式五：Codex
+
+Codex 支持 Agent Skills。YouAI Skills 提供了 `platforms/codex/skills/{skill-name}/SKILL.md` 适配版本，可安装到项目级 `.agents/skills/`，也可安装到个人级 `~/.codex/skills/`。
+
+**项目级安装**：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .agents\skills
+Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+```
+
+macOS / Linux：
+
+```bash
+mkdir -p .agents/skills
+cp -r platforms/codex/skills/* .agents/skills/
+```
+
+**个人级安装**：
+
+```powershell
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
+Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+```
+
+macOS / Linux：
+
+```bash
+mkdir -p ~/.codex/skills
+cp -r platforms/codex/skills/* ~/.codex/skills/
+```
+
+安装后重启 Codex 或开启新会话。
+
+**使用**：
+
+在 Codex 对话中用 `$skill-name` 显式触发：
+
+| 命令 | 对应 Skill |
+|------|-----------|
+| `$project-analysis` | 项目理解与分析 |
+| `$product-discovery` | 产品需求探索与定义 |
+| `$market-research` | 市场调研分析 |
+| `$prd-generation` | PRD 文档生成 |
+| `$uiux-redesign` | UI/UX 设计风格重塑 |
+| `$investor-bp-generation` | 投资人BP商业计划报告生成 |
+| `$prototype-design` | 产品原型与界面设计图提示词生成 |
+
+示例：
+
+```text
+$project-analysis 查询当前项目，了解项目背景和目标
+$product-discovery 我想做一个团队日报 AI 助手，帮我梳理 MVP
+$prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
+```
+
+**提示**：
+- 显式 `$skill-name` 调用最稳定，适合明确指定某条 YouAI 工作流
+- Codex 也可能根据 Skill 的 `description` 自动发现匹配的 Skill
+- Codex 适配入口会优先读取本地 `skills/0X_*.md` 完整定义，不存在时再从 GitHub 远程读取
+
+---
+
+## 七个 Skill 详解
 
 ### 01 项目理解与分析
 
@@ -181,7 +245,7 @@ Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
 8. 改进建议
 
 **使用技巧**：
-- 在 AI IDE（Windsurf/Cursor）中使用效果最好，AI 可以直接读取代码
+- 在 AI IDE（Windsurf/Cursor/Codex）中使用效果最好，AI 可以直接读取代码
 - 如果项目较大（>50 个源码文件），AI 会先输出 1-6 节并征求确认
 - 产出报告可直接作为 04_prd-generation 的参考输入
 
@@ -412,7 +476,7 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 解决方法：
 - 在新对话中重新开始
 - 提醒 AI："请按照 Skill 定义的格式输出"
-- 使用 Windsurf Workflow 或 Cursor @Skill 触发，格式更稳定
+- 使用 Windsurf Workflow、Cursor @Skill 或 Codex `$skill-name` 触发，格式更稳定
 
 ### Q: 项目太大，AI 分析不完怎么办？
 
@@ -439,4 +503,4 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 1. 在 `skills/` 下创建源文件
 2. 包含 YAML 元信息头
 3. 包含角色设定、执行步骤、输出格式、行为约束
-4. 同步创建 Windsurf 和 Cursor 的适配版本
+4. 同步创建 Windsurf、Cursor、Claude Code 和 Codex 的适配版本

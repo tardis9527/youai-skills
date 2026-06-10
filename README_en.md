@@ -9,6 +9,7 @@
 [![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
 [![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
+[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./platforms/codex/)
 
 ---
 
@@ -103,11 +104,29 @@ cp -r platforms/claude-code/skills/* your-project/.claude/skills/
 
 Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The lightweight entry resolves the full definition from local `skills/` first, then falls back to GitHub remotely.
 
+### Option 5: Codex (Recommended)
+
+Copy the skill folders under `platforms/codex/skills/` into the target project's `.agents/skills/` directory:
+
+```powershell
+New-Item -ItemType Directory -Force -Path .agents\skills
+Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+```
+
+For user-level reuse across Codex projects, copy them into your personal Codex skills directory:
+
+```powershell
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
+Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+```
+
+Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, or `$prototype-design`.
+
 ---
 
 ## 📋 Key Features
 
-- **🔗 Chainable** — 6 Skills form a pipeline, outputs feed into next stage
+- **🔗 Chainable** — 7 Skills form a pipeline, outputs feed into next stage
 - **📐 Structured Output** — Every Skill defines clear output format and quality standards
 - **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
 - **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints

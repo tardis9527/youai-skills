@@ -9,6 +9,7 @@
 [![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
 [![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
+[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./platforms/codex/)
 
 ---
 
@@ -123,11 +124,38 @@ Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
 
 在 Claude Code 对话中通过 `/` 命令触发对应 Skill（如 `/project-analysis`）。Skill 入口轻量，完整定义优先读本地 `skills/`，否则从 GitHub 远程拉取。
 
+### 方式五：Codex（推荐）
+
+将 `platforms/codex/skills/` 下的 Skill 目录复制到你项目的 `.agents/skills/` 目录：
+
+```powershell
+# 复制 Codex Agent Skills（项目级）
+New-Item -ItemType Directory -Force -Path .agents\skills
+Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+```
+
+如需在当前用户的所有 Codex 项目中复用，可复制到个人 Codex skills 目录：
+
+```powershell
+# 复制 Codex Agent Skills（个人级）
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
+Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+```
+
+安装后重启 Codex 或开启新会话。在 Codex 对话中通过 `$skill-name` 显式触发，例如：
+- `$project-analysis` — 项目理解与分析
+- `$product-discovery` — 产品需求探索
+- `$market-research` — 市场调研分析
+- `$prd-generation` — PRD 文档生成
+- `$uiux-redesign` — UI/UX 设计风格重塑
+- `$investor-bp-generation` — 投资人BP商业计划报告生成
+- `$prototype-design` — 产品原型与界面设计图提示词生成
+
 ---
 
 ## 📋 Skill 特点
 
-- **🔗 链式可组合** — 6个Skill形成工作流，产出物可串联
+- **🔗 链式可组合** — 7个Skill形成工作流，产出物可串联
 - **📐 结构化输出** — 每个Skill定义了明确的输出格式和质量标准
 - **🛡️ 行为约束** — 内置角色设定、禁止行为、自检清单，减少AI胡说
 - **🔄 交互式引导** — 分阶段推进，每步确认，避免方向跑偏
@@ -165,7 +193,8 @@ youai-skills/
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
 │   ├── cursor/skills/        # Cursor Agent Skills（复制到 .cursor/skills/）
-│   └── claude-code/skills/   # Claude Code Agent Skills（复制到 .claude/skills/）
+│   ├── claude-code/skills/   # Claude Code Agent Skills（复制到 .claude/skills/）
+│   └── codex/skills/         # Codex Agent Skills（复制到 .agents/skills/ 或 ~/.codex/skills/）
 │
 ├── examples/                 # 使用示例（产出样例）
 │

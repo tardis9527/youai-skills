@@ -31,7 +31,8 @@ youai-skills/
 ├── platforms/                # 各平台原生适配版本
 │   ├── windsurf/workflows/
 │   ├── cursor/skills/        # 复制到业务项目 .cursor/skills/
-│   └── claude-code/skills/   # 复制到业务项目 .claude/skills/
+│   ├── claude-code/skills/   # 复制到业务项目 .claude/skills/
+│   └── codex/skills/         # 复制到业务项目 .agents/skills/ 或 ~/.codex/skills/
 └── ...
 ```
 
@@ -118,6 +119,7 @@ cursor.directory 自动检测以下路径：
 | `.plugin/plugin.json` | `homepage` + `repository` 字段 |
 | `skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
 | `platforms/cursor/skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
+| `platforms/codex/skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
 
 ### 额外宣传渠道（手动）
 
