@@ -37,11 +37,11 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 │       │ Existing     │ New product │ Pre-funding  │ Product    │ Brand    │
 │       └──────────────┴─────────────┴──────────────┴────────────┘         │
 │                              ▼                                           │
-│                  ┌──────────┐   ┌──────────┐                            │
-│                  │ 06       │   │ 07       │                            │
-│                  │ Investor │   │Prototype │                            │
-│                  │ BP       │   │ & Design │                            │
-│                  └──────────┘   └──────────┘                            │
+│                  ┌──────────┐   ┌──────────┐   ┌──────────┐             │
+│                  │ 06       │   │ 07       │   │ 08       │             │
+│                  │ Investor │   │Prototype │   │ WeChat   │             │
+│                  │ BP       │   │ & Design │   │ Writer   │             │
+│                  └──────────┘   └──────────┘   └──────────┘             │
 │                                                                          │
 │  Path A: New product from scratch  ──▶ 02 → 03 → 04                     │
 │  Path B: Existing project          ──▶ 01 → 04                           │
@@ -49,6 +49,7 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 │  Path D: UI/UX design optimization ──▶ 01 → 05 (or 02 → 05)              │
 │  Path E: Investor BP preparation   ──▶ 02/03/04 → 06                     │
 │  Path F: Prototype & design specs  ──▶ 04 → 07 (or 02 → 07)              │
+│  Path G: Content writing           ──▶ 08 (standalone, can reuse 02/03)  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -65,6 +66,7 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 | 05 | [UI/UX Redesign](./skills/05_uiux-redesign.md) | UI style optimization, brand upgrade, design system | Existing project + product context | UI/UX redesign plan |
 | 06 | [Investor BP Generation](./skills/06_investor-bp-generation.md) | Fundraising, investor meetings, pitch materials | Product Brief + PRD/market/competitor docs | Markdown BP or HTML pitch deck + oral pitch |
 | 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
+| 08 | [WeChat Article Writer (Self-Evolving)](./skills/08_wechat-writer.md) | Writing WeChat/public-account articles, titles & outlines, de-AI-ifying, personal-voice polishing | A writing topic (optional: reference articles / style prefs) | A finalized article passing the 6-dimension self-review + learnings persisted to a local knowledge base |
 
 > Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
@@ -84,7 +86,7 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`, `/wechat-writer`
 
 ### Option 3: Cursor (Recommended)
 
@@ -120,7 +122,7 @@ New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
 Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
 ```
 
-Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, or `$prototype-design`.
+Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, or `$wechat-writer`.
 
 ---
 

@@ -23,7 +23,7 @@
 
 ## 🔗 工作流全景
 
-七个 Skill 形成一条完整的产品开发链路，每个 Skill 的产出物可直接作为下一个 Skill 的输入：
+八个 Skill 覆盖产品开发全流程与内容传播，每个 Skill 的产出物可直接作为下一个 Skill 的输入：
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -37,10 +37,10 @@
 │       │ 已有项目      │ 新产品       │ 融资前分析    │ 产品方案    │ 品牌表达 │
 │       └──────────────┴─────────────┴──────────────┴────────────┘         │
 │                              ▼                                           │
-│                  ┌──────────┐   ┌──────────┐                            │
-│                  │ 06 投资人 │   │ 07 原型与 │                            │
-│                  │ BP 生成   │   │ 设计图    │                            │
-│                  └──────────┘   └──────────┘                            │
+│                  ┌──────────┐   ┌──────────┐   ┌──────────┐             │
+│                  │ 06 投资人 │   │ 07 原型与 │   │ 08 公众号 │             │
+│                  │ BP 生成   │   │ 设计图    │   │ 自进化写作│             │
+│                  └──────────┘   └──────────┘   └──────────┘             │
 │                                                                          │
 │  场景A：新产品从0开始      ──▶ 02 → 03 → 04                              │
 │  场景B：接手已有项目      ──▶ 01 → 04                                    │
@@ -48,6 +48,7 @@
 │  场景D：UI/UX 设计优化   ──▶ 01 → 05（或 02 → 05）                      │
 │  场景E：融资BP准备       ──▶ 02/03/04 → 06                              │
 │  场景F：原型与设计图出图  ──▶ 04 → 07（或 02 → 07）                      │
+│  场景G：公众号内容写作    ──▶ 08（独立，可接 02/03 素材）                 │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -64,6 +65,7 @@
 | 05 | [UI/UX 设计风格重塑](./skills/05_uiux-redesign.md) | 界面风格优化、品牌升级、设计系统重构 | 已有项目 + 产品背景 | UI/UX 设计重塑方案 |
 | 06 | [投资人BP商业计划报告生成](./skills/06_investor-bp-generation.md) | 融资路演、投资人沟通、商业计划书准备 | Product Brief + PRD/市场/竞品资料 | Markdown BP 或 HTML 演示版 + 口述版 |
 | 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
+| 08 | [公众号文章自进化写作](./skills/08_wechat-writer.md) | 写公众号文章、起标题大纲、去 AI 味、润色成个人文风 | 一个写作主题（可选参考文章/风格偏好） | 通过六维评分自审的公众号定稿 + 沉淀到本地知识库的学习记录 |
 
 ---
 
@@ -92,6 +94,7 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 - `/uiux-redesign` — UI/UX 设计风格重塑
 - `/investor-bp-generation` — 投资人BP商业计划报告生成
 - `/prototype-design` — 产品原型与界面设计图提示词生成
+- `/wechat-writer` — 公众号文章自进化写作
 
 ### 方式三：Cursor（推荐）
 
@@ -150,12 +153,13 @@ Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
 - `$uiux-redesign` — UI/UX 设计风格重塑
 - `$investor-bp-generation` — 投资人BP商业计划报告生成
 - `$prototype-design` — 产品原型与界面设计图提示词生成
+- `$wechat-writer` — 公众号文章自进化写作
 
 ---
 
 ## 📋 Skill 特点
 
-- **🔗 链式可组合** — 7个Skill形成工作流，产出物可串联
+- **🔗 链式可组合** — 8个Skill形成工作流，产出物可串联
 - **📐 结构化输出** — 每个Skill定义了明确的输出格式和质量标准
 - **🛡️ 行为约束** — 内置角色设定、禁止行为、自检清单，减少AI胡说
 - **🔄 交互式引导** — 分阶段推进，每步确认，避免方向跑偏
@@ -182,13 +186,15 @@ youai-skills/
 │   ├── 05_uiux-redesign.md
 │   ├── 06_investor-bp-generation.md
 │   ├── 07_prototype-design.md
+│   ├── 08_wechat-writer.md
 │   ├── project-analysis/     # Open Plugins SKILL.md 格式
 │   ├── product-discovery/
 │   ├── market-research/
 │   ├── prd-generation/
 │   ├── uiux-redesign/
 │   ├── investor-bp-generation/
-│   └── prototype-design/
+│   ├── prototype-design/
+│   └── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
 │
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式
