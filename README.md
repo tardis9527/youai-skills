@@ -66,6 +66,7 @@
 | 06 | [投资人BP商业计划报告生成](./skills/06_investor-bp-generation.md) | 融资路演、投资人沟通、商业计划书准备 | Product Brief + PRD/市场/竞品资料 | Markdown BP 或 HTML 演示版 + 口述版 |
 | 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
 | 08 | [公众号文章自进化写作](./skills/08_wechat-writer.md) | 写公众号文章、起标题大纲、去 AI 味、润色成个人文风 | 一个写作主题（可选参考文章/风格偏好） | 通过六维评分自审的公众号定稿 + 沉淀到本地知识库的学习记录 |
+| 09 | [朋友圈文案自进化写作](./skills/09_moments-writer.md) | 写朋友圈配文、发圈文案、去朋友圈"塑料感" | 一个发圈场景（可选人设风格/篇幅偏好） | 3-5 条通过轻量检查表自审的候选文案 + 沉淀到本地知识库的学习记录 |
 
 ---
 
@@ -95,6 +96,7 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 - `/investor-bp-generation` — 投资人BP商业计划报告生成
 - `/prototype-design` — 产品原型与界面设计图提示词生成
 - `/wechat-writer` — 公众号文章自进化写作
+- `/moments-writer` — 朋友圈文案自进化写作
 
 ### 方式三：Cursor（推荐）
 
@@ -154,12 +156,13 @@ Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
 - `$investor-bp-generation` — 投资人BP商业计划报告生成
 - `$prototype-design` — 产品原型与界面设计图提示词生成
 - `$wechat-writer` — 公众号文章自进化写作
+- `$moments-writer` — 朋友圈文案自进化写作
 
 ---
 
 ## 📋 Skill 特点
 
-- **🔗 链式可组合** — 8个Skill形成工作流，产出物可串联
+- **🔗 链式可组合** — 9个Skill形成工作流，产出物可串联
 - **📐 结构化输出** — 每个Skill定义了明确的输出格式和质量标准
 - **🛡️ 行为约束** — 内置角色设定、禁止行为、自检清单，减少AI胡说
 - **🔄 交互式引导** — 分阶段推进，每步确认，避免方向跑偏
@@ -187,6 +190,7 @@ youai-skills/
 │   ├── 06_investor-bp-generation.md
 │   ├── 07_prototype-design.md
 │   ├── 08_wechat-writer.md
+│   ├── 09_moments-writer.md
 │   ├── project-analysis/     # Open Plugins SKILL.md 格式
 │   ├── product-discovery/
 │   ├── market-research/
@@ -194,7 +198,8 @@ youai-skills/
 │   ├── uiux-redesign/
 │   ├── investor-bp-generation/
 │   ├── prototype-design/
-│   └── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
+│   ├── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
+│   └── moments-writer/       # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
 │
 ├── platforms/                # 各平台适配版本
 │   ├── windsurf/workflows/   # Windsurf workflow 格式

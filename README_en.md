@@ -67,6 +67,7 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 | 06 | [Investor BP Generation](./skills/06_investor-bp-generation.md) | Fundraising, investor meetings, pitch materials | Product Brief + PRD/market/competitor docs | Markdown BP or HTML pitch deck + oral pitch |
 | 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
 | 08 | [WeChat Article Writer (Self-Evolving)](./skills/08_wechat-writer.md) | Writing WeChat/public-account articles, titles & outlines, de-AI-ifying, personal-voice polishing | A writing topic (optional: reference articles / style prefs) | A finalized article passing the 6-dimension self-review + learnings persisted to a local knowledge base |
+| 09 | [WeChat Moments Copywriter (Self-Evolving)](./skills/09_moments-writer.md) | Writing WeChat Moments captions, de-plasticizing "AI feel" from short posts | A posting scenario (optional: persona style / length preference) | 3-5 candidate captions passing a lightweight self-check + learnings persisted to a local knowledge base |
 
 > Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
@@ -86,7 +87,7 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`, `/wechat-writer`
+Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`, `/wechat-writer`, `/moments-writer`
 
 ### Option 3: Cursor (Recommended)
 
@@ -122,7 +123,7 @@ New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
 Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
 ```
 
-Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, or `$wechat-writer`.
+Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, or `$moments-writer`.
 
 ---
 
