@@ -17,9 +17,9 @@ description: 面向产品开发全流程的 AI 技能包 —— 包含 9 个结�
 - 产出：8 节结构化报告
 
 ### 2. 产品需求探索与定义（Product Discovery）
-六阶段交互式引导，将模糊想法转化为结构化产品简报（Product Brief）。
+六阶段交互式引导，将模糊想法转化为结构化产品简报（Product Brief）。支持 Express / Standard / Deep 三档节奏，每阶段有可判定的通过条件，支持断点续传与团队画像记忆。
 - 适用场景：0-1 产品构思、Hackathon、MVP 定义
-- 产出：Product Brief（含用户画像、MVP 功能清单、可行性评估）
+- 产出：11 节 Product Brief（含用户画像、MVP 功能清单、可行性与冷启动评估、成功指标、关键假设与验证计划、下游交接校验表）
 
 ### 3. 产品市场调研分析（Market Research）
 系统性竞品分析、市场规模估算、用户洞察、风险评估。
@@ -59,9 +59,12 @@ description: 面向产品开发全流程的 AI 技能包 —— 包含 9 个结�
 ## 使用方式
 
 1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
-2. **Windsurf**：将 `platforms/windsurf/workflows/` 下的文件复制到项目的 `.windsurf/workflows/`
-3. **Cursor**：将 `platforms/cursor/skills/` 下的目录复制到项目的 `.cursor/skills/`，通过 @Skill 触发
-4. **Claude Code**：将 `platforms/claude-code/skills/` 下的目录复制到项目的 `.claude/skills/`，通过 `/` 命令触发
+2. **Windsurf**：把每个 `skills/{skill-name}/SKILL.md` 复制成 `.windsurf/workflows/{skill-name}.md`，通过 `/` 命令触发
+3. **Cursor**：将 `skills/` 下的各 Skill 目录复制到项目的 `.cursor/skills/`，通过 @Skill 触发
+4. **Claude Code**：将 `skills/` 下的各 Skill 目录复制到项目的 `.claude/skills/`，通过 `/` 命令触发
+5. **Codex**：将 `skills/` 下的各 Skill 目录复制到 `.agents/skills/`（项目级）或 `~/.codex/skills/`（个人级），通过 `$skill-name` 触发
+
+> 完整安装命令（含 Windows PowerShell）见 [docs/usage-guide.md](./docs/usage-guide.md)。仓库只维护一份 Skill 定义，各平台差异仅在安装位置与触发符。
 
 ## 工作流串联
 

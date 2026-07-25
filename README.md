@@ -6,10 +6,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
-[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
-[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
-[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./platforms/codex/)
+[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./docs/usage-guide.md)
+[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./docs/usage-guide.md)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./docs/usage-guide.md)
+[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./docs/usage-guide.md)
 
 ---
 
@@ -59,7 +59,7 @@
 | # | Skill | 使用场景 | 输入 | 产出 |
 |---|-------|---------|------|------|
 | 01 | [项目理解与分析](./skills/01_project-analysis.md) | 接手新项目、代码审查、技术尽调 | 已有代码仓库 | 结构化项目理解报告 |
-| 02 | [产品需求探索与定义](./skills/02_product-discovery.md) | 从0到1产品孵化、MVP定义 | 模糊的产品想法 | Product Brief（产品简报） |
+| 02 | [产品需求探索与定义](./skills/02_product-discovery.md) | 从0到1产品孵化、MVP定义、Hackathon快速出方案 | 模糊的产品想法 | Product Brief（产品简报，11 节） |
 | 03 | [产品市场调研分析](./skills/03_market-research.md) | 赛道评估、竞品分析、方向验证 | 产品方向/名称 | 调研分析报告 |
 | 04 | [PRD 文档生成](./skills/04_prd-generation.md) | 实施方案转PRD、功能详细设计 | 实施方案文档 | 完整可落地的PRD |
 | 05 | [UI/UX 设计风格重塑](./skills/05_uiux-redesign.md) | 界面风格优化、品牌升级、设计系统重构 | 已有项目 + 产品背景 | UI/UX 设计重塑方案 |
@@ -80,11 +80,19 @@
 
 ### 方式二：Windsurf（推荐）
 
-将 `platforms/windsurf/workflows/` 下的文件复制到你项目的 `.windsurf/workflows/` 目录：
+Windsurf 的 Workflow 需要 `.windsurf/workflows/` 下的扁平 `.md` 文件，把每个 Skill 入口复制成同名 workflow：
 
 ```bash
 # 复制 Windsurf workflows
-cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
+mkdir -p your-project/.windsurf/workflows
+for d in skills/*/; do cp "$d/SKILL.md" "your-project/.windsurf/workflows/$(basename "$d").md"; done
+```
+
+Windows PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .windsurf\workflows
+Get-ChildItem skills -Directory | ForEach-Object { Copy-Item "$($_.FullName)\SKILL.md" ".windsurf\workflows\$($_.Name).md" }
 ```
 
 然后在 Windsurf 中使用 `/` 命令触发：
@@ -100,43 +108,43 @@ cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
 
 ### 方式三：Cursor（推荐）
 
-将 `platforms/cursor/skills/` 下的 Skill 目录复制到你项目的 `.cursor/skills/` 目录：
+将 `skills/` 下的各 Skill 目录复制到你项目的 `.cursor/skills/` 目录：
 
 ```bash
 # 复制 Cursor Agent Skills
 mkdir -p your-project/.cursor/skills/
-cp -r platforms/cursor/skills/* your-project/.cursor/skills/
+cp -r skills/*/ your-project/.cursor/skills/
 ```
 
 在 Cursor Agent 对话中通过 **@Skill** 选择对应 Skill 触发（如 `@project-analysis`）。Skill 定义会从 GitHub 远程拉取，无需拷贝完整 `skills/` 源文件。
 
 ### 方式四：Claude Code（推荐）
 
-将 `platforms/claude-code/skills/` 下的 Skill 目录复制到你项目的 `.claude/skills/` 目录：
+将 `skills/` 下的各 Skill 目录复制到你项目的 `.claude/skills/` 目录：
 
 ```bash
 # 复制 Claude Code Agent Skills
 mkdir -p your-project/.claude/skills/
-cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+cp -r skills/*/ your-project/.claude/skills/
 ```
 
 Windows PowerShell：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .claude\skills
-Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills\
 ```
 
 在 Claude Code 对话中通过 `/` 命令触发对应 Skill（如 `/project-analysis`）。Skill 入口轻量，完整定义优先读本地 `skills/`，否则从 GitHub 远程拉取。
 
 ### 方式五：Codex（推荐）
 
-将 `platforms/codex/skills/` 下的 Skill 目录复制到你项目的 `.agents/skills/` 目录：
+将 `skills/` 下的各 Skill 目录复制到你项目的 `.agents/skills/` 目录：
 
 ```powershell
 # 复制 Codex Agent Skills（项目级）
 New-Item -ItemType Directory -Force -Path .agents\skills
-Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills\
 ```
 
 如需在当前用户的所有 Codex 项目中复用，可复制到个人 Codex skills 目录：
@@ -144,7 +152,7 @@ Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
 ```powershell
 # 复制 Codex Agent Skills（个人级）
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
 ```
 
 安装后重启 Codex 或开启新会话。在 Codex 对话中通过 `$skill-name` 显式触发，例如：
@@ -181,7 +189,7 @@ youai-skills/
 ├── LICENSE                   # MIT 开源协议
 ├── CONTRIBUTING.md           # 贡献指南
 │
-├── skills/                   # 🎯 核心 Skill 文件（Source of Truth）
+├── skills/                   # 🎯 唯一来源：Skill 源文件 + Open Plugins SKILL.md 入口
 │   ├── 01_project-analysis.md
 │   ├── 02_product-discovery.md
 │   ├── 03_market-research.md
@@ -191,8 +199,8 @@ youai-skills/
 │   ├── 07_prototype-design.md
 │   ├── 08_wechat-writer.md
 │   ├── 09_moments-writer.md
-│   ├── project-analysis/     # Open Plugins SKILL.md 格式
-│   ├── product-discovery/
+│   ├── project-analysis/     # SKILL.md 入口，可直接装到各平台的 skills 目录
+│   ├── product-discovery/    # 自带 references/（痛点库+可行性清单）与 knowledge/（团队画像+历史复盘）
 │   ├── market-research/
 │   ├── prd-generation/
 │   ├── uiux-redesign/
@@ -201,18 +209,14 @@ youai-skills/
 │   ├── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
 │   └── moments-writer/       # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
 │
-├── platforms/                # 各平台适配版本
-│   ├── windsurf/workflows/   # Windsurf workflow 格式
-│   ├── cursor/skills/        # Cursor Agent Skills（复制到 .cursor/skills/）
-│   ├── claude-code/skills/   # Claude Code Agent Skills（复制到 .claude/skills/）
-│   └── codex/skills/         # Codex Agent Skills（复制到 .agents/skills/ 或 ~/.codex/skills/）
-│
 ├── examples/                 # 使用示例（产出样例）
 │
 └── docs/                     # 文档
-    ├── usage-guide.md        # 详细使用指南
+    ├── usage-guide.md        # 详细使用指南（含各平台安装方式）
     └── distribution-guide.md # 分发指南
 ```
+
+> 📌 **单一来源**：不再维护 `platforms/` 平台副本。`skills/{skill-name}/SKILL.md` 是通用入口，Cursor / Claude Code / Codex 可直接安装；Windsurf 复制成 `.windsurf/workflows/{name}.md` 即可。各平台差异只体现在**安装位置和触发符**上，Skill 内容不分叉。
 
 ---
 

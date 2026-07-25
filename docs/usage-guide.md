@@ -62,16 +62,23 @@ Skill 是一份精心设计的**结构化 AI 提示词**，包含：
 
 ### 方式二：Windsurf（推荐）
 
-Windsurf 的 Workflow 功能可以将 Skill 注册为斜杠命令，使用体验最佳。
+Windsurf 的 Workflow 功能可以将 Skill 注册为斜杠命令，使用体验最佳。Workflow 要求 `.windsurf/workflows/` 下是**扁平的 `.md` 文件**，因此把每个 Skill 入口复制成同名 workflow：
 
-**安装**：
+**安装**（macOS / Linux）：
 
 ```bash
 # 在你的项目根目录下创建 .windsurf/workflows/ 目录
-mkdir -p .windsurf/workflows/
+mkdir -p your-project/.windsurf/workflows
 
-# 将 YouAI Skills 的 Windsurf 适配文件复制过去
-cp platforms/windsurf/workflows/*.md your-project/.windsurf/workflows/
+# 把每个 Skill 入口复制成同名 workflow 文件
+for d in skills/*/; do cp "$d/SKILL.md" "your-project/.windsurf/workflows/$(basename "$d").md"; done
+```
+
+Windows PowerShell：
+
+```powershell
+New-Item -ItemType Directory -Force -Path .windsurf\workflows
+Get-ChildItem skills -Directory | ForEach-Object { Copy-Item "$($_.FullName)\SKILL.md" ".windsurf\workflows\$($_.Name).md" }
 ```
 
 **使用**：
@@ -86,9 +93,12 @@ cp platforms/windsurf/workflows/*.md your-project/.windsurf/workflows/
 | `/prd-generation` | PRD 文档生成 |
 | `/uiux-redesign` | UI/UX 设计风格重塑 |
 | `/investor-bp-generation` | 投资人BP商业计划报告生成 |
+| `/prototype-design` | 产品原型与界面设计图提示词生成 |
+| `/wechat-writer` | 公众号文章自进化写作 |
+| `/moments-writer` | 朋友圈文案自进化写作 |
 
 **提示**：
-- Windsurf Workflow 中的 Skill 已针对 Cascade 做了格式适配
+- SKILL.md 的 YAML 头自带 `description`，正是 Windsurf Workflow 需要的字段，无需改写
 - 使用 `/project-analysis` 时，确保当前工作区已打开目标项目
 - 使用 `/prd-generation` 时，建议先把实施方案文档放在项目的 `doc/` 目录下
 
@@ -100,17 +110,17 @@ Cursor 的 **Agent Skills** 功能（`.cursor/skills/{skill-name}/SKILL.md`）�
 
 ```bash
 # 在你的项目根目录下创建 .cursor/skills/ 目录
-mkdir -p .cursor/skills/
+mkdir -p your-project/.cursor/skills/
 
-# 将 YouAI Skills 的 Cursor 适配目录复制过去
-cp -r platforms/cursor/skills/* your-project/.cursor/skills/
+# 将 skills/ 下的各 Skill 目录复制过去
+cp -r skills/*/ your-project/.cursor/skills/
 ```
 
 Windows PowerShell：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .cursor\skills
-Copy-Item -Recurse platforms\cursor\skills\* .cursor\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .cursor\skills\
 ```
 
 **使用**：
@@ -132,17 +142,17 @@ Claude Code 的 **Agent Skills** 功能（`.claude/skills/{skill-name}/SKILL.md`
 
 ```bash
 # 在你的项目根目录下创建 .claude/skills/ 目录
-mkdir -p .claude/skills/
+mkdir -p your-project/.claude/skills/
 
-# 将 YouAI Skills 的 Claude Code 适配目录复制过去
-cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+# 将 skills/ 下的各 Skill 目录复制过去
+cp -r skills/*/ your-project/.claude/skills/
 ```
 
 Windows PowerShell：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .claude\skills
-Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills\
 ```
 
 **使用**：
@@ -154,43 +164,49 @@ Copy-Item -Recurse platforms\claude-code\skills\* .claude\skills\
 **提示**：
 - Skill 入口文件轻量，完整定义优先读本地 `skills/`，否则从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
 - 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
+- 自带 `knowledge/` 的自进化 Skill（如 `wechat-writer`、`moments-writer`、`product-discovery`）会在安装目录内读写记忆文件，复制时不要漏掉这些子目录
 - Skill 适合阶段性产品工作流，长期编码规范请使用 `CLAUDE.md` 而非 Skill
 
 ---
 
 ### 方式五：Codex
 
-Codex 支持 Agent Skills。YouAI Skills 提供了 `platforms/codex/skills/{skill-name}/SKILL.md` 适配版本，可安装到项目级 `.agents/skills/`，也可安装到个人级 `~/.codex/skills/`。
+Codex 支持 Agent Skills。直接使用 `skills/{skill-name}/SKILL.md`，可安装到项目级 `.agents/skills/`，也可安装到个人级 `~/.codex/skills/`。
 
 **项目级安装**：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .agents\skills
-Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills\
 ```
 
 macOS / Linux：
 
 ```bash
 mkdir -p .agents/skills
-cp -r platforms/codex/skills/* .agents/skills/
+cp -r skills/*/ .agents/skills/
 ```
 
 **个人级安装**：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
 ```
 
 macOS / Linux：
 
 ```bash
 mkdir -p ~/.codex/skills
-cp -r platforms/codex/skills/* ~/.codex/skills/
+cp -r skills/*/ ~/.codex/skills/
 ```
 
 安装后重启 Codex 或开启新会话。
+
+---
+
+> 📌 **为什么只有一份 Skill 文件？**
+> 仓库不再维护 `platforms/` 下的平台副本——`skills/{skill-name}/SKILL.md` 是各平台通用的入口，平台差异只体现在**安装位置**和**触发符**（Windsurf `/`、Cursor `@`、Claude Code `/`、Codex `$`）上，Skill 内容不分叉，改一处即全平台生效。
 
 **使用**：
 
@@ -262,21 +278,39 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 
 **输入**：你脑中的产品想法（可以很模糊）
 
-**产出**：产品简报（Product Brief），包含 8 个章节：
-1. 产品定位
-2. 用户角色（1-3 个）
-3. MVP 功能清单
-4. 核心用户旅程
-5. 可行性评估与技术约束
-6. 明确排除项
-7. 开放问题
-8. 下一步行动
+**产出**：产品简报（Product Brief），包含 11 个章节：
+1. 产品背景与目标
+2. 产品定位与价值主张
+3. 用户角色（1-3 个）
+4. MVP 功能清单
+5. 核心用户旅程（含空状态/失败/中断恢复三类异常分支）
+6. 成功指标（1 个北极星 + 辅助指标 + 反向指标）
+7. 可行性评估与技术约束
+8. 冷启动与分发路径
+9. 明确排除项
+10. 关键假设与验证计划
+11. 下一步行动
+
+> 文末附「下游交接校验表」，逐项确认 03 / 04 / 06 所需输入是否齐备。
+
+**三档节奏，开场自动判定**：
+
+| 模式 | 什么时候用 | 你要停下来确认几次 | 大概几轮 |
+|------|----------|-----------------|---------|
+| ⚡ Express | Hackathon、周末项目、想法已较清晰 | 2 | 4-6 |
+| 🎯 Standard（默认） | 常规 0-1 产品定义 | 4 | 10-15 |
+| 🔬 Deep | 要拿去融资、需团队对齐、方向没定 | 6 | 20+ |
+
+说一句"快速出个方案"就会走 Express；中途随时可以说"加速"或"展开"切档。
 
 **使用技巧**：
-- 这是一个**交互式** Skill，AI 会分 6 个阶段提问，不要跳过
-- 阶段一的提问至关重要，尽量详细回答
+- 这是一个**交互式** Skill，但只在确认点停下来等你拍板，不会每轮都问
+- 阶段一的提问至关重要，尽量详细回答；尤其是**"第一批 10 个用户从哪找"**这题
 - 如果你说"都要做"，AI 会追问你优先级——这是故意的
-- 每个阶段结束时 AI 会输出阶段交付物并征求确认
+- 如果你说"你定"，AI 会直接采用它的推荐并标注 `[AI默认]` 记入假设表，不会来回踢皮球
+- 每阶段有**通过条件**，答得太空（如"目标用户是所有需要提效的人"）会被要求补具体
+- 对话中断了不用重来：技能会检测 `doc/drafts/*_WIP.md` 草稿并询问是否续做
+- 团队规模、技术栈、预算这些信息只需说一次，之后存进 `knowledge/team-profile.md` 复用
 
 ---
 

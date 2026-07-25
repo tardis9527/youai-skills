@@ -6,10 +6,10 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
-[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./platforms/windsurf/)
-[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./platforms/cursor/)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./platforms/claude-code/)
-[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./platforms/codex/)
+[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./docs/usage-guide.md)
+[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./docs/usage-guide.md)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./docs/usage-guide.md)
+[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./docs/usage-guide.md)
 
 ---
 
@@ -83,8 +83,11 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 
 ### Option 2: Windsurf
 
+Windsurf Workflows expect flat `.md` files, so copy each Skill entry as a same-named workflow:
+
 ```bash
-cp -r platforms/windsurf/workflows/ your-project/.windsurf/workflows/
+mkdir -p your-project/.windsurf/workflows
+for d in skills/*/; do cp "$d/SKILL.md" "your-project/.windsurf/workflows/$(basename "$d").md"; done
 ```
 
 Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`, `/wechat-writer`, `/moments-writer`
@@ -93,7 +96,7 @@ Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`,
 
 ```bash
 mkdir -p your-project/.cursor/skills/
-cp -r platforms/cursor/skills/* your-project/.cursor/skills/
+cp -r skills/*/ your-project/.cursor/skills/
 ```
 
 Invoke Skills in Cursor Agent via **@Skill** (e.g. `@project-analysis`). Full skill definitions are fetched from GitHub remotely — no need to copy the entire `skills/` source files.
@@ -102,25 +105,25 @@ Invoke Skills in Cursor Agent via **@Skill** (e.g. `@project-analysis`). Full sk
 
 ```bash
 mkdir -p your-project/.claude/skills/
-cp -r platforms/claude-code/skills/* your-project/.claude/skills/
+cp -r skills/*/ your-project/.claude/skills/
 ```
 
 Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The lightweight entry resolves the full definition from local `skills/` first, then falls back to GitHub remotely.
 
 ### Option 5: Codex (Recommended)
 
-Copy the skill folders under `platforms/codex/skills/` into the target project's `.agents/skills/` directory:
+Copy the skill folders under `skills/` into the target project's `.agents/skills/` directory:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .agents\skills
-Copy-Item -Recurse platforms\codex\skills\* .agents\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills\
 ```
 
 For user-level reuse across Codex projects, copy them into your personal Codex skills directory:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Copy-Item -Recurse platforms\codex\skills\* $env:USERPROFILE\.codex\skills\
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
 ```
 
 Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, or `$moments-writer`.

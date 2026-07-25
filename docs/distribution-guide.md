@@ -21,26 +21,28 @@
 ```
 youai-skills/
 ├── .plugin/
-│   └── plugin.json          # Open Plugins 标准清单（含 GitHub 链接）
-├── skills/                   # 🎯 核心 Skill 源文件 + Open Plugins 格式
+│   └── plugin.json          # Open Plugins 标准清单（含 GitHub 链接，skills 指向 ./skills/）
+├── skills/                   # 🎯 唯一来源：Skill 源文件 + Open Plugins 格式入口
 │   ├── 01_project-analysis.md
 │   ├── ...
 │   ├── project-analysis/
-│   │   └── SKILL.md          # Cursor Agent Skill（与 platforms/cursor 同步）
+│   │   └── SKILL.md          # 各平台通用入口（Cursor / Claude Code / Codex / Windsurf）
+│   ├── product-discovery/
+│   │   ├── SKILL.md
+│   │   ├── references/       # 静态资料（只读）
+│   │   └── knowledge/        # 动态记忆（可写）
 │   └── ...
-├── platforms/                # 各平台原生适配版本
-│   ├── windsurf/workflows/
-│   ├── cursor/skills/        # 复制到业务项目 .cursor/skills/
-│   ├── claude-code/skills/   # 复制到业务项目 .claude/skills/
-│   └── codex/skills/         # 复制到业务项目 .agents/skills/ 或 ~/.codex/skills/
-└── ...
+├── examples/                 # 产出样例
+└── docs/                     # 使用指南 + 分发指南
 ```
+
+> 📌 仓库**不再维护 `platforms/` 平台副本**。`skills/{skill-name}/SKILL.md` 是各平台通用入口，安装位置与触发符的差异见 [usage-guide.md](./usage-guide.md)，Skill 内容不分叉。
 
 cursor.directory 自动检测以下路径：
 
 | 组件类型 | 检测路径 | 状态 |
 |---------|---------|------|
-| Skills | `skills/*/SKILL.md` | ✅ 已创建 |
+| Skills | `skills/*/SKILL.md` | ✅ 已创建（9 个） |
 | Plugin 清单 | `.plugin/plugin.json` | ✅ 已创建 |
 
 ---
@@ -55,14 +57,14 @@ cursor.directory 自动检测以下路径：
 2. 使用 GitHub 或 Google 账号登录
 3. 粘贴仓库 URL：`https://github.com/tardis9527/youai-skills`
 4. 网站会自动检测仓库中的组件：
-   - `skills/*/SKILL.md` → 7 个 Agent Skills
+   - `skills/*/SKILL.md` → 9 个 Agent Skills
    - `.plugin/plugin.json` → 插件元信息（含 GitHub 链接 = 自动宣传）
 5. 点击 **Submit**
 
 ### 宣传效果
 
 - `plugin.json` 中的 `homepage` 和 `repository` 字段直接链接到 GitHub 仓库
-- 每个 SKILL.md 和 .mdc 文件的 description 中包含 GitHub 链接
+- 每个 `SKILL.md` 顶部与 description 中包含 GitHub 链接
 - 用户在 cursor.directory 上看到插件后，可以直接跳转到你的 GitHub 仓库
 
 ---
@@ -75,7 +77,7 @@ cursor.directory 自动检测以下路径：
 
 1. 访问 [skillsdirectory.com/submit](https://www.skillsdirectory.com/submit)
 2. 使用 GitHub 账号登录
-3. 为每个 Skill 分别提交（7 个 Skill = 7 次提交）
+3. 为每个 Skill 分别提交（9 个 Skill = 9 次提交）
 4. 每个提交中：
    - 粘贴对应 Skill 的完整内容（如 `skills/01_project-analysis.md`）
    - 添加描述，包含 GitHub 仓库链接
@@ -93,7 +95,7 @@ cursor.directory 自动检测以下路径：
 2. 在 README.md 的 `Planning & Architecture` 分类下添加：
 
 ```markdown
-- [YouAI Skills](https://github.com/tardis9527/youai-skills) - AI Skills for product development workflow. 6 skills covering project analysis, product discovery, market research, PRD generation, UI/UX redesign, and investor BP generation. Helps you make the right product, design, and fundraising decisions before writing the first line of code.
+- [YouAI Skills](https://github.com/tardis9527/youai-skills) - AI Skills for product development workflow. 9 skills covering project analysis, product discovery, market research, PRD generation, UI/UX redesign, prototype & design-mockup prompts, investor BP generation, and self-evolving content writing. Helps you make the right product, design, and fundraising decisions before writing the first line of code.
 ```
 
 3. 提交 PR，标题：`Add YouAI Skills - Product Development AI Skills Pack`
@@ -118,8 +120,6 @@ cursor.directory 自动检测以下路径：
 |------|---------|
 | `.plugin/plugin.json` | `homepage` + `repository` 字段 |
 | `skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
-| `platforms/cursor/skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
-| `platforms/codex/skills/*/SKILL.md` | 每个文件顶部的 YouAI Skills 链接 |
 
 ### 额外宣传渠道（手动）
 
@@ -134,7 +134,7 @@ cursor.directory 自动检测以下路径：
 ## 操作清单
 
 - [ ] 提交到 cursor.directory（粘贴 GitHub URL）
-- [ ] 提交到 skillsdirectory.com（4 个 Skill 分别提交）
+- [ ] 提交到 skillsdirectory.com（9 个 Skill 分别提交）
 - [ ] 提交 PR 到 awesome-cursor-skills
 - [ ] 提交 PR 到 awesome-cursorrules
 - [ ] GitHub 仓库添加 Topics 标签
