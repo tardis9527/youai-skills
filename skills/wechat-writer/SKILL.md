@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/08_wechat-writer.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/08_wechat-writer.md 。阅读后理解角色设定、核心原则与九阶段闭环流程。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../08_wechat-writer.md`；若不存在，再尝试工作区的 `skills/08_wechat-writer.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/08_wechat-writer.md 读取完整定义。阅读后理解角色设定、核心原则与九阶段闭环流程。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **阶段 0 · 学习加载**（静默）：读取本地 `knowledge/` 下的 user-preferences、successful-patterns、common-revisions、execution-history，把用户画像装进脑子，一句话确认后开工。文件为空则视为首次使用。
 

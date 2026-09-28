@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 ## 第一步：加载完整 Skill 定义（必做）
 
-先尝试打开本地 `skills/02_product-discovery.md`。若不存在，从此 URL 读取：
+以本 `SKILL.md` 所在目录为基准，先读取 `../02_product-discovery.md`；若不存在，再尝试工作区的 `skills/02_product-discovery.md`。仍不存在时，从此 URL 读取：
 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/02_product-discovery.md
 
 该文件是**唯一权威定义**（角色设定、节奏模式、六阶段流程与各阶段通过条件、Brief 模板、对话控制规则），读完后严格按它执行。本文件只提供入口与关键规则摘要，**不复述阶段细节**。

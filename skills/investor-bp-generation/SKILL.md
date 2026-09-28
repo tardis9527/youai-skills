@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/06_investor-bp-generation.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/06_investor-bp-generation.md 。阅读后理解角色设定、资料盘点、融资叙事设计、Markdown/HTML 输出要求和禁止行为。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../06_investor-bp-generation.md`；若不存在，再尝试工作区的 `skills/06_investor-bp-generation.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/06_investor-bp-generation.md 读取完整定义。阅读后理解角色设定、资料盘点、融资叙事设计、Markdown/HTML 输出要求和禁止行为。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **资料盘点**：优先读取项目中的 `doc/Product_Brief_*.md`、PRD、市场调研报告、竞品分析、项目理解报告等资料。提取产品定位、目标用户、市场机会、商业模式、牵引力、团队、融资计划等信息。
 

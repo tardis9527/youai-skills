@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/04_prd-generation.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/04_prd-generation.md 。阅读后理解角色设定、技术栈偏好、PRD 文档结构要求、质量要求和自检清单。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../04_prd-generation.md`；若不存在，再尝试工作区的 `skills/04_prd-generation.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/04_prd-generation.md 读取完整定义。阅读后理解角色设定、技术栈偏好、PRD 文档结构要求、质量要求和自检清单。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **通读实施方案**：完整阅读用户提供的实施方案文档，提取项目背景、模块清单、技术约束、范围边界等关键信息。
 

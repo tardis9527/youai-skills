@@ -171,7 +171,18 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills
 
 ### 方式五：Codex
 
-Codex 支持 Agent Skills。直接使用 `skills/{skill-name}/SKILL.md`，可安装到项目级 `.agents/skills/`，也可安装到个人级 `~/.codex/skills/`。
+Codex 支持 Agent Skills。可以通过本仓库的插件市场一次安装 10 个 Skill，也可以直接使用 `skills/{skill-name}/SKILL.md`，安装到项目级 `.agents/skills/` 或个人级 `~/.agents/skills/`。
+
+**从 Git 仓库安装插件市场**：在 Codex「添加插件市场」中填入 `https://github.com/tardis9527/youai-skills.git`，Git 引用填 `main`，稀疏路径留空；添加后从市场安装 `youai-skills` 插件，并开启新会话。命令行等价操作：
+
+```powershell
+codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --ref main
+codex plugin add youai-skills@youai-skills
+```
+
+插件清单位于 `.agents/plugins/marketplace.json` 和 `plugins/youai-skills/.codex-plugin/plugin.json`。安装包内包含完整的 10 个 Skill 及 `skills/01_*.md` 等定义文件，无需运行时从 GitHub 读取定义。
+
+**直接安装 Skill**：
 
 **项目级安装**：
 
@@ -190,15 +201,15 @@ cp -r skills/*/ .agents/skills/
 **个人级安装**：
 
 ```powershell
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
 ```
 
 macOS / Linux：
 
 ```bash
-mkdir -p ~/.codex/skills
-cp -r skills/*/ ~/.codex/skills/
+mkdir -p ~/.agents/skills
+cp -r skills/*/ ~/.agents/skills/
 ```
 
 安装后重启 Codex 或开启新会话。
@@ -206,7 +217,7 @@ cp -r skills/*/ ~/.codex/skills/
 ---
 
 > 📌 **为什么只有一份 Skill 文件？**
-> 仓库不再维护 `platforms/` 下的平台副本——`skills/{skill-name}/SKILL.md` 是各平台通用的入口，平台差异只体现在**安装位置**和**触发符**（Windsurf `/`、Cursor `@`、Claude Code `/`、Codex `$`）上，Skill 内容不分叉，改一处即全平台生效。
+> `skills/` 是唯一源目录；`plugins/youai-skills/skills/` 是由 `scripts/sync-codex-plugin.ps1` 生成的 Codex 插件安装包。源文件修改后需重新同步并提交安装包。插件副本移除了 Codex 不接受的 `disable-model-invocation: true` 字段。
 
 **使用**：
 
@@ -233,7 +244,7 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 **提示**：
 - 显式 `$skill-name` 调用最稳定，适合明确指定某条 YouAI 工作流
 - Codex 也可能根据 Skill 的 `description` 自动发现匹配的 Skill
-- Codex 适配入口会优先读取本地 `skills/0X_*.md` 完整定义，不存在时再从 GitHub 远程读取
+- Codex 适配入口优先读取所在 Skill 目录上一层的 `0X_*.md` 完整定义，再尝试工作区的 `skills/`，最后才从 GitHub 远程读取
 
 ---
 

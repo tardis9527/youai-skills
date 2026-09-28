@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/01_project-analysis.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/01_project-analysis.md 。阅读后理解角色设定、核心原则、执行步骤和报告结构要求。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../01_project-analysis.md`；若不存在，再尝试工作区的 `skills/01_project-analysis.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/01_project-analysis.md 读取完整定义。阅读后理解角色设定、核心原则、执行步骤和报告结构要求。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **宏观扫描**：浏览项目根目录、README、业务/产品文档、配置文件、依赖管理文件，从文档与命名中初步识别业务域。
 

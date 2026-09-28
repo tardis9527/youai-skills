@@ -10,6 +10,7 @@
 - 修改 `skills/{序号}_{英文名}.md` 源文件（Single Source of Truth）
 - 若改动涉及**阶段划分、关键规则或输出结构**，同步更新 `skills/{skill-name}/SKILL.md` 入口文件
 - 若 Skill 自带 `references/`（静态规则）或 `knowledge/`（动态记忆），相关规则改动也要同步
+- 修改 `skills/` 后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1`，并提交更新后的 `plugins/youai-skills/skills/` Codex 插件包
 
 ### ✨ 贡献新 Skill
 
@@ -29,6 +30,7 @@
 4. 同步创建 Open Plugins 入口 `skills/{skill-name}/SKILL.md`（英文 `name` + `description` 的 YAML 头），内容保持轻量：指向源文件、列出关键规则，**不复述完整流程**，避免两处漂移
 5. 该入口文件是各平台通用的：Cursor 装到 `.cursor/skills/`、Claude Code 装到 `.claude/skills/`、Codex 装到 `.agents/skills/`、Windsurf 复制成 `.windsurf/workflows/{skill-name}.md`。**不需要为每个平台维护单独副本**
 6. 如需自带资料，按约定放 `skills/{skill-name}/references/`（静态、只读）与 `skills/{skill-name}/knowledge/`（动态、可写）
+7. 运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1`，将新 Skill 打包到 Codex 插件目录
 
 ### 🌐 翻译
 

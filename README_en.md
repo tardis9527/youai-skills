@@ -115,7 +115,16 @@ Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The l
 
 ### Option 5: Codex (Recommended)
 
-Copy the skill folders under `skills/` into the target project's `.agents/skills/` directory:
+**Install from the Git marketplace:** In Codex, add `https://github.com/tardis9527/youai-skills.git` as a plugin marketplace, use Git ref `main`, and leave the sparse path empty. Then install the `youai-skills` plugin from that marketplace and start a new session. The plugin bundles all 10 skills and their full definitions.
+
+From the CLI:
+
+```powershell
+codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --ref main
+codex plugin add youai-skills@youai-skills
+```
+
+**Direct skill installation:** Copy the skill folders under `skills/` into the target project's `.agents/skills/` directory:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .agents\skills
@@ -125,11 +134,13 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills
 For user-level reuse across Codex projects, copy them into your personal Codex skills directory:
 
 ```powershell
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
 ```
 
 Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, `$moments-writer`, or `$imagegen-zh`. For image generation, copy the complete `skills/imagegen-zh/` directory to the target project's `.agents/skills/imagegen-zh/` directory.
+
+The top-level `skills/` directory is the source of truth. After changing a skill, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1` and commit the updated `plugins/youai-skills/skills/` package. The packaged copies omit `disable-model-invocation: true`, which Codex plugin validation does not accept.
 
 ---
 

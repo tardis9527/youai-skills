@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/03_market-research.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/03_market-research.md 。阅读后理解角色设定、调研框架、数据诚信规则。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../03_market-research.md`；若不存在，再尝试工作区的 `skills/03_market-research.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/03_market-research.md 读取完整定义。阅读后理解角色设定、调研框架、数据诚信规则。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **确认调研范围**：与用户确认目标产品方向、关注的核心问题、调研重点领域。
 

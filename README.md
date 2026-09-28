@@ -142,7 +142,16 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills
 
 ### 方式五：Codex（推荐）
 
-将 `skills/` 下的各 Skill 目录复制到你项目的 `.agents/skills/` 目录：
+**通过插件市场安装（适合从 Git 仓库分发）**：在 Codex 的「添加插件市场」中填入来源 `https://github.com/tardis9527/youai-skills.git`，Git 引用填 `main`，稀疏路径留空。添加市场后，在市场中安装 `youai-skills` 插件，并开启新会话。该插件包含全部 10 个 Skill 及其完整定义。
+
+命令行也可以添加市场并安装插件：
+
+```powershell
+codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --ref main
+codex plugin add youai-skills@youai-skills
+```
+
+**直接安装 Skill**：将 `skills/` 下的各 Skill 目录复制到你项目的 `.agents/skills/` 目录：
 
 ```powershell
 # 复制 Codex Agent Skills（项目级）
@@ -154,8 +163,8 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills
 
 ```powershell
 # 复制 Codex Agent Skills（个人级）
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
+Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
 ```
 
 安装后重启 Codex 或开启新会话。在 Codex 对话中通过 `$skill-name` 显式触发，例如：
@@ -188,6 +197,11 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFI
 ```
 youai-skills/
 ├── .plugin/plugin.json       # Open Plugins 标准清单
+├── .agents/plugins/marketplace.json # Codex 插件市场清单
+├── plugins/youai-skills/     # Codex 插件安装包（由 scripts/sync-codex-plugin.ps1 同步）
+│   ├── .codex-plugin/plugin.json
+│   └── skills/              # 10 个 Skill 与完整定义的打包副本
+├── scripts/sync-codex-plugin.ps1 # 更新源 Skill 后重新生成安装包
 ├── README.md                 # 项目介绍（中文）
 ├── README_en.md              # 项目介绍（English）
 ├── LICENSE                   # MIT 开源协议
@@ -221,7 +235,7 @@ youai-skills/
     └── distribution-guide.md # 分发指南
 ```
 
-> 📌 **单一来源**：不再维护 `platforms/` 平台副本。`skills/{skill-name}/SKILL.md` 是通用入口，Cursor / Claude Code / Codex 可直接安装；Windsurf 复制成 `.windsurf/workflows/{name}.md` 即可。各平台差异只体现在**安装位置和触发符**上，Skill 内容不分叉。
+> 📌 **单一来源**：`skills/` 是 Skill 源目录。修改后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1` 更新 Codex 插件包，再提交两处变更。插件副本会移除 Codex 不支持的 `disable-model-invocation: true` 字段。Cursor / Claude Code / Codex 也可直接安装源目录中的入口；Windsurf 复制成 `.windsurf/workflows/{name}.md`。
 
 ---
 

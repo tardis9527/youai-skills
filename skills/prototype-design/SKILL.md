@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 ## 步骤
 
-1. **阅读 Skill 定义**：先尝试打开本地 `skills/07_prototype-design.md`。如果文件不存在，请从以下 URL 读取完整 Skill 定义：https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/07_prototype-design.md 。阅读后理解角色设定、六阶段流程、全局风格基准机制与出图提示词格式。如果 URL 也无法访问，则直接按以下核心流程执行。
+1. **阅读 Skill 定义**：以本 `SKILL.md` 所在目录为基准，先读取 `../07_prototype-design.md`；若不存在，再尝试工作区的 `skills/07_prototype-design.md`。仍不存在时，从 https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/07_prototype-design.md 读取完整定义。阅读后理解角色设定、六阶段流程、全局风格基准机制与出图提示词格式。如果 URL 也无法访问，则直接按以下核心流程执行。
 
 2. **PRD 理解与上下文提取**：读取 PRD / 产品简报，提炼产品背景、产品目标、用户画像、核心功能、平台与设备，输出「产品设计上下文卡片」并确认。
 
