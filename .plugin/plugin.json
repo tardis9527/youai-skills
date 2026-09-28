@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.0",
-  "description": "面向产品开发全流程的 AI 技能包 —— 从项目分析到 UI/UX 重塑、PRD 生成、原型与设计图出图、投资人 BP 生成、公众号文章自进化写作。8 个技能覆盖写下第一行代码之前的关键决策、设计、融资与内容传播准备流程。",
+  "description": "面向产品开发与内容创作的 AI 技能包。10 个技能覆盖项目分析、产品探索、市场调研、PRD、UI/UX、原型设计、融资材料、内容写作及图片生成编辑。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -20,6 +20,8 @@
     "product-discovery",
     "uiux-redesign",
     "prototype-design",
+    "imagegen-zh",
+    "image-generation",
     "ui-design",
     "wireframe",
     "ai-image-prompt",

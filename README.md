@@ -17,13 +17,13 @@
 
 大多数 AI 编程提示词聚焦在"怎么写代码"，但**决定做什么远比怎么写代码更重要**。
 
-这套 Skill Pack 覆盖了产品开发的**前半段关键决策流程**，帮助你用 AI 完成从模糊想法到可落地 PRD、再到投资人 BP 的全过程——**在写第一行代码之前，先把方向搞对**。
+这套 Skill Pack 覆盖产品开发中的决策、设计、内容创作与图片制作，帮助你用 AI 完成从模糊想法到可落地 PRD、再到投资人 BP 的全过程。
 
 ---
 
 ## 🔗 工作流全景
 
-八个 Skill 覆盖产品开发全流程与内容传播，每个 Skill 的产出物可直接作为下一个 Skill 的输入：
+十个 Skill 覆盖产品开发、内容传播与图片制作，相关产出物可作为其他 Skill 的输入：
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -67,6 +67,9 @@
 | 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
 | 08 | [公众号文章自进化写作](./skills/08_wechat-writer.md) | 写公众号文章、起标题大纲、去 AI 味、润色成个人文风 | 一个写作主题（可选参考文章/风格偏好） | 通过六维评分自审的公众号定稿 + 沉淀到本地知识库的学习记录 |
 | 09 | [朋友圈文案自进化写作](./skills/09_moments-writer.md) | 写朋友圈配文、发圈文案、去朋友圈"塑料感" | 一个发圈场景（可选人设风格/篇幅偏好） | 3-5 条通过轻量检查表自审的候选文案 + 沉淀到本地知识库的学习记录 |
+| 10 | [中文生图](./skills/imagegen-zh/SKILL.md) | 生成或编辑照片、插画、产品图、透明素材 | 图片需求；编辑时提供原图 | 图片文件；默认使用 Codex 内置生图工具 |
+
+> `imagegen-zh` 的默认路径依赖 Codex 环境提供 `image_gen`；其他工具需具备等效生图能力，或由用户明确选择 Skill 随附的 CLI/API 路径。
 
 ---
 
@@ -165,12 +168,13 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFI
 - `$prototype-design` — 产品原型与界面设计图提示词生成
 - `$wechat-writer` — 公众号文章自进化写作
 - `$moments-writer` — 朋友圈文案自进化写作
+- `$imagegen-zh` — 生成或编辑图片（将 `skills/imagegen-zh/` 完整复制到目标项目的 `.agents/skills/imagegen-zh/`）
 
 ---
 
 ## 📋 Skill 特点
 
-- **🔗 链式可组合** — 9个Skill形成工作流，产出物可串联
+- **🔗 链式可组合** — 10个Skill可按需求串联，产出物可复用
 - **📐 结构化输出** — 每个Skill定义了明确的输出格式和质量标准
 - **🛡️ 行为约束** — 内置角色设定、禁止行为、自检清单，减少AI胡说
 - **🔄 交互式引导** — 分阶段推进，每步确认，避免方向跑偏
@@ -207,7 +211,8 @@ youai-skills/
 │   ├── investor-bp-generation/
 │   ├── prototype-design/
 │   ├── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
-│   └── moments-writer/       # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
+│   ├── moments-writer/       # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
+│   └── imagegen-zh/         # 中文生图 Skill，含脚本、参考资料和独立许可证
 │
 ├── examples/                 # 使用示例（产出样例）
 │
@@ -235,7 +240,7 @@ youai-skills/
 
 ## 📄 开源协议
 
-本项目采用 [MIT License](./LICENSE) 开源。你可以自由使用、修改和分发，但请保留原作者署名。
+本项目采用 [MIT License](./LICENSE) 开源。`skills/imagegen-zh/` 中保留的内置生图脚本和素材附带独立的 [Apache License 2.0](./skills/imagegen-zh/LICENSE.txt)，分发时请一并保留。
 
 ---
 

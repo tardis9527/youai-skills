@@ -23,7 +23,7 @@ This Skill Pack covers the **critical decision-making stages before coding** —
 
 ## 🔗 Workflow Overview
 
-Seven Skills form a complete product development pipeline. Each Skill's output serves as input for the next:
+Ten Skills cover product development, content creation, and image production. Related outputs can feed into other skills:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -68,8 +68,11 @@ Seven Skills form a complete product development pipeline. Each Skill's output s
 | 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
 | 08 | [WeChat Article Writer (Self-Evolving)](./skills/08_wechat-writer.md) | Writing WeChat/public-account articles, titles & outlines, de-AI-ifying, personal-voice polishing | A writing topic (optional: reference articles / style prefs) | A finalized article passing the 6-dimension self-review + learnings persisted to a local knowledge base |
 | 09 | [WeChat Moments Copywriter (Self-Evolving)](./skills/09_moments-writer.md) | Writing WeChat Moments captions, de-plasticizing "AI feel" from short posts | A posting scenario (optional: persona style / length preference) | 3-5 candidate captions passing a lightweight self-check + learnings persisted to a local knowledge base |
+| 10 | [Image Generation (Chinese)](./skills/imagegen-zh/SKILL.md) | Generate or edit photos, illustrations, product images, and transparent assets | Image request; source image for edits | Image files using Codex's built-in image tool by default |
 
-> Note: Skill content is currently in Chinese. English translations are on the roadmap.
+> Note: Skill content is currently in Chinese. English translations are on the roadmap. The image generation skill also includes a CLI fallback for users who explicitly choose the API path.
+
+> `imagegen-zh` uses Codex's built-in `image_gen` by default. Other tools need an equivalent image tool, or the user must explicitly choose its bundled CLI/API path.
 
 ---
 
@@ -126,13 +129,13 @@ New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.codex\skills
 Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.codex\skills\
 ```
 
-Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, or `$moments-writer`.
+Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, `$moments-writer`, or `$imagegen-zh`. For image generation, copy the complete `skills/imagegen-zh/` directory to the target project's `.agents/skills/imagegen-zh/` directory.
 
 ---
 
 ## 📋 Key Features
 
-- **🔗 Chainable** — 7 Skills form a pipeline, outputs feed into next stage
+- **🔗 Chainable** — 10 Skills can be combined as needed, with reusable outputs
 - **📐 Structured Output** — Every Skill defines clear output format and quality standards
 - **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
 - **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints
@@ -147,4 +150,4 @@ Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## 📄 License
 
-[MIT License](./LICENSE)
+[MIT License](./LICENSE). The bundled image generation scripts and assets retain their separate [Apache License 2.0](./skills/imagegen-zh/LICENSE.txt).
