@@ -67,10 +67,7 @@
 | 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
 | 08 | [公众号文章自进化写作](./skills/08_wechat-writer.md) | 写公众号文章、起标题大纲、去 AI 味、润色成个人文风 | 一个写作主题（可选参考文章/风格偏好） | 通过六维评分自审的公众号定稿 + 沉淀到本地知识库的学习记录 |
 | 09 | [朋友圈文案自进化写作](./skills/09_moments-writer.md) | 写朋友圈配文、发圈文案、去朋友圈"塑料感" | 一个发圈场景（可选人设风格/篇幅偏好） | 3-5 条通过轻量检查表自审的候选文案 + 沉淀到本地知识库的学习记录 |
-| 10 | [中文生图](./skills/imagegen-zh/SKILL.md) | 生成或编辑照片、插画、产品图、透明素材 | 图片需求；编辑时提供原图 | 图片文件；默认使用 Codex 内置生图工具 |
-| 11 | [Tardis 生图](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片需求；本机 Codex API Key | 图片文件及聊天内预览、下载链接 |
-
-> `imagegen-zh` 的默认路径依赖 Codex 环境提供 `image_gen`；其他工具需具备等效生图能力，或由用户明确选择 Skill 随附的 CLI/API 路径。
+| 10 | [Tardis 生图](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片需求；本机 Codex API Key | 图片文件及聊天内预览、下载链接 |
 
 ---
 
@@ -143,7 +140,7 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills
 
 ### 方式五：Codex（推荐）
 
-**通过插件市场安装（适合从 Git 仓库分发）**：在 Codex 的「添加插件市场」中填入来源 `https://github.com/tardis9527/youai-skills.git`，Git 引用填 `main`，稀疏路径留空。添加市场后，在市场中安装 `youai-skills` 插件，并开启新会话。该插件包含全部 11 个 Skill 及其完整定义。
+**通过插件市场安装（适合从 Git 仓库分发）**：在 Codex 的「添加插件市场」中填入来源 `https://github.com/tardis9527/youai-skills.git`，Git 引用填 `main`，稀疏路径留空。添加市场后，在市场中安装 `youai-skills` 插件，并开启新会话。该插件包含全部 10 个 Skill 及其完整定义。
 
 命令行也可以添加市场并安装插件：
 
@@ -178,7 +175,6 @@ Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFI
 - `$prototype-design` — 产品原型与界面设计图提示词生成
 - `$wechat-writer` — 公众号文章自进化写作
 - `$moments-writer` — 朋友圈文案自进化写作
-- `$imagegen-zh` — 生成或编辑图片（将 `skills/imagegen-zh/` 完整复制到目标项目的 `.agents/skills/imagegen-zh/`）
 - `$imagegen-tardis` — 使用自定义供应商生成或编辑图片，并在 Codex 聊天中预览和下载（需本机 `~/.codex/auth.json`）
 
 ---
@@ -202,7 +198,7 @@ youai-skills/
 ├── .agents/plugins/marketplace.json # Codex 插件市场清单
 ├── plugins/youai-skills/     # Codex 插件安装包（由 scripts/sync-codex-plugin.ps1 同步）
 │   ├── .codex-plugin/plugin.json
-│   └── skills/              # 11 个 Skill 与完整定义的打包副本
+│   └── skills/              # 10 个 Skill 与完整定义的打包副本
 ├── scripts/sync-codex-plugin.ps1 # 更新源 Skill 后重新生成安装包
 ├── README.md                 # 项目介绍（中文）
 ├── README_en.md              # 项目介绍（English）
@@ -228,7 +224,6 @@ youai-skills/
 │   ├── prototype-design/
 │   ├── wechat-writer/        # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
 │   ├── moments-writer/       # 自带 references/（规则+风格）与 knowledge/（自进化记忆）
-│   └── imagegen-zh/         # 中文生图 Skill，含脚本、参考资料和独立许可证
 │   └── imagegen-tardis/     # 自定义供应商生图 Skill，含 API 调用脚本
 │
 ├── examples/                 # 使用示例（产出样例）
@@ -257,7 +252,7 @@ youai-skills/
 
 ## 📄 开源协议
 
-本项目采用 [MIT License](./LICENSE) 开源。`skills/imagegen-zh/` 中保留的内置生图脚本和素材附带独立的 [Apache License 2.0](./skills/imagegen-zh/LICENSE.txt)，分发时请一并保留。
+本项目采用 [MIT License](./LICENSE) 开源。
 
 ---
 

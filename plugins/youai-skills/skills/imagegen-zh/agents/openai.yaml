@@ -1,6 +1,0 @@
-interface:
-  display_name: "生图（中文项目版）"
-  short_description: "生成或编辑照片、插画、产品图与透明图片"
-  icon_small: "./assets/imagegen-small.svg"
-  icon_large: "./assets/imagegen.png"
-  default_prompt: "使用 $imagegen-zh 为当前项目生成或编辑图片。"

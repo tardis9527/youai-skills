@@ -68,12 +68,9 @@ Ten Skills cover product development, content creation, and image production. Re
 | 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
 | 08 | [WeChat Article Writer (Self-Evolving)](./skills/08_wechat-writer.md) | Writing WeChat/public-account articles, titles & outlines, de-AI-ifying, personal-voice polishing | A writing topic (optional: reference articles / style prefs) | A finalized article passing the 6-dimension self-review + learnings persisted to a local knowledge base |
 | 09 | [WeChat Moments Copywriter (Self-Evolving)](./skills/09_moments-writer.md) | Writing WeChat Moments captions, de-plasticizing "AI feel" from short posts | A posting scenario (optional: persona style / length preference) | 3-5 candidate captions passing a lightweight self-check + learnings persisted to a local knowledge base |
-| 10 | [Image Generation (Chinese)](./skills/imagegen-zh/SKILL.md) | Generate or edit photos, illustrations, product images, and transparent assets | Image request; source image for edits | Image files using Codex's built-in image tool by default |
-| 11 | [Tardis Image Generation](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image request; local Codex API key | Image files with inline Codex preview and download links |
+| 10 | [Tardis Image Generation](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image request; local Codex API key | Image files with inline Codex preview and download links |
 
-> Note: Skill content is currently in Chinese. English translations are on the roadmap. The image generation skill also includes a CLI fallback for users who explicitly choose the API path.
-
-> `imagegen-zh` uses Codex's built-in `image_gen` by default. Other tools need an equivalent image tool, or the user must explicitly choose its bundled CLI/API path.
+> Note: Skill content is currently in Chinese. English translations are on the roadmap.
 
 ---
 
@@ -116,7 +113,7 @@ Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The l
 
 ### Option 5: Codex (Recommended)
 
-**Install from the Git marketplace:** In Codex, add `https://github.com/tardis9527/youai-skills.git` as a plugin marketplace, use Git ref `main`, and leave the sparse path empty. Then install the `youai-skills` plugin from that marketplace and start a new session. The plugin bundles all 11 skills and their full definitions.
+**Install from the Git marketplace:** In Codex, add `https://github.com/tardis9527/youai-skills.git` as a plugin marketplace, use Git ref `main`, and leave the sparse path empty. Then install the `youai-skills` plugin from that marketplace and start a new session. The plugin bundles all 10 skills and their full definitions.
 
 From the CLI:
 
@@ -139,7 +136,7 @@ New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
 Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
 ```
 
-Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, `$moments-writer`, `$imagegen-zh`, or `$imagegen-tardis`. For image generation, copy the complete skill directory to the target project's `.agents/skills/` directory.
+Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, `$moments-writer`, or `$imagegen-tardis`. For image generation, copy the complete skill directory to the target project's `.agents/skills/` directory.
 
 The top-level `skills/` directory is the source of truth. After changing a skill, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1` and commit the updated `plugins/youai-skills/skills/` package. The packaged copies omit `disable-model-invocation: true`, which Codex plugin validation does not accept.
 
@@ -147,7 +144,7 @@ The top-level `skills/` directory is the source of truth. After changing a skill
 
 ## 📋 Key Features
 
-- **🔗 Chainable** — 11 Skills can be combined as needed, with reusable outputs
+- **🔗 Chainable** — 10 Skills can be combined as needed, with reusable outputs
 - **📐 Structured Output** — Every Skill defines clear output format and quality standards
 - **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
 - **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints
@@ -162,4 +159,4 @@ Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## 📄 License
 
-[MIT License](./LICENSE). The bundled image generation scripts and assets retain their separate [Apache License 2.0](./skills/imagegen-zh/LICENSE.txt).
+[MIT License](./LICENSE).

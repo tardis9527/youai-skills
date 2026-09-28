@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.0",
-  "description": "面向产品开发与内容创作的 AI 技能包，包含 11 个 Skill。",
+  "description": "面向产品开发与内容创作的 AI 技能包，包含 10 个 Skill。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -12,7 +12,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "YouAI Skills",
-    "shortDescription": "产品开发与内容创作的 11 个 Skill",
+    "shortDescription": "产品开发与内容创作的 10 个 Skill",
     "longDescription": "涵盖项目分析、产品探索、市场调研、PRD、UI/UX、原型设计、融资材料、内容写作与图片生成编辑。",
     "developerName": "tardis9527",
     "category": "Productivity",
