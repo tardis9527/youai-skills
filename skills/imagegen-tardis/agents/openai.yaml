@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tardis 生图"
+  short_description: "通过自定义图片接口生成、编辑并预览图片"
+  default_prompt: "使用 $imagegen-tardis 生成图片，并在聊天中预览和提供下载链接。"

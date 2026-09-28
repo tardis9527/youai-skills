@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: 面向产品开发与内容创作的 AI 技能包，包含 10 个技能，覆盖项目分析、产品探索、市场调研、PRD、UI/UX、原型、融资材料、内容写作与图片生成编辑。
+description: 面向产品开发与内容创作的 AI 技能包，包含 11 个技能，覆盖项目分析、产品探索、市场调研、PRD、UI/UX、原型、融资材料、内容写作与图片生成编辑。
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
@@ -9,7 +9,7 @@ description: 面向产品开发与内容创作的 AI 技能包，包含 10 个�
 
 在写第一行代码之前，先用 AI 把产品方向想清楚。
 
-## 包含 10 个 Skill
+## 包含 11 个 Skill
 
 ### 1. 项目理解与分析（Project Analysis）
 系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
@@ -61,6 +61,10 @@ description: 面向产品开发与内容创作的 AI 技能包，包含 10 个�
 - 适用场景：项目图片素材制作、参考图衍生、局部编辑、透明抠图
 - 产出：保存到项目中的图片文件及所用提示词
 - 入口：`skills/imagegen-zh/SKILL.md`；完整复制该目录以保留脚本、资源与 Apache License 2.0
+
+### 11. Tardis 生图（Image Generation）
+通过自定义供应商生成或编辑图片，默认 `gpt-image-2`，可指定其他模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
+- 入口：`skills/imagegen-tardis/SKILL.md`；需要本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY` 和 Python `openai` 包
 - 默认路径要求 Codex 环境具备 `image_gen`；其他工具需具备等效能力，或由用户明确选择 CLI/API 路径
 
 ## 使用方式
