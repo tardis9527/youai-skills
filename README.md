@@ -64,7 +64,7 @@
 | 04 | [PRD 文档生成](./skills/04_prd-generation.md) | 实施方案转PRD、功能详细设计 | 实施方案文档 | 完整可落地的PRD |
 | 05 | [UI/UX 设计风格重塑](./skills/05_uiux-redesign.md) | 界面风格优化、品牌升级、设计系统重构 | 已有项目 + 产品背景 | UI/UX 设计重塑方案 |
 | 06 | [投资人BP商业计划报告生成](./skills/06_investor-bp-generation.md) | 融资路演、投资人沟通、商业计划书准备 | Product Brief + PRD/市场/竞品资料 | Markdown BP 或 HTML 演示版 + 口述版 |
-| 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词（中英双语，统一风格） |
+| 07 | [产品原型与界面设计图提示词生成](./skills/07_prototype-design.md) | 产品界面设计、原型设计、设计稿/出图提示词生成 | PRD / 产品简报 | 原型交互草图 + 各页面 AI 出图提示词 + 可选 Tardis 真实生图资产（中英双语，统一风格） |
 | 08 | [公众号文章自进化写作](./skills/08_wechat-writer.md) | 写公众号文章、起标题大纲、去 AI 味、润色成个人文风 | 一个写作主题（可选参考文章/风格偏好） | 通过六维评分自审的公众号定稿 + 沉淀到本地知识库的学习记录 |
 | 09 | [朋友圈文案自进化写作](./skills/09_moments-writer.md) | 写朋友圈配文、发圈文案、去朋友圈"塑料感" | 一个发圈场景（可选人设风格/篇幅偏好） | 3-5 条通过轻量检查表自审的候选文案 + 沉淀到本地知识库的学习记录 |
 | 10 | [Tardis 生图](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片需求；本机 Codex API Key | 图片文件及聊天内预览、下载链接 |
@@ -200,6 +200,8 @@ youai-skills/
 │   ├── .codex-plugin/plugin.json
 │   └── skills/              # 10 个 Skill 与完整定义的打包副本
 ├── scripts/sync-codex-plugin.ps1 # 更新源 Skill 后重新生成安装包
+├── scripts/check-skill-sync.ps1  # 发布前检查源目录与插件副本一致性
+├── scripts/validate-product-artifact.ps1 # 校验 PRD/原型产物结构和占位符
 ├── README.md                 # 项目介绍（中文）
 ├── README_en.md              # 项目介绍（English）
 ├── LICENSE                   # MIT 开源协议

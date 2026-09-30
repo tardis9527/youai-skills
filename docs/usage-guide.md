@@ -219,6 +219,8 @@ cp -r skills/*/ ~/.agents/skills/
 > 📌 **为什么只有一份 Skill 文件？**
 > `skills/` 是唯一源目录；`plugins/youai-skills/skills/` 是由 `scripts/sync-codex-plugin.ps1` 生成的 Codex 插件安装包。源文件修改后需重新同步并提交安装包。插件副本移除了 Codex 不接受的 `disable-model-invocation: true` 字段。
 
+发布前可运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-skill-sync.ps1` 检查同步状态；PRD 或原型文档完成后，可运行 `scripts/validate-product-artifact.ps1` 检查必需章节和未解释占位符。
+
 **使用**：
 
 在 Codex 对话中用 `$skill-name` 显式触发：
@@ -363,7 +365,7 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 
 **输入**：实施方案文档或产品简报（可来自 02/03 的产出）
 
-**产出**：完整的 PRD 文档，包含 13 个章节：
+**产出**：完整的 PRD 文档，包含 14 个章节（新增需求追踪矩阵附录）：
 1. 文档信息
 2. 项目概述
 3. 用户角色与权限矩阵
@@ -377,6 +379,7 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 11. 设计规范与 UI/UX 标准
 12. 迭代规划
 13. 风险与开放问题
+14. 需求追踪矩阵
 
 **使用技巧**：
 - 这是内容最丰富的 Skill，分 5 段输出，回复"继续"逐段获取
