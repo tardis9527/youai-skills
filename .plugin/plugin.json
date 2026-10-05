@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.1",
-  "description": "面向产品开发与内容创作的 AI 技能包。10 个技能覆盖项目分析、产品探索、市场调研、PRD、UI/UX、原型设计、融资材料、内容写作及图片生成编辑。",
+  "description": "面向独立开发者的 10 个 AI Skill：在写代码前，把产品想法变成产品简报、PRD 和原型方案；还支持项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -34,6 +34,7 @@
     "copywriting",
     "self-evolving",
     "codex",
+    "claude-code",
     "cursor",
     "windsurf"
   ],

@@ -12,7 +12,8 @@ function Get-NormalizedText {
     if ([IO.Path]::GetFileName($Path) -eq 'SKILL.md') {
         $text = [regex]::Replace($text, '(?m)^disable-model-invocation: true\r?\n', '')
     }
-    return $text
+    # Ignore CRLF/LF differences introduced by Git checkout settings.
+    return $text.Replace("`r`n", "`n")
 }
 
 $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File

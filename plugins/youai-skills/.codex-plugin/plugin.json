@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.1",
-  "description": "面向产品开发与内容创作的 AI 技能包，包含 10 个 Skill。",
+  "description": "面向独立开发者的 10 个 AI Skill：从产品想法到产品简报、PRD 和原型方案。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -12,11 +12,11 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "YouAI Skills",
-    "shortDescription": "产品开发与内容创作的 10 个 Skill",
-    "longDescription": "涵盖项目分析、产品探索、市场调研、PRD、UI/UX、原型设计、融资材料、内容写作与图片生成编辑。",
+    "shortDescription": "从产品想法到 PRD 与原型方案",
+    "longDescription": "面向独立开发者、个人项目作者和 Hackathon 团队，主推需求探索 → PRD → 原型设计工作流；共 10 个 Skill，还涵盖项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。",
     "developerName": "tardis9527",
     "category": "Productivity",
     "capabilities": ["Write"],
-    "defaultPrompt": "使用 YouAI Skills 帮我梳理当前项目。"
+    "defaultPrompt": "使用 product-discovery 帮我把产品想法梳理成明确的 MVP 和产品简报。"
   }
 }

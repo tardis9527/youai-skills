@@ -1,162 +1,120 @@
 # 🍊 YouAI Skills
 
-**AI Skills for Builders** — A structured set of AI prompts covering the full product development lifecycle, from ideation to PRD, prototype design mockups, and investor BP materials. Compatible with mainstream AI IDEs.
+**Turn a product idea into a brief, a PRD, and a prototype plan before writing code.**
 
-[中文](./README.md) | English
+An open-source AI skill workflow for indie developers, side-project builders, and hackathon teams. Use it with Codex, Claude Code, Cursor, or Windsurf, or paste a full skill definition into an AI conversation.
+
+[中文](./README.md) · [Try the workflow](./examples/teamlog-walkthrough_en.md) · [Installation guide (Chinese)](./docs/usage-guide.md) · [All skills](#all-skills)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
-[![Windsurf](https://img.shields.io/badge/Windsurf-Compatible-00C4B4)](./docs/usage-guide.md)
-[![Cursor](https://img.shields.io/badge/Cursor-Compatible-7C3AED)](./docs/usage-guide.md)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-D97757)](./docs/usage-guide.md)
-[![Codex](https://img.shields.io/badge/Codex-Compatible-111827)](./docs/usage-guide.md)
 
----
+## Start with an idea
 
-## ✨ Why This Project?
+> “I want to build a daily-report assistant that helps a technical lead understand team progress.”
 
-Most AI coding prompts focus on "how to write code", but **deciding what to build matters far more than how to code it**.
+| Step | What the skill helps you define | TeamLog sample (Chinese) |
+|---|---|---|
+| Product discovery | Users, pain points, MVP scope, and where to find initial users | [Product brief](./examples/example-product-discovery.md) |
+| PRD generation | Features, acceptance criteria, data models, APIs, and page mapping | [PRD excerpt](./examples/example-prd-generation.md) |
+| Prototype design | Pages, key states, wireframes, a shared visual style, and image prompts | [Prototype plan excerpt](./examples/example-prototype-design.md) |
 
-This Skill Pack covers the **critical decision-making stages before coding** — helping you use AI to go from a vague idea to a production-ready PRD and investor-facing BP materials. **Get the direction right before writing the first line of code.**
-
----
-
-## 🔗 Workflow Overview
-
-Ten Skills cover product development, content creation, and image production. Related outputs can feed into other skills:
-
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                           YouAI Skills                                  │
-│                                                                          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ 01 Project│  │ 02 Product│  │ 03 Market │  │ 04 PRD   │  │ 05 UI/UX │  │
-│  │ Analysis  │  │ Discovery │─▶│ Research  │─▶│Generation│  │ Redesign │  │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-│       │              │             │              │            │         │
-│       │ Existing     │ New product │ Pre-funding  │ Product    │ Brand    │
-│       └──────────────┴─────────────┴──────────────┴────────────┘         │
-│                              ▼                                           │
-│                  ┌──────────┐   ┌──────────┐   ┌──────────┐             │
-│                  │ 06       │   │ 07       │   │ 08       │             │
-│                  │ Investor │   │Prototype │   │ WeChat   │             │
-│                  │ BP       │   │ & Design │   │ Writer   │             │
-│                  └──────────┘   └──────────┘   └──────────┘             │
-│                                                                          │
-│  Path A: New product from scratch  ──▶ 02 → 03 → 04                     │
-│  Path B: Existing project          ──▶ 01 → 04                           │
-│  Path C: Validate direction        ──▶ 02 → 03 → Decision                │
-│  Path D: UI/UX design optimization ──▶ 01 → 05 (or 02 → 05)              │
-│  Path E: Investor BP preparation   ──▶ 02/03/04 → 06                     │
-│  Path F: Prototype & design specs  ──▶ 04 → 07 (or 02 → 07)              │
-│  Path G: Content writing           ──▶ 08 (standalone, can reuse 02/03)  │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    A[Product idea] --> B[product-discovery<br/>Product brief]
+    B --> C[prd-generation<br/>PRD]
+    C --> D[prototype-design<br/>Prototype plan and image prompts]
 ```
 
----
+TeamLog is fictional. These are manually written, abbreviated samples of deliverable structure, rather than a customer case or measured result. [Follow the walkthrough to run your own version →](./examples/teamlog-walkthrough_en.md)
 
-## 📦 Skill Catalog
+## Your first run
 
-| # | Skill | Use Case | Input | Output |
-|---|-------|----------|-------|--------|
-| 01 | [Project Analysis](./skills/01_project-analysis.md) | Onboarding, code review, tech due diligence | Existing codebase | Structured project report |
-| 02 | [Product Discovery](./skills/02_product-discovery.md) | 0-to-1 product ideation, MVP definition | Vague product idea | Product Brief |
-| 03 | [Market Research](./skills/03_market-research.md) | Market validation, competitor analysis | Product direction | Research report |
-| 04 | [PRD Generation](./skills/04_prd-generation.md) | Implementation plan → PRD | Implementation doc | Complete PRD |
-| 05 | [UI/UX Redesign](./skills/05_uiux-redesign.md) | UI style optimization, brand upgrade, design system | Existing project + product context | UI/UX redesign plan |
-| 06 | [Investor BP Generation](./skills/06_investor-bp-generation.md) | Fundraising, investor meetings, pitch materials | Product Brief + PRD/market/competitor docs | Markdown BP or HTML pitch deck + oral pitch |
-| 07 | [Prototype & Design Mockup Prompts](./skills/07_prototype-design.md) | UI design, prototyping, design-spec / image-prompt generation | PRD / Product Brief | Wireframe sketches + per-page AI image prompts (bilingual, unified style) |
-| 08 | [WeChat Article Writer (Self-Evolving)](./skills/08_wechat-writer.md) | Writing WeChat/public-account articles, titles & outlines, de-AI-ifying, personal-voice polishing | A writing topic (optional: reference articles / style prefs) | A finalized article passing the 6-dimension self-review + learnings persisted to a local knowledge base |
-| 09 | [WeChat Moments Copywriter (Self-Evolving)](./skills/09_moments-writer.md) | Writing WeChat Moments captions, de-plasticizing "AI feel" from short posts | A posting scenario (optional: persona style / length preference) | 3-5 candidate captions passing a lightweight self-check + learnings persisted to a local knowledge base |
-| 10 | [Tardis Image Generation](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image request; local Codex API key | Image files with inline Codex preview and download links |
+**Try product discovery without installing anything:** Open the [full product-discovery definition (Chinese)](./skills/02_product-discovery.md), paste the entire file into a new AI conversation, then send:
 
-> Note: Skill content is currently in Chinese. English translations are on the roadmap.
-
----
-
-## 🚀 Quick Start
-
-### Option 1: Direct Use (Any AI Tool)
-
-1. Open the corresponding Skill file in [`skills/`](./skills/)
-2. Copy the full content into your AI conversation (ChatGPT / Claude / any AI)
-3. Follow the guided interaction in the prompt
-
-### Option 2: Windsurf
-
-Windsurf Workflows expect flat `.md` files, so copy each Skill entry as a same-named workflow:
-
-```bash
-mkdir -p your-project/.windsurf/workflows
-for d in skills/*/; do cp "$d/SKILL.md" "your-project/.windsurf/workflows/$(basename "$d").md"; done
+```text
+I want to build a daily-report assistant for a small technical team.
+Use Express mode to clarify the target users, pain points, and MVP scope.
+Start with a web app and exclude automatic Git integration from V1.
+Mark uncertain assumptions as unverified. Please respond in English.
 ```
 
-Use `/` commands: `/project-analysis`, `/product-discovery`, `/market-research`, `/prd-generation`, `/uiux-redesign`, `/investor-bp-generation`, `/prototype-design`, `/wechat-writer`, `/moments-writer`
+Answer the follow-up questions and confirm the scope to get a draft product brief. Pass the resulting document to the PRD and prototype skills. In a text-only chat, paste its contents instead. [Full steps and review checkpoints →](./examples/teamlog-walkthrough_en.md)
 
-### Option 3: Cursor (Recommended)
+**Codex users can install the complete plugin:** Add the following repository as a plugin marketplace, set the Git ref to `main`, and leave the sparse path empty. Install `youai-skills` and start a new session.
 
-```bash
-mkdir -p your-project/.cursor/skills/
-cp -r skills/*/ your-project/.cursor/skills/
+```text
+https://github.com/tardis9527/youai-skills.git
 ```
 
-Invoke Skills in Cursor Agent via **@Skill** (e.g. `@project-analysis`). Full skill definitions are fetched from GitHub remotely — no need to copy the entire `skills/` source files.
+Then send:
 
-### Option 4: Claude Code (Recommended)
-
-```bash
-mkdir -p your-project/.claude/skills/
-cp -r skills/*/ your-project/.claude/skills/
+```text
+$product-discovery Help me define the MVP for a team daily-report assistant.
+Use Express mode and respond in English.
 ```
 
-Trigger Skills in Claude Code via `/` commands (e.g. `/project-analysis`). The lightweight entry resolves the full definition from local `skills/` first, then falls back to GitHub remotely.
+For other tools, CLI commands, or installation into a project directory, see the [installation and usage guide (Chinese)](./docs/usage-guide.md).
 
-### Option 5: Codex (Recommended)
+## Requirements and scope
 
-**Install from the Git marketplace:** In Codex, add `https://github.com/tardis9527/youai-skills.git` as a plugin marketplace, use Git ref `main`, and leave the sparse path empty. Then install the `youai-skills` plugin from that marketplace and start a new session. The plugin bundles all 10 skills and their full definitions.
+- The skills are free under the MIT license. AI subscriptions, model APIs, and image services have their own pricing.
+- The core workflow can produce documents, wireframes, and image prompts. Generating actual images is optional and requires a configured image service.
+- Skill definitions and most samples are currently in Chinese. This README and the [English walkthrough](./examples/teamlog-walkthrough_en.md) explain the workflow; full English skill translations are not yet available. Asking for English output does not replace a translated definition.
+- An AI IDE can read and save files. In a text-only chat, supply reference material and save the results manually. Web research depends on the tools available in your AI environment.
+- Outputs are drafts for review. Verify market data, technical decisions, permissions, and acceptance criteria, and retain unresolved questions in the document.
 
-From the CLI:
+## All skills
+
+The ten skills work independently or use previous documents as input. Start with the three core skills above.
+
+| Skill | Use case | Main output |
+|---|---|---|
+| [product-discovery](./skills/02_product-discovery.md) | Define a product and its MVP | Product brief, assumptions, and validation plan |
+| [prd-generation](./skills/04_prd-generation.md) | Turn a brief or implementation plan into development specifications | PRD, acceptance criteria, and traceability matrix |
+| [prototype-design](./skills/07_prototype-design.md) | Translate requirements into pages and interactions | Wireframes, design specifications, bilingual image prompts; optional image generation |
+| [project-analysis](./skills/01_project-analysis.md) | Understand an existing codebase and business domain | Project analysis report |
+| [market-research](./skills/03_market-research.md) | Evaluate a direction, competitors, and market risks | Research report with confidence annotations |
+| [uiux-redesign](./skills/05_uiux-redesign.md) | Improve an existing product's interface and experience | Design system and implementation roadmap |
+| [investor-bp-generation](./skills/06_investor-bp-generation.md) | Prepare fundraising and pitch materials | Markdown business plan / HTML presentation and oral pitch |
+| [wechat-writer](./skills/08_wechat-writer.md) | Write WeChat articles and develop a personal voice | Article, image prompts, and local learning records |
+| [moments-writer](./skills/09_moments-writer.md) | Write WeChat Moments captions | Caption candidates, image concepts, and local learning records |
+| [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image files, previews, and download links |
+
+Other useful combinations:
+
+- **Validate a direction:** Discovery → research → decision → PRD.
+- **Take over a project:** Project analysis → PRD; add UI/UX redesign when needed.
+- **Prepare a pitch:** Product brief + research / PRD → investor business plan.
+- **Create content:** Use the writing skills independently and add image generation as needed.
+
+## Why use this workflow
+
+- **Review checkpoints:** Define users and scope before expanding features and design. Discovery supports Express, Standard, and Deep modes.
+- **Document handoffs:** Each step reads confirmed work to reduce repeated explanations of project context.
+- **Quality checks:** PRD and prototype definitions require evidence, states, traceability, and self-review, with unknowns explicitly marked.
+- **Editable and reusable:** Adapt the prompts, supporting files, and default technical choices to your project.
+
+## Documentation and contributions
+
+- [Sample index (Chinese)](./examples/README.md): Deliverable examples for individual skills.
+- [Usage guide (Chinese)](./docs/usage-guide.md): Installation, workflows, and common questions.
+- [Contributing (Chinese)](./CONTRIBUTING.md): Report issues, share actual runs, translate, or improve skills.
+- [Distribution guide (Chinese)](./docs/distribution-guide.md): Positioning, sharing copy, and release preparation.
+
+When reporting an issue, include the tool version, skill name, sanitized input, and actual result. Human edits are useful feedback too.
+
+If this workflow helps you, **Star** the repository to save it and support the project.
+
+## Repository maintenance
+
+`skills/` is the source of truth. `plugins/youai-skills/skills/` is the generated Codex package containing both entry files and full definitions. After updating source skills, run:
 
 ```powershell
-codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --ref main
-codex plugin add youai-skills@youai-skills
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-skill-sync.ps1
 ```
 
-**Direct skill installation:** Copy the skill folders under `skills/` into the target project's `.agents/skills/` directory:
+The plugin copy removes the unsupported `disable-model-invocation: true` field. Use `scripts/validate-product-artifact.ps1` for structural checks of PRD / prototype outputs; see the usage guide for parameters.
 
-```powershell
-New-Item -ItemType Directory -Force -Path .agents\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills\
-```
-
-For user-level reuse across Codex projects, copy them into your personal Codex skills directory:
-
-```powershell
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
-```
-
-Restart Codex or start a new session after installing. Invoke skills explicitly with `$skill-name`, for example `$project-analysis`, `$product-discovery`, `$market-research`, `$prd-generation`, `$uiux-redesign`, `$investor-bp-generation`, `$prototype-design`, `$wechat-writer`, `$moments-writer`, or `$imagegen-tardis`. For image generation, copy the complete skill directory to the target project's `.agents/skills/` directory.
-
-The top-level `skills/` directory is the source of truth. After changing a skill, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1` and commit the updated `plugins/youai-skills/skills/` package. The packaged copies omit `disable-model-invocation: true`, which Codex plugin validation does not accept.
-
----
-
-## 📋 Key Features
-
-- **🔗 Chainable** — 10 Skills can be combined as needed, with reusable outputs
-- **📐 Structured Output** — Every Skill defines clear output format and quality standards
-- **🛡️ Behavioral Constraints** — Built-in role definitions, forbidden actions, self-check lists
-- **🔄 Interactive Guidance** — Stage-by-stage progression with confirmation checkpoints
-- **🏗️ Flexible Tech Stack** — PRD Skill includes preferred tech stack with alternatives
-- **📱 Multi-platform** — Supports Web + Mobile (React Native) product design
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-## 📄 License
-
-[MIT License](./LICENSE).
+Licensed under [MIT](./LICENSE).

@@ -1,13 +1,15 @@
 ---
 name: youai-skills
-description: 面向产品开发与内容创作的 AI 技能包，包含 10 个技能，覆盖项目分析、产品探索、市场调研、PRD、UI/UX、原型、融资材料、内容写作与图片生成编辑。
+description: 面向独立开发者的 10 个 AI Skill，从产品想法到产品简报、PRD 和原型方案，并覆盖项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
 
 > 🍊 GitHub: https://github.com/tardis9527/youai-skills
 
-在写第一行代码之前，先用 AI 把产品方向想清楚。
+在写代码前，把一句产品想法变成产品简报、PRD 和原型设计方案。
+
+首次使用建议从 `product-discovery → prd-generation → prototype-design` 开始。查看 [TeamLog 体验教程](./examples/teamlog-walkthrough.md) 获取可复制的输入和人工检查点；现有 TeamLog 产物是虚构产品的精简结构样例。
 
 ## 包含 10 个 Skill
 
@@ -29,7 +31,7 @@ description: 面向产品开发与内容创作的 AI 技能包，包含 10 个�
 ### 4. PRD 文档生成（PRD Generation）
 将实施方案转化为可落地的 PRD，含功能规格、数据模型、API 设计、迭代规划。
 - 适用场景：方案转 PRD、输出开发文档
-- 产出：13 章完整 PRD（含验收标准、Mermaid 流程图）
+- 产出：14 章完整 PRD（含验收标准、Mermaid 流程图、证据台账与需求追踪矩阵）
 
 ### 5. UI/UX 设计风格重塑（UI/UX Redesign）
 结合产品背景与用户画像，系统性审计现有界面并输出完整设计重塑方案。
@@ -64,15 +66,16 @@ description: 面向产品开发与内容创作的 AI 技能包，包含 10 个�
 
 1. **复制粘贴**：将 `skills/` 目录下对应的 Skill 文件完整复制到 AI 对话中
 2. **Windsurf**：把每个 `skills/{skill-name}/SKILL.md` 复制成 `.windsurf/workflows/{skill-name}.md`，通过 `/` 命令触发
-3. **Cursor**：将 `skills/` 下的各 Skill 目录复制到项目的 `.cursor/skills/`，通过 @Skill 触发
-4. **Claude Code**：将 `skills/` 下的各 Skill 目录复制到项目的 `.claude/skills/`，通过 `/` 命令触发
-5. **Codex**：将 `skills/` 下的各 Skill 目录复制到 `.agents/skills/`（项目级）或 `~/.codex/skills/`（个人级），通过 `$skill-name` 触发
+3. **Cursor**：将 `skills/` 中的目录、完整定义及支撑资料复制到项目的 `.cursor/skills/`，通过 Skill 选择入口触发
+4. **Claude Code**：将 `skills/` 中的目录、完整定义及支撑资料复制到项目的 `.claude/skills/`，通过 `/` 命令触发
+5. **Codex**：通过插件市场安装，或将 `plugins/youai-skills/skills/` 中的全部内容复制到 `.agents/skills/`（项目级）或 `~/.agents/skills/`（个人级），通过 `$skill-name` 触发
 
 > 完整安装命令（含 Windows PowerShell）见 [docs/usage-guide.md](./docs/usage-guide.md)。仓库只维护一份 Skill 定义，各平台差异仅在安装位置与触发符。
 
 ## 工作流串联
 
 ```
+首次体验：          产品探索 → PRD 生成 → 原型设计方案
 新产品从 0 开始：    产品探索 → 市场调研 → PRD 生成
 接手已有项目：      项目分析 → PRD 生成
 验证产品方向：      产品探索 → 市场调研 → 决策

@@ -1,256 +1,179 @@
-# 📖 YouAI Skills 详细使用指南
+# 📖 YouAI Skills 安装与使用指南
 
-本指南帮助你快速上手 YouAI Skills，并在实际项目中高效使用。
+[返回首页](../README.md) · [首次体验教程](../examples/teamlog-walkthrough.md) · [English walkthrough](../examples/teamlog-walkthrough_en.md)
 
----
+首次使用建议先跑“需求探索 → PRD → 原型方案”。本指南提供安装路径、十个 Skill 的说明和常见问题。
 
 ## 目录
 
-- [核心概念](#核心概念)
-- [使用方式](#使用方式)
-  - [方式一：直接复制到任意 AI 工具](#方式一直接复制到任意-ai-工具)
-  - [方式二：Windsurf（推荐）](#方式二windsurf推荐)
-  - [方式三：Cursor](#方式三cursor)
-  - [方式四：Claude Code](#方式四claude-code)
-  - [方式五：Codex](#方式五codex)
-- [七个 Skill 详解](#七个-skill-详解)
+- [使用前准备](#使用前准备)
+- [无需安装：直接复制完整定义](#无需安装直接复制完整定义)
+- [Codex：完整插件包](#codex完整插件包)
+- [Cursor 与 Claude Code：项目级安装](#cursor-与-claude-code项目级安装)
+- [Codex：手动目录安装](#codex手动目录安装)
+- [Windsurf：Workflow 入口](#windsurfworkflow-入口)
+- [十个 Skill 详解](#十个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
+- [产物校验与仓库维护](#产物校验与仓库维护)
 - [最佳实践](#最佳实践)
 - [常见问题](#常见问题)
 
----
+## 使用前准备
 
-## 核心概念
+- Skill 内容免费开源，运行时需要自己的 AI 工具或模型服务。服务订阅、API 和图片接口可能收费。
+- 主推流程可以只输出文档、线框和提示词。真实生图需另行配置，见 [imagegen-tardis](../skills/imagegen-tardis/SKILL.md)。
+- Skill 目录可能包含 `references/` 和可写的 `knowledge/`，安装时应保留。再次安装前备份已有记忆，避免用仓库初始文件覆盖积累内容。
+- 下方手动安装命令用于**首次安装到新项目**。已经存在同名 Skill 时，先检查差异，不能直接用复制命令覆盖。
+- AI IDE 能读取项目文件；纯文本对话需要粘贴输入和手动保存产物。完整 Skill 定义和多数样例目前为中文。
 
-### 什么是 Skill？
+## 无需安装：直接复制完整定义
 
-Skill 是一份精心设计的**结构化 AI 提示词**，包含：
+1. 打开 [产品需求探索完整定义](../skills/02_product-discovery.md)，复制全文到新对话。
+2. 发送需求，例如“我想做一个团队日报助手，请按 Express 模式先梳理 MVP”。
+3. 回答追问并确认范围，将产品简报保存下来。
+4. 下一阶段在新对话中复制 [PRD 完整定义](../skills/04_prd-generation.md)，附上简报全文。
 
-- **角色设定** — 让 AI 扮演特定专家角色
-- **执行步骤** — 分阶段引导 AI 完成任务
-- **输出格式** — 规定产出物的结构和质量标准
-- **行为约束** — 限制 AI 的越界行为，减少幻觉
+复制的是 `skills/02_product-discovery.md` 等**完整定义**，不是只负责加载定义的 `SKILL.md` 入口。无文件系统时，记忆改为在对话中记录；可以按 [TeamLog 教程](../examples/teamlog-walkthrough.md) 继续到原型阶段。
 
-### Skill vs 普通提示词
+## Codex：完整插件包
 
-| 维度 | 普通提示词 | YouAI Skill |
-|------|-----------|-------------|
-| 输出稳定性 | 每次结果差异大 | 结构化模板，输出一致 |
-| 质量控制 | 依赖使用者追问 | 内置自检清单和禁止行为 |
-| 可复用性 | 一次性使用 | 跨项目复用 |
-| 上下游衔接 | 独立使用 | 产出物可串联为工作流 |
+在「添加插件市场」中填入：
 
----
-
-## 使用方式
-
-### 方式一：直接复制到任意 AI 工具
-
-适用于 ChatGPT、Claude、豆包、Kimi 等任何支持长文本输入的 AI 对话工具。
-
-**步骤**：
-
-1. 打开 `skills/` 目录下对应的 Skill 文件（如 `01_project-analysis.md`）
-2. **完整复制**文件内容（包括 YAML 头部元信息）
-3. 粘贴到 AI 对话框中
-4. 按 Skill 中的引导开始交互
-
-**提示**：
-- 建议在新对话中使用，避免上下文干扰
-- 一次只使用一个 Skill，不要在同一对话中混合多个 Skill
-- 如果使用的 AI 工具支持"系统提示词"功能，可将 Skill 内容设为系统提示词
-
-### 方式二：Windsurf（推荐）
-
-Windsurf 的 Workflow 功能可以将 Skill 注册为斜杠命令，使用体验最佳。Workflow 要求 `.windsurf/workflows/` 下是**扁平的 `.md` 文件**，因此把每个 Skill 入口复制成同名 workflow：
-
-**安装**（macOS / Linux）：
-
-```bash
-# 在你的项目根目录下创建 .windsurf/workflows/ 目录
-mkdir -p your-project/.windsurf/workflows
-
-# 把每个 Skill 入口复制成同名 workflow 文件
-for d in skills/*/; do cp "$d/SKILL.md" "your-project/.windsurf/workflows/$(basename "$d").md"; done
+```text
+https://github.com/tardis9527/youai-skills.git
 ```
 
-Windows PowerShell：
+Git 引用填 `main`，稀疏路径留空。添加市场后安装 `youai-skills`，并开启新会话。
 
-```powershell
-New-Item -ItemType Directory -Force -Path .windsurf\workflows
-Get-ChildItem skills -Directory | ForEach-Object { Copy-Item "$($_.FullName)\SKILL.md" ".windsurf\workflows\$($_.Name).md" }
-```
-
-**使用**：
-
-在 Windsurf 的 Cascade 对话框中输入 `/` 即可看到可用的 Skill 命令：
-
-| 命令 | 对应 Skill |
-|------|-----------|
-| `/project-analysis` | 项目理解与分析 |
-| `/product-discovery` | 产品需求探索与定义 |
-| `/market-research` | 市场调研分析 |
-| `/prd-generation` | PRD 文档生成 |
-| `/uiux-redesign` | UI/UX 设计风格重塑 |
-| `/investor-bp-generation` | 投资人BP商业计划报告生成 |
-| `/prototype-design` | 产品原型与界面设计图提示词生成 |
-| `/wechat-writer` | 公众号文章自进化写作 |
-| `/moments-writer` | 朋友圈文案自进化写作 |
-
-**提示**：
-- SKILL.md 的 YAML 头自带 `description`，正是 Windsurf Workflow 需要的字段，无需改写
-- 使用 `/project-analysis` 时，确保当前工作区已打开目标项目
-- 使用 `/prd-generation` 时，建议先把实施方案文档放在项目的 `doc/` 目录下
-
-### 方式三：Cursor（推荐）
-
-Cursor 的 **Agent Skills** 功能（`.cursor/skills/{skill-name}/SKILL.md`）是 Skill 的正确使用方式，与 Rules 不同——Skill 由用户通过 @Skill 显式触发，适合产品开发这类阶段性工作流。
-
-**安装**：
-
-```bash
-# 在你的项目根目录下创建 .cursor/skills/ 目录
-mkdir -p your-project/.cursor/skills/
-
-# 将 skills/ 下的各 Skill 目录复制过去
-cp -r skills/*/ your-project/.cursor/skills/
-```
-
-Windows PowerShell：
-
-```powershell
-New-Item -ItemType Directory -Force -Path .cursor\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .cursor\skills\
-```
-
-**使用**：
-
-1. 在 Cursor Agent 对话中输入 `@`，选择对应 Skill（如 `@project-analysis`、`@prd-generation`）
-2. 描述你的需求，Agent 会先拉取 GitHub 上的完整 Skill 定义，再按流程执行
-3. 一次对话建议只启用一个 Skill，避免工作流冲突
-
-**提示**：
-- Skill 入口文件轻量，完整定义从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
-- 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
-- 不要将 Skill 放入 `.cursor/rules/`，Rules 用于持久性编码规范，不适合阶段性产品工作流
-
-### 方式四：Claude Code
-
-Claude Code 的 **Agent Skills** 功能（`.claude/skills/{skill-name}/SKILL.md`）与 Cursor 一致，由用户通过 `/` 命令显式触发，适合产品开发这类阶段性工作流。每个 Skill 入口都设置了 `disable-model-invocation: true`，表示仅在用户主动调用时执行，不会被模型自动触发。
-
-**安装**：
-
-```bash
-# 在你的项目根目录下创建 .claude/skills/ 目录
-mkdir -p your-project/.claude/skills/
-
-# 将 skills/ 下的各 Skill 目录复制过去
-cp -r skills/*/ your-project/.claude/skills/
-```
-
-Windows PowerShell：
-
-```powershell
-New-Item -ItemType Directory -Force -Path .claude\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .claude\skills\
-```
-
-**使用**：
-
-1. 在 Claude Code 对话中输入 `/`，选择对应 Skill（如 `/project-analysis`、`/prd-generation`）
-2. 描述你的需求，Claude Code 会先读取本地 `skills/0X_*.md`（不存在则从 GitHub 远程拉取）的完整定义，再按流程执行
-3. 一次对话建议只启用一个 Skill，避免工作流冲突
-
-**提示**：
-- Skill 入口文件轻量，完整定义优先读本地 `skills/`，否则从 `https://raw.githubusercontent.com/tardis9527/youai-skills/main/skills/` 远程读取，统一管理
-- 若业务项目也克隆了 youai-skills 仓库，会优先使用本地 `skills/0X_*.md`
-- 自带 `knowledge/` 的自进化 Skill（如 `wechat-writer`、`moments-writer`、`product-discovery`）会在安装目录内读写记忆文件，复制时不要漏掉这些子目录
-- Skill 适合阶段性产品工作流，长期编码规范请使用 `CLAUDE.md` 而非 Skill
-
----
-
-### 方式五：Codex
-
-Codex 支持 Agent Skills。可以通过本仓库的插件市场一次安装 10 个 Skill，也可以直接使用 `skills/{skill-name}/SKILL.md`，安装到项目级 `.agents/skills/` 或个人级 `~/.agents/skills/`。
-
-**从 Git 仓库安装插件市场**：在 Codex「添加插件市场」中填入 `https://github.com/tardis9527/youai-skills.git`，Git 引用填 `main`，稀疏路径留空；添加后从市场安装 `youai-skills` 插件，并开启新会话。命令行等价操作：
+支持插件命令的 Codex CLI 也可执行：
 
 ```powershell
 codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --ref main
 codex plugin add youai-skills@youai-skills
 ```
 
-插件清单位于 `.agents/plugins/marketplace.json` 和 `plugins/youai-skills/.codex-plugin/plugin.json`。安装包内包含完整的 10 个 Skill 及 `skills/01_*.md` 等定义文件，无需运行时从 GitHub 读取定义。
+插件包包含十个 Skill 的入口、完整定义和支撑文件；使用时无需再从 GitHub 下载定义。AI 模型本身和调研检索仍可能需要联网。若当前版本没有插件入口或命令，使用下面的手动目录安装。
 
-**直接安装 Skill**：
+调用示例：
 
-**项目级安装**：
+```text
+$product-discovery 我想做一个团队日报助手，请按 Express 模式梳理 MVP。
+```
+
+## Cursor 与 Claude Code：项目级安装
+
+先克隆仓库。命令中的 `youaiRoot` / `youai_root` 是本仓库路径，`projectRoot` / `project_root` 是你要使用 Skill 的业务项目路径，两者分开设置。
+
+Windows PowerShell：
 
 ```powershell
-New-Item -ItemType Directory -Force -Path .agents\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination .agents\skills\
+git clone https://github.com/tardis9527/youai-skills.git
+Set-Location youai-skills
+$youaiRoot = (Get-Location).Path
+$projectRoot = 'D:\demo\my-product' # 改成你的目标项目绝对路径
+```
+
+Cursor 首次安装：
+
+```powershell
+$skillTarget = Join-Path $projectRoot '.cursor\skills'
+New-Item -ItemType Directory -Force -Path $skillTarget | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $youaiRoot 'skills') |
+    Copy-Item -Recurse -Destination $skillTarget
+```
+
+Claude Code 首次安装：
+
+```powershell
+$skillTarget = Join-Path $projectRoot '.claude\skills'
+New-Item -ItemType Directory -Force -Path $skillTarget | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $youaiRoot 'skills') |
+    Copy-Item -Recurse -Destination $skillTarget
 ```
 
 macOS / Linux：
 
 ```bash
-mkdir -p .agents/skills
-cp -r skills/*/ .agents/skills/
+git clone https://github.com/tardis9527/youai-skills.git
+cd youai-skills
+youai_root="$PWD"
+project_root="/absolute/path/to/my-product" # 改成你的目标项目绝对路径
+
+# Cursor
+mkdir -p "$project_root/.cursor/skills"
+cp -R "$youai_root/skills/." "$project_root/.cursor/skills/"
+
+# Claude Code
+mkdir -p "$project_root/.claude/skills"
+cp -R "$youai_root/skills/." "$project_root/.claude/skills/"
 ```
 
-**个人级安装**：
+只执行你使用的平台对应的安装段。复制内容同时包含 Skill 子目录和 `01_*.md` 等完整定义，入口可从父目录加载；不用只复制轻量入口后再依赖 GitHub 远程读取。
+
+安装后在目标项目开启新会话。Cursor 使用 Skill 选择入口（如 `@product-discovery`）；Claude Code 使用 `/product-discovery`。界面入口随工具版本可能不同，先确认能看到 Skill，再发送需求。
+
+## Codex：手动目录安装
+
+先按上一节克隆仓库并设置源目录、目标项目目录。Codex 使用**已生成的插件副本**，保留完整定义，并避免源入口中不受支持的 `disable-model-invocation: true` 字段。
+
+项目级首次安装（Windows PowerShell）：
 
 ```powershell
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.agents\skills
-Get-ChildItem skills -Directory | Copy-Item -Recurse -Destination $env:USERPROFILE\.agents\skills\
+$skillTarget = Join-Path $projectRoot '.agents\skills'
+New-Item -ItemType Directory -Force -Path $skillTarget | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $youaiRoot 'plugins\youai-skills\skills') |
+    Copy-Item -Recurse -Destination $skillTarget
 ```
 
-macOS / Linux：
+个人级首次安装时，把上面第一行换成：
+
+```powershell
+$skillTarget = Join-Path $env:USERPROFILE '.agents\skills'
+```
+
+macOS / Linux 项目级安装：
+
+```bash
+mkdir -p "$project_root/.agents/skills"
+cp -R "$youai_root/plugins/youai-skills/skills/." "$project_root/.agents/skills/"
+```
+
+个人级安装：
 
 ```bash
 mkdir -p ~/.agents/skills
-cp -r skills/*/ ~/.agents/skills/
+cp -R "$youai_root/plugins/youai-skills/skills/." ~/.agents/skills/
 ```
 
-安装后重启 Codex 或开启新会话。
+开启新会话后，通过 `$skill-name` 显式调用，十个名称见后面的 Skill 详解。插件市场安装和手动安装选一种即可，避免同时加载同名 Skill。
+
+## Windsurf：Workflow 入口
+
+先克隆仓库并设置 `youaiRoot` 与 `projectRoot`。Workflow 使用扁平的 `.md` 入口：
+
+```powershell
+$workflowTarget = Join-Path $projectRoot '.windsurf\workflows'
+New-Item -ItemType Directory -Force -Path $workflowTarget | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $youaiRoot 'skills') -Directory |
+    ForEach-Object {
+        Copy-Item -LiteralPath (Join-Path $_.FullName 'SKILL.md') -Destination (Join-Path $workflowTarget ($_.Name + '.md'))
+    }
+```
+
+macOS / Linux：
+
+```bash
+mkdir -p "$project_root/.windsurf/workflows"
+for skill_dir in "$youai_root"/skills/*/; do
+  cp "$skill_dir/SKILL.md" "$project_root/.windsurf/workflows/$(basename "$skill_dir").md"
+done
+```
+
+在 Cascade 中使用 `/product-discovery` 等命令。此方式复制的是轻量入口，完整定义在工作区不可用时会尝试 GitHub 远程读取。需要本地资料和记忆时，向 Agent 提供本仓库中对应 Skill 目录的实际路径，例如 `D:\tools\youai-skills\skills\product-discovery`；扁平入口本身不包含这些支撑文件。生图脚本也需要完整的 `imagegen-tardis/` 目录及其运行条件。
 
 ---
 
-> 📌 **为什么只有一份 Skill 文件？**
-> `skills/` 是唯一源目录；`plugins/youai-skills/skills/` 是由 `scripts/sync-codex-plugin.ps1` 生成的 Codex 插件安装包。源文件修改后需重新同步并提交安装包。插件副本移除了 Codex 不接受的 `disable-model-invocation: true` 字段。
-
-发布前可运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-skill-sync.ps1` 检查同步状态；PRD 或原型文档完成后，可运行 `scripts/validate-product-artifact.ps1` 检查必需章节和未解释占位符。
-
-**使用**：
-
-在 Codex 对话中用 `$skill-name` 显式触发：
-
-| 命令 | 对应 Skill |
-|------|-----------|
-| `$project-analysis` | 项目理解与分析 |
-| `$product-discovery` | 产品需求探索与定义 |
-| `$market-research` | 市场调研分析 |
-| `$prd-generation` | PRD 文档生成 |
-| `$uiux-redesign` | UI/UX 设计风格重塑 |
-| `$investor-bp-generation` | 投资人BP商业计划报告生成 |
-| `$prototype-design` | 产品原型与界面设计图提示词生成 |
-
-示例：
-
-```text
-$project-analysis 查询当前项目，了解项目背景和目标
-$product-discovery 我想做一个团队日报 AI 助手，帮我梳理 MVP
-$prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
-```
-
-**提示**：
-- 显式 `$skill-name` 调用最稳定，适合明确指定某条 YouAI 工作流
-- Codex 也可能根据 Skill 的 `description` 自动发现匹配的 Skill
-- Codex 适配入口优先读取所在 Skill 目录上一层的 `0X_*.md` 完整定义，再尝试工作区的 `skills/`，最后才从 GitHub 远程读取
-
----
-
-## 七个 Skill 详解
+## 十个 Skill 详解
 
 ### 01 项目理解与分析
 
@@ -432,17 +355,49 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 
 ---
 
+### 07 产品原型与界面设计图提示词生成
+
+完整定义：[prototype-design](../skills/07_prototype-design.md)。
+
+**输入：** 已确认的 PRD（优先）或产品简报。**产出：** 页面清单、页面状态矩阵、共享设计 Token / Style Anchor、线框与交互说明、中英出图提示词。
+
+先确认页面范围和风格，再逐批审阅布局。真实生图是可选步骤，需明确选择并配置图片接口。详见 [TeamLog 第三步](../examples/teamlog-walkthrough.md#第三步设计页面状态和统一风格)。
+
+### 08 公众号文章自进化写作
+
+完整定义：[wechat-writer](../skills/08_wechat-writer.md)。
+
+**输入：** 主题、参考资料及可选的文风偏好。**产出：** 自审后的定稿、配图提示词和本地学习记录。安装时保留 `references/` 与 `knowledge/`，定稿前仍需人工审核事实和表达。
+
+### 09 朋友圈文案自进化写作
+
+完整定义：[moments-writer](../skills/09_moments-writer.md)。
+
+**输入：** 发圈场景及可选的人设、篇幅和风格。**产出：** 3–5 条候选文案、配图方案和本地学习记录。文案与配图提示词保存到项目的 `output/`，个人偏好写回安装目录的 `knowledge/`。
+
+### 10 Tardis 生图
+
+完整入口：[imagegen-tardis](../skills/imagegen-tardis/SKILL.md)。
+
+**输入：** 图片需求或待编辑的本地图片。**产出：** 本地图片文件及预览、下载链接。
+
+需要 Python 与 `openai` 包、本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY`，以及可用的供应商接口；真实调用可能收费。不要把密钥粘贴到提示词或共享文档。脚本的 `--dry-run` 只检查参数和路径，不验证接口可用性。
+
+---
+
 ## 工作流组合指南
 
-### 场景 A：新产品从 0 开始
+### 场景 A：首次体验，想法到原型方案
 
-```
-02 产品需求探索 → 03 市场调研 → 04 PRD 生成
+```text
+02 产品需求探索 → 04 PRD 生成 → 07 原型设计
 ```
 
-1. 用 02 把模糊想法梳理成 Product Brief
-2. 用 03 对产品方向做市场调研和竞品分析
-3. 将 Product Brief + 调研报告一起喂给 04，生成完整 PRD
+1. 用 02 确认用户、MVP、成功指标及关键假设，保存产品简报。
+2. 将简报交给 04，确认技术和范围后生成完整 PRD。
+3. 将 PRD 交给 07，确认页面、状态与风格后生成原型方案。
+
+需要验证赛道时，在 PRD 前加入 03 市场调研。主推流程不要求先生成真实图片。按 [TeamLog 教程](../examples/teamlog-walkthrough.md) 体验。
 
 ### 场景 B：接手已有项目
 
@@ -483,6 +438,28 @@ $prd-generation 根据 doc/Product_Brief_TeamLog_20260609.md 生成 PRD
 
 ---
 
+## 产物校验与仓库维护
+
+在本仓库根目录运行，将示例路径换成实际产物的绝对路径：
+
+```powershell
+pwsh ./scripts/validate-product-artifact.ps1 -Path 'D:\demo\doc\TeamLog_PRD.md' -Type PRD
+pwsh ./scripts/validate-product-artifact.ps1 -Path 'D:\demo\doc\TeamLog_Prototype.md' -Type Prototype
+```
+
+校验器检查完整文档的必需标记和未解释占位符。精简结构样例不保证通过，校验也不能替代业务、数据和设计审核。目前部分必需标记为中文，英文产物可能需要保留对应标记才能通过。
+
+`skills/` 是唯一源目录；`plugins/youai-skills/skills/` 是生成的 Codex 安装包。更新源 Skill 后运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-codex-plugin.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-skill-sync.ps1
+```
+
+源文件与生成副本需一起更新。仅修改 README 等外围文档时无需重新同步。
+
+---
+
 ## 最佳实践
 
 ### 1. 充分提供上下文
@@ -507,9 +484,9 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 
 ### 4. 产出物要保存和版本管理
 
-- 所有 Skill 约定将产出保存到 `doc/` 目录
-- 建议将产出文件纳入 Git 版本管理
-- 文件命名已包含日期，便于追溯
+- 产品类文档通常保存到 `doc/`；写作产物保存到 `output/`，图片保存到指定输出目录，具体以当前 Skill 的输出约束为准
+- 适合共享的产物可纳入 Git；包含个人偏好或敏感信息的本地记忆应先脱敏，或排除出版本管理
+- 默认文件命名包含日期，便于追溯；教程中的固定文件名只用于演示交接
 
 ---
 
@@ -541,9 +518,7 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 
 ### Q: 可以用英文输出吗？
 
-目前 Skill 默认中文输出。如需英文：
-- 在对话开头说明"请用英文输出"
-- 或等待社区贡献英文版 Skill（欢迎 PR！）
+目前完整 Skill 定义以中文为主。可以在对话开头要求英文输出，但这不等于已经提供或验证了完整英文版 Skill。可先参考 [英文体验教程](../examples/teamlog-walkthrough_en.md)，欢迎贡献翻译。
 
 ### Q: 如何贡献新 Skill？
 
@@ -551,4 +526,4 @@ AI 的输出质量取决于你给的输入质量。使用 Skill 时：
 1. 在 `skills/` 下创建源文件
 2. 包含 YAML 元信息头
 3. 包含角色设定、执行步骤、输出格式、行为约束
-4. 同步创建 Windsurf、Cursor、Claude Code 和 Codex 的适配版本
+4. 创建通用 `skills/{skill-name}/SKILL.md` 入口和所需支撑资料，再同步 Codex 插件包；无需为各平台分别维护 Skill 定义
