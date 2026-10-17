@@ -16,6 +16,7 @@ from urllib.request import urlopen
 DEFAULT_BASE_URL = "https://sub-tardis.ai-you.top/v1"
 DEFAULT_MODEL = "gpt-image-2"
 DEFAULT_AUTH_FILE = Path.home() / ".codex" / "auth.json"
+DEFAULT_CONFIG_FILE = Path.home() / ".codex" / "config.toml"
 IMAGE_SUFFIXES = {"png": ".png", "jpeg": ".jpg", "webp": ".webp"}
 
 
@@ -31,6 +32,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--auth-file", type=Path, default=DEFAULT_AUTH_FILE)
+    parser.add_argument("--config-file", type=Path, default=DEFAULT_CONFIG_FILE)
     parser.add_argument("--size")
     parser.add_argument("--quality")
     parser.add_argument("--output-format", choices=tuple(IMAGE_SUFFIXES), default="png")
@@ -77,17 +79,65 @@ def _validate(args: argparse.Namespace) -> tuple[str, list[Path]]:
     return prompt, paths
 
 
-def _api_key(path: Path) -> str:
+def _auth_file_key(path: Path) -> str:
     try:
         auth = json.loads(path.read_text(encoding="utf-8-sig"))
-    except FileNotFoundError as exc:
-        raise ValueError(f"Auth file not found: {path}") from exc
     except json.JSONDecodeError as exc:
         raise ValueError(f"Auth file is not valid JSON: {path}") from exc
     key = auth.get("OPENAI_API_KEY") if isinstance(auth, dict) else None
     if not isinstance(key, str) or not key.strip():
         raise ValueError(f"OPENAI_API_KEY is missing in {path}")
     return key.strip()
+
+
+def _config_file_key(path: Path) -> str:
+    try:
+        import tomllib
+    except ModuleNotFoundError as exc:
+        raise ValueError(
+            "Reading config.toml requires Python 3.11+ (or the optional tomli package)"
+        ) from exc
+
+    try:
+        with path.open("rb") as stream:
+            config = tomllib.load(stream)
+    except FileNotFoundError as exc:
+        raise ValueError(
+            f"No OPENAI_API_KEY found in auth file and config file not found: {path}"
+        ) from exc
+    except tomllib.TOMLDecodeError as exc:
+        raise ValueError(f"Config file is not valid TOML: {path}") from exc
+    except OSError as exc:
+        raise ValueError(f"Cannot read config file: {path}") from exc
+
+    # Codex stores the token under a named model provider. Prefer the custom
+    # provider used by this Skill, then accept another provider if configured.
+    providers = config.get("model_providers")
+    if isinstance(providers, dict):
+        custom = providers.get("custom")
+        if isinstance(custom, dict):
+            token = custom.get("experimental_bearer_token")
+            if isinstance(token, str) and token.strip():
+                return token.strip()
+        for provider in providers.values():
+            if isinstance(provider, dict):
+                token = provider.get("experimental_bearer_token")
+                if isinstance(token, str) and token.strip():
+                    return token.strip()
+
+    token = config.get("experimental_bearer_token")
+    if isinstance(token, str) and token.strip():
+        return token.strip()
+    raise ValueError(f"experimental_bearer_token is missing in {path}")
+
+
+def _api_key(path: Path, config_path: Path = DEFAULT_CONFIG_FILE) -> str:
+    """Read the local API key, preferring auth.json over config.toml."""
+    if path.exists():
+        if not path.is_file():
+            raise ValueError(f"Auth path is not a file: {path}")
+        return _auth_file_key(path)
+    return _config_file_key(config_path)
 
 
 def _image_bytes(item: object) -> bytes:
@@ -130,7 +180,9 @@ def run(args: argparse.Namespace) -> list[Path]:
     if args.quality:
         options["quality"] = args.quality
 
-    with OpenAI(api_key=_api_key(args.auth_file), base_url=args.base_url) as client:
+    with OpenAI(
+        api_key=_api_key(args.auth_file, args.config_file), base_url=args.base_url
+    ) as client:
         if args.command == "generate":
             result = client.images.generate(**options)
         else:

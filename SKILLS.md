@@ -60,7 +60,7 @@ description: 面向独立开发者的 10 个 AI Skill，从产品想法到产品
 
 ### 10. Tardis 生图（Image Generation）
 通过自定义供应商生成或编辑图片，默认 `gpt-image-2`，可指定其他模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
-- 入口：`skills/imagegen-tardis/SKILL.md`；需要本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY` 和 Python `openai` 包
+- 入口：`skills/imagegen-tardis/SKILL.md`；优先读取本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY`，文件不存在时回退到 `~/.codex/config.toml` 的 `experimental_bearer_token`，并需要 Python `openai` 包
 
 ## 使用方式
 

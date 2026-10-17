@@ -381,7 +381,7 @@ done
 
 **输入：** 图片需求或待编辑的本地图片。**产出：** 本地图片文件及预览、下载链接。
 
-需要 Python 与 `openai` 包、本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY`，以及可用的供应商接口；真实调用可能收费。不要把密钥粘贴到提示词或共享文档。脚本的 `--dry-run` 只检查参数和路径，不验证接口可用性。
+需要 Python 与 `openai` 包、本机密钥（优先读取 `~/.codex/auth.json` 的 `OPENAI_API_KEY`，文件不存在时读取 `~/.codex/config.toml` 的 `experimental_bearer_token`），以及可用的供应商接口；真实调用可能收费。不要把密钥粘贴到提示词或共享文档。脚本的 `--dry-run` 只检查参数和路径，不验证接口可用性。
 
 ---
 

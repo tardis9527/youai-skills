@@ -71,6 +71,35 @@ class ImageGenTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "already exists"):
                 module.run(args)
 
+    def test_auth_json_takes_priority_over_config_toml(self):
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            auth = root / "auth.json"
+            config = root / "config.toml"
+            auth.write_text(json.dumps({"OPENAI_API_KEY": "auth-key"}), encoding="utf-8")
+            config.write_text(
+                '[model_providers.custom]\nexperimental_bearer_token = "config-key"\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(module._api_key(auth, config), "auth-key")
+
+    def test_config_toml_is_used_when_auth_json_is_missing(self):
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            config = root / "config.toml"
+            config.write_text(
+                '[model_providers.custom]\nexperimental_bearer_token = "config-key"\n',
+                encoding="utf-8",
+            )
+            self.assertEqual(module._api_key(root / "missing-auth.json", config), "config-key")
+
+    def test_missing_key_in_config_is_reported_without_exposing_values(self):
+        with TemporaryDirectory() as temp_dir:
+            config = Path(temp_dir) / "config.toml"
+            config.write_text("[model_providers.custom]\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "experimental_bearer_token is missing"):
+                module._api_key(Path(temp_dir) / "missing-auth.json", config)
+
     def test_edit_passes_image_file(self):
         with TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
