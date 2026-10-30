@@ -9,8 +9,8 @@
 | 文本编码节点 | `MiniMaxMusic3TextEncode`，可被封装在子图中 | 根据 `type` / `class_type` 和字段识别，不依赖固定节点编号；UI JSON 的子图可能在 `definitions.subgraphs` 中 |
 | `caption` | 音乐描述文本 | 推荐分 Global Metadata、Vocal Details、Arrangement 三部分 |
 | `lyrics` | 歌词文本及段落标签 | 原语言歌词与音乐说明分开；不要向用户暴露内部特殊 token |
-| `max_duration` | 最大时长，单位秒；模型可以提前结束 | 约 300 秒为该模型的时长上限，不代表一定生成满设定秒数 |
-| `seed` | 随机生成控制；模板可以共享给编码与采样节点 | 保留已有设置；对比提示词时固定，并检查生成后是否自动 randomize/increment |
+| `max_duration` | 最大时长，单位秒；模型可以提前结束 | 先让用户选择目标长度，再映射到合法上限；约 300 秒是该模型的单次能力边界，不能把它当作推荐或默认片长 |
+| `seed` | 随机生成控制；模板可以共享给编码与采样节点 | 根据用户选择做固定对照或新变体；沿用时核对生成后是否自动 randomize/increment，不强制所有创作固定 seed |
 | `tiled_decode` | 模板可能以此标题暴露分块音频解码开关 | 仅在相应控件存在且用户关心显存时说明；不保证每个版本字段名相同 |
 | 高级采样参数 | 当前编码节点有 `cfg_scale`、`top_k`；模板内部另有采样器 | 默认沿用工作流；不要把编码参数与采样器 CFG 混为一谈 |
 | negative prompt | 官方模板用 `ConditioningZeroOut` 产生采样器的 negative conditioning | 这不等于有可粘贴文本的负面提示词框，不凭空输出负面提示词字段 |
@@ -70,11 +70,27 @@
 | 节点/环节 | 官方实现中的字段与行为 | 使用边界 |
 | --- | --- | --- |
 | `SaveAudio` | 基础保存实现默认使用 `flac` | 可用于保留生成音频的无损编码副本；不是把低质来源恢复成高质量母带 |
-| `SaveAudioAdvanced` | `format` 提供 `flac`、`mp3`、`opus`；选择 `mp3` 后，`quality` 有 `V0`、`128k`、`320k`，默认 `V0` | 针对 320 kbps MP3 的导出目标，明确建议 `format=mp3`、`quality=320k`，仍需检查保存文件 |
-| `SaveAudioMP3` | `quality` 有 `V0`、`128k`、`320k`，schema 默认 `V0`；该节点在当前源码中标为 deprecated | 适配仍在使用的旧工作流，不擅自替用户迁移节点；不能假定默认就是 320k |
-| 采样率 | 上述保存节点没有独立的 `sample_rate` 输入；音频数据携带采样率，解码值来自实际 VAE/音频数据 | 不给保存节点编造采样率控件，不把其他模型或模板的采样率当作 MiniMax Music 3 的固定输出规格；以实际文件为准 |
+| `SaveAudioAdvanced` | `format` 提供 `flac`、`mp3`、`opus`；选择 `mp3` 后，`quality` 有 `V0`、`128k`、`320k`，默认 `V0` | 按用户选择的格式与质量映射；`V0`、`128k`、`320k` 都可以是有效选择，不强制改默认值为最高档。保存后对照已选目标检查实际文件 |
+| `SaveAudioMP3` | `quality` 有 `V0`、`128k`、`320k`，schema 默认 `V0`；该节点在当前源码中标为 deprecated | 只设置用户所选 `quality`，不添加不存在的格式控件；保留旧工作流，不擅自迁移节点 |
+| 采样率 | 上述保存节点没有独立的 `sample_rate` 输入；音频数据携带采样率，解码值来自实际 VAE/音频数据 | 允许用户选择沿用来源或指定目标，实际值待文件检测；有转换要求时明确另需支持的重采样环节，不把某一数值设为所有作品最低要求 |
 
 用户版本不同或使用第三方保存节点时，先核对其字段。不能因为某个 Opus 选项也是 `320k` 就认定平台接受 Opus；不能因为选了 FLAC 就推定文件和发布规则全部合格。格式、码率、采样率的解释与只读检查方法见 [audio-quality.md](audio-quality.md)。
+
+2026-10-30 另核对实际编码助手 `comfy_api/latest/_ui.py`：MP3 分支使用 `libmp3lame`；`V0` 走 `qscale` 分支，`320k` 设置 `bit_rate=320000`。它从输入音频读取采样率，不提供可由 Caption 修改的采样率设置。以上是界面操作说明；`SaveAudioAdvanced` 的动态 `format` 输入在 API JSON 中可以是嵌套结构，不能直接把界面里的 `format=mp3` 写成对所有工作流通用的 JSON 补丁。
+
+## 将本次参数选择映射到工作流
+
+先记录用户已选参数，再给实际控件与限制；缺少目标时先引导选择，不能通过节点默认值推断用户意愿。任何示例的时长、码率或采样率都不是默认方案。
+
+| 选择项 | 映射原则 |
+| --- | --- |
+| 时长与片长精度 | 目标时长决定歌词密度与结构，`max_duration` 仅控制生成上限；用户选精确片长时说明需成品检查，必要的剪辑另按任务范围处理 |
+| 听感 | 写入 Caption；不转换成不存在的统一质量开关 |
+| 格式与编码质量 | MP3 映射到用户选定的 `quality`，FLAC/Opus 则映射各自支持的格式选项；不在无损格式上套 MP3 码率档位 |
+| 采样率 | 用户选沿用时保留来源；明确指定目标时先检测来源与工具能力，只有需要转换才改变 |
+| 变体策略 | 用户选复现/对照时固定并核对各 seed 控件；用户选探索新变体时按实际支持方式更换，不混淆策略与具体 seed 数值 |
+
+用户需要文件验证时，读取实际输出的格式、采样率、声道、码率与时长，只对照本次所选方案；没有目标或检测结果时写 `PENDING`。若不一致，先核对实际保存节点、路径和时间，再讨论重导出，不回头强化 Caption 来解决编码问题。平台门槛仅在该发布目标下附加检查。
 
 ## 一手资料
 
@@ -85,5 +101,6 @@
 - 模型说明与生成限制：https://github.com/MiniMax-AI/MiniMax-Music3
 - 官方 Caption 编写说明：https://github.com/MiniMax-AI/MiniMax-Music3/blob/main/skills/music-caption-rewriter/SKILL.md
 - 官方音频保存与解码节点：https://github.com/Comfy-Org/ComfyUI/blob/master/comfy_extras/nodes_audio.py
+- 官方音频保存助手：https://github.com/Comfy-Org/ComfyUI/blob/master/comfy_api/latest/_ui.py
 
 这些是查证入口，不是需要安装的依赖。本技能自行完成创作引导与文本整理，不依赖另一个 Caption 技能或其模板库。
