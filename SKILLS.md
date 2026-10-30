@@ -60,7 +60,7 @@ description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品
 
 ### 10. Tardis 生图（Image Generation）
 通过自定义供应商生成或编辑图片，默认 `gpt-image-2`，可指定其他模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
-- 入口：`skills/imagegen-tardis/SKILL.md`；需要本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY` 和 Python `openai` 包
+- 入口：`skills/imagegen-tardis/SKILL.md`；首次使用时向用户索取密钥并保存到当前用户主目录下的 `~/.tardis-skill/imagegen-tardis/credentials.json`，后续直接读取该文件，并需要 Python `openai` 包
 
 ### 11. MiniMax 音乐创作引导（MiniMax Music）
 在 ComfyUI 中使用 MiniMax Music 3 / MiniMaxMusic 3.0 梳理歌曲或纯音乐的方向、听感、人声、歌词和编曲，生成可复制的 Caption、Lyrics、工作流参数及音质导出建议。
