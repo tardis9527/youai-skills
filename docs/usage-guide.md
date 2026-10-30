@@ -2,7 +2,7 @@
 
 [返回首页](../README.md) · [首次体验教程](../examples/teamlog-walkthrough.md) · [English walkthrough](../examples/teamlog-walkthrough_en.md)
 
-首次使用建议先跑“需求探索 → PRD → 原型方案”。本指南提供安装路径、十个 Skill 的说明和常见问题。
+首次使用建议先跑“需求探索 → PRD → 原型方案”。本指南提供安装路径、十一个 Skill 的说明和常见问题。
 
 ## 目录
 
@@ -12,7 +12,7 @@
 - [Cursor 与 Claude Code：项目级安装](#cursor-与-claude-code项目级安装)
 - [Codex：手动目录安装](#codex手动目录安装)
 - [Windsurf：Workflow 入口](#windsurfworkflow-入口)
-- [十个 Skill 详解](#十个-skill-详解)
+- [十一个 Skill 详解](#十一个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
 - [产物校验与仓库维护](#产物校验与仓库维护)
 - [最佳实践](#最佳实践)
@@ -52,7 +52,7 @@ codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --re
 codex plugin add youai-skills@youai-skills
 ```
 
-插件包包含十个 Skill 的入口、完整定义和支撑文件；使用时无需再从 GitHub 下载定义。AI 模型本身和调研检索仍可能需要联网。若当前版本没有插件入口或命令，使用下面的手动目录安装。
+插件包包含十一个 Skill 的入口、完整定义和支撑文件；使用时无需再从 GitHub 下载定义。AI 模型本身和调研检索仍可能需要联网。若当前版本没有插件入口或命令，使用下面的手动目录安装。
 
 调用示例：
 
@@ -145,7 +145,7 @@ mkdir -p ~/.agents/skills
 cp -R "$youai_root/plugins/youai-skills/skills/." ~/.agents/skills/
 ```
 
-开启新会话后，通过 `$skill-name` 显式调用，十个名称见后面的 Skill 详解。插件市场安装和手动安装选一种即可，避免同时加载同名 Skill。
+开启新会话后，通过 `$skill-name` 显式调用，十一个名称见后面的 Skill 详解。插件市场安装和手动安装选一种即可，避免同时加载同名 Skill。
 
 ## Windsurf：Workflow 入口
 
@@ -173,7 +173,7 @@ done
 
 ---
 
-## 十个 Skill 详解
+## 十一个 Skill 详解
 
 ### 01 项目理解与分析
 
@@ -382,6 +382,16 @@ done
 **输入：** 图片需求或待编辑的本地图片。**产出：** 本地图片文件及预览、下载链接。
 
 需要 Python 与 `openai` 包、本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY`，以及可用的供应商接口；真实调用可能收费。不要把密钥粘贴到提示词或共享文档。脚本的 `--dry-run` 只检查参数和路径，不验证接口可用性。
+
+### 11 MiniMax 音乐创作引导
+
+完整入口：[comfyui-minimax-music](../skills/comfyui-minimax-music/SKILL.md)。
+
+**何时使用**：在 ComfyUI 中使用 MiniMax Music 3 / MiniMaxMusic 3.0 创作歌曲或纯音乐，或需要把模糊灵感、已有歌词和发布要求整理成可执行输入时。
+
+**产出**：按官方双文本输入模板整理的 `Caption` 与 `Lyrics`，以及与当前工作流相符的参数和音质导出建议。入口附带 `references/`，用于工作流字段、作曲组织和发布规格检查。
+
+**边界**：默认只整理提示词和参数，不运行 ComfyUI、不调用音乐生成 API，也不把未经核实的工作流字段或音频规格写成已确认事实。
 
 ---
 

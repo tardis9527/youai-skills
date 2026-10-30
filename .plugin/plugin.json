@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.1",
-  "description": "面向独立开发者的 10 个 AI Skill：在写代码前，把产品想法变成产品简报、PRD 和原型方案；还支持项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。",
+  "description": "面向独立开发者的 11 个 AI Skill：在写代码前，把产品想法变成产品简报、PRD 和原型方案；还支持项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑与 MiniMax 音乐创作。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -21,6 +21,10 @@
     "uiux-redesign",
     "prototype-design",
     "imagegen-tardis",
+    "comfyui-minimax-music",
+    "music-generation",
+    "comfyui",
+    "minimax-music",
     "image-generation",
     "ui-design",
     "wireframe",

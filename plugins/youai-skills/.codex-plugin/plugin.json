@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.1",
-  "description": "面向独立开发者的 10 个 AI Skill：从产品想法到产品简报、PRD 和原型方案。",
+  "description": "面向独立开发者的 11 个 AI Skill：从产品想法到产品简报、PRD 和原型方案，并支持 MiniMax 音乐创作。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -13,7 +13,7 @@
   "interface": {
     "displayName": "YouAI Skills",
     "shortDescription": "从产品想法到 PRD 与原型方案",
-    "longDescription": "面向独立开发者、个人项目作者和 Hackathon 团队，主推需求探索 → PRD → 原型设计工作流；共 10 个 Skill，还涵盖项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。",
+    "longDescription": "面向独立开发者、个人项目作者和 Hackathon 团队，主推需求探索 → PRD → 原型设计工作流；共 11 个 Skill，还涵盖项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑与 MiniMax 音乐创作。",
     "developerName": "tardis9527",
     "category": "Productivity",
     "capabilities": ["Write"],

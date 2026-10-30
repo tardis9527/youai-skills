@@ -64,7 +64,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 
 ## 全部 Skill
 
-十个 Skill 可独立使用，也可将产出文档交给下一步。首次体验建议从上面的三个核心 Skill 开始。
+十一个 Skill 可独立使用，也可将产出文档交给下一步。首次体验建议从上面的三个核心 Skill 开始。
 
 | Skill | 适用场景 | 主要产出 |
 |---|---|---|
@@ -78,6 +78,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 | [wechat-writer](./skills/08_wechat-writer.md) | 公众号写作与个人文风积累 | 定稿、配图提示词与本地学习记录 |
 | [moments-writer](./skills/09_moments-writer.md) | 朋友圈文案与风格积累 | 候选文案、配图方案与本地学习记录 |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片文件、预览与下载链接 |
+| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | 在 ComfyUI 中使用 MiniMax Music 3 创作歌曲或纯音乐 | Caption、Lyrics、工作流参数与音质导出建议 |
 
 其他常用组合：
 

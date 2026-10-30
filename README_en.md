@@ -66,7 +66,7 @@ For other tools, CLI commands, or installation into a project directory, see the
 
 ## All skills
 
-The ten skills work independently or use previous documents as input. Start with the three core skills above.
+The eleven skills work independently or use previous documents as input. Start with the three core skills above.
 
 | Skill | Use case | Main output |
 |---|---|---|
@@ -80,6 +80,7 @@ The ten skills work independently or use previous documents as input. Start with
 | [wechat-writer](./skills/08_wechat-writer.md) | Write WeChat articles and develop a personal voice | Article, image prompts, and local learning records |
 | [moments-writer](./skills/09_moments-writer.md) | Write WeChat Moments captions | Caption candidates, image concepts, and local learning records |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image files, previews, and download links |
+| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | Create songs or instrumental music in ComfyUI with MiniMax Music 3 | Caption, Lyrics, workflow parameters, and export guidance |
 
 Other useful combinations:
 

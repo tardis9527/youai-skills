@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: 面向独立开发者的 10 个 AI Skill，从产品想法到产品简报、PRD 和原型方案，并覆盖项目分析、市场调研、UI/UX、融资材料、内容写作与图片生成编辑。
+description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品简报、PRD 和原型方案，并覆盖项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑与音乐创作。
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
@@ -11,7 +11,7 @@ description: 面向独立开发者的 10 个 AI Skill，从产品想法到产品
 
 首次使用建议从 `product-discovery → prd-generation → prototype-design` 开始。查看 [TeamLog 体验教程](./examples/teamlog-walkthrough.md) 获取可复制的输入和人工检查点；现有 TeamLog 产物是虚构产品的精简结构样例。
 
-## 包含 10 个 Skill
+## 包含 11 个 Skill
 
 ### 1. 项目理解与分析（Project Analysis）
 系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
@@ -61,6 +61,10 @@ description: 面向独立开发者的 10 个 AI Skill，从产品想法到产品
 ### 10. Tardis 生图（Image Generation）
 通过自定义供应商生成或编辑图片，默认 `gpt-image-2`，可指定其他模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
 - 入口：`skills/imagegen-tardis/SKILL.md`；需要本机 `~/.codex/auth.json` 中的 `OPENAI_API_KEY` 和 Python `openai` 包
+
+### 11. MiniMax 音乐创作引导（MiniMax Music）
+在 ComfyUI 中使用 MiniMax Music 3 / MiniMaxMusic 3.0 梳理歌曲或纯音乐的方向、听感、人声、歌词和编曲，生成可复制的 Caption、Lyrics、工作流参数及音质导出建议。
+- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带 `references/` 工作流契约、作曲指南和音质建议
 
 ## 使用方式
 
