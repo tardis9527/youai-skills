@@ -23,6 +23,8 @@
 
 记录“听感目标、格式、码率/模式、采样率、使用场景、参数来源”。尚未选择的项目保留待选；用户说“你来定”时按用途推荐，不自动套最高规格。时长按主流程同步记录，不从文件质量选项推导固定片长。
 
+首次完整创作的未选项目不能只在成稿表中写“待选择”：当前轮应先给选项、等回答，再交付最终文本。质量选定后，继续主动给出采样率的“沿用/自定”和 seed 的“沿用/固定对照/新变体”选择；不要等用户自己想起这些参数。“帮我生成提示词”或只委托歌词并不授权代选它们。用户明确要求免提问时按授权范围推荐；格式、采样率实际值或节点映射未知可另标待核实。
+
 ## 听感写进 Caption
 
 把具体听感自然写入 `Global Metadata` 或 `Vocal Details`，与编制和情绪一致。下面是可选择的自写片段，不是必须整段附加的咒语：
@@ -30,19 +32,19 @@
 歌曲中强调主唱与伴奏的清晰关系：
 
 ```text
-Keep the lead vocal present and intelligible, with clear separation from the accompaniment. Maintain a balanced low end, smooth high frequencies, and natural dynamics as the chorus opens up.
+主唱清晰地处于前景，与伴奏保持明确的层次。低频均衡，高频平顺；副歌展开时保留自然的动态变化。
 ```
 
 纯音乐中强调声部、瞬态与高潮余量：
 
 ```text
-Give the main melodic instrument a clear foreground position, with distinct supporting layers and controlled low frequencies. Preserve natural transients and leave room for the final build to expand.
+让主旋律乐器清晰地处于前景，支撑声部各有层次，低频受控。保留自然的起音，为最后一段的层次展开留出空间。
 ```
 
 有意采用 lo-fi 或磁带质感时保留风格：
 
 ```text
-Retain the intended tape warmth and gentle background hiss, while keeping the melody intelligible and the bass from masking the other instruments.
+保留刻意选择的磁带温暖感与轻微底噪，同时保持旋律清楚，避免低频遮住其他乐器。
 ```
 
 只选符合当前作品的 1–2 句；人声、音色、空间和动态描述不应相互冲突。不要加入 `320 kbps`、`44.1 kHz`、`24-bit` 等文件指标来代替编码设置，不用“无损”“4K 音质”“保证过审”等无法由文本保证的承诺，也不一律增加立体声宽度、极高响度或强限制处理。

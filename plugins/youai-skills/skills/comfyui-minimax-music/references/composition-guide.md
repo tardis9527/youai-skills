@@ -30,11 +30,11 @@
 
 Caption 与 Lyrics 必须对应。Lyrics 没有桥段时，不在 Caption 中无故安排一段长桥段；歌词短、时长长时，可明确器乐间奏空间。对纯音乐按主题展开描述，不硬套主歌与副歌。
 
-明确的排除条件可以写进自然语言 Caption，例如“an acoustic arrangement without drums”。它是创作约束，不是已验证的 negative prompt 功能。
+明确的排除条件可以写进中文 Caption，例如“全曲使用原声编制，不使用鼓或打击乐”。它是创作约束，不是已验证的 negative prompt 功能。
 
 ## 把反馈改成可控制的音乐描述
 
-先找问题发生的声部与段落，然后写出“保留什么、改变什么、怎样过渡”。不要同时用相反的描述控制同一声部，例如主唱既要求 extremely airy 又要求每字强烈、有力；用户确实希望段落反差时，明确各自作用的段落。
+先找问题发生的声部与段落，然后写出“保留什么、改变什么、怎样过渡”。不要同时用相反的描述控制同一声部，例如主唱既要求极度气声又要求每字强烈、有力；用户确实希望段落反差时，明确各自作用的段落。
 
 | 反馈 | Caption 应改变的内容 | 保留的内容 |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ Caption 与 Lyrics 必须对应。Lyrics 没有桥段时，不在 Caption 中无
 质量口号如 `best quality, lossless, 320 kbps, perfect mastering` 不提供可靠的声部关系或编曲变化；删除其中的文件指标，把需要的听感写成具体动作。例如：
 
 ```text
-Keep the lead vocal close and intelligible, with short room ambience. In each chorus, let the guitar voicings open around the vocal rather than adding competing lead lines. Keep the bass controlled and preserve the contrast between the restrained verse and the fuller chorus.
+主唱贴近、咬字清晰，只保留短而自然的空间尾音。副歌通过展开吉他和弦增加层次，避免加入与主唱争夺旋律的声部。低频保持受控，保留克制主歌与较饱满副歌之间的动态差异。
 ```
 
 这是写法示例，不能作为所有风格都自动追加的固定尾缀。正式修订需返回受影响 Caption 的完整三部分；纯音乐改用主旋律乐器，lo-fi 等艺术质感继续保留。一次只测试一个问题维度，不把文本缩短或增加质量词说成经过实测的音质提升。
@@ -62,20 +62,24 @@ Keep the lead vocal close and intelligible, with short room ambience. In each ch
 
 不要在这一轮同时追问 BPM、调性、拍号、种子、混响、全部乐器和完整故事。下一轮根据回答提出听感方案；如果用户已经说了语言，就不要重问。
 
-## 示例 B：已足够明确的短歌需求
+## 示例 B：方向明确，仍需补齐参数选择
 
 用户：“给我一首 60 秒左右的中文暖心歌，轻柔女声、木吉他、不要鼓，主题是下班终于回家。歌词你写，直接给官方模板能用的完整文本。”
 
-直接交付，不继续采访。60 秒来自本例用户要求，不是默认片长；文件质量未指定，可在用户“直接给”的范围内推荐或沿用并注明来源，不把推荐冒充已选。下面展示完整短歌文本，不保证实际生成时长。
+本例已经明确时长、主题、人声和编制，但“歌词你写，直接给完整文本”没有明确委托文件参数。不能直接交付；本轮只补两个选择：
+
+> 60 秒、轻柔女声、木吉他和无鼓已经确定。文件主要用来自己试听、分享还是平台发布？导出想选偏小的 MP3（128k）、可变码率 MP3（V0）、较高码率 MP3（320k）还是支持的无损格式？也可以让我按用途建议。
+
+假设用户选“自己试听、MP3 V0”，下一轮再问“采样率沿用源音频还是自定”“seed 沿用、固定对照还是更换新变体”。用户明确两者沿用后，才交付下面这份中文 Caption 和完整歌词。60 秒仅来自本例用户要求，不是默认片长，也不保证实际生成时长。
 
 Caption：
 
 ```text
-Global Metadata: A warm acoustic pop miniature for a quiet evening at home. An unhurried, gently flowing pulse supports an emotional movement from end-of-day fatigue toward relief and belonging. Keep the production intimate, organic, and restrained, with soft dynamics and enough space for each phrase. Preserve natural guitar transients and a balanced low end, with clear separation between the lead vocal and accompaniment. The arrangement has no drums or percussion.
+Global Metadata: 温暖的原声流行短歌，采用舒缓、轻轻流动的律动，情绪从疲惫逐步转向放松与安定。整体声音自然、贴近而克制，为每句演唱留出空间。保留木吉他的自然拨弦细节，低频均衡，主唱与伴奏层次清楚。全曲不使用鼓或打击乐。
 
-Vocal Details: One soft female lead sings in Mandarin with clear diction and a natural, close vocal tone. Keep the verse conversational and understated, then let the chorus open slightly with a warmer sustained delivery. Use restrained room ambience. There are no backing vocals, spoken interjections, or wordless vocal fills.
+Vocal Details: 一位轻柔女声以普通话独唱，咬字清晰，音色自然贴近。主歌像轻声交谈，表达克制；副歌稍微展开，延长音更温暖。只保留少量自然空间感，不加入伴唱、念白或无词哼唱。
 
-Arrangement: Intro establishes a simple fingerpicked acoustic-guitar figure. Verse continues with the same guitar pattern and ample space between vocal lines. Chorus gently expands the guitar voicing while a few low piano notes add warmth without increasing rhythmic density. Outro returns to the opening guitar figure and closes with a settled final chord. Maintain a coherent short form with natural transitions and a clear ending.
+Arrangement: 前奏以简洁的木吉他指弹动机引入。主歌延续同一指弹型，在演唱乐句之间留白。副歌轻轻展开吉他和弦，加入少量钢琴低音增加温暖感，不增加节奏密度。尾奏回到开场的指弹动机，以安定的最终和弦和自然尾音结束。保持短曲结构连贯、过渡自然、收尾完整。
 ```
 
 Lyrics：
@@ -98,7 +102,7 @@ Lyrics：
 [Outro]
 ```
 
-参数建议为 `max_duration=60`，seed 沿用现有值，需要对比时固定。用户未给工作流文件时，说明按官方双文本模板整理。不要给出未经用户节点核实的其他数值。
+参数记录为目标约 60 秒、`max_duration=60`、自己试听、MP3 / `V0`、采样率与 seed 策略均明确沿用。节点映射与实际文件值尚未核实，不因选择 V0 自动改为 320k。用户未给工作流文件时，说明按官方双文本模板整理；不要编造其他参数值。
 
 可按用途建议保留原始生成音频或无损编码副本，文件质量选择见 [audio-quality.md](audio-quality.md)。只有用户选择了具体发布目标，才附相应平台门槛；不把历史截图的规格套入本例 Caption 或导出设置。
 
@@ -106,10 +110,10 @@ Lyrics：
 
 用户：“40 秒科普视频配乐，轻快钢琴、拨弦，不能有人声，也不能抢解说。”
 
-跳过歌手与歌词采访。Caption 的 Vocal Details 可写：
+跳过歌手与歌词采访，保留 40 秒这一已选目标；文件质量、采样率与 seed 策略尚未明确时，先按主流程补选择。选择完成后的中文 Caption 中，Vocal Details 可写：
 
 ```text
-Vocal Details: Strictly instrumental. No singing, humming, spoken voice, choir, or vocal samples. A light piano motif carries the melody, with restrained plucked-string responses. Keep the melodic activity sparse enough to leave room for narration added separately.
+Vocal Details: 严格纯音乐，不出现歌唱、哼唱、念白、合唱或人声采样。轻盈的钢琴动机承担主旋律，拨弦声部作克制回应。旋律活动保持稀疏，为后续另行加入的解说留出空间。
 ```
 
 正式交付时还需补全 Global Metadata 和 Arrangement，不能只交这一段。Lyrics 可使用 `[Intro]`、`[Instrumental]`、`[Outro]` 的纯标签文本；参数建议注明 40 秒是上限设置，成品可能提前结束。
@@ -147,3 +151,15 @@ Vocal Details: Strictly instrumental. No singing, humming, spoken voice, choir, 
 | seed | 沿用 | 用户已选；原值与生成后变化方式待工作流核对 |
 
 歌词与 Arrangement 根据本例长度组织；听感沿用用户此前选择，文件验证标为 `PENDING`。不能因 128k 低于历史截图的 320k 而判 FAIL。本例若用户改选 `V0`，保留 VBR 方案，不要求它的平均码率达到固定 320 kbps；若用户改为平台发布，再核对该平台的本次规则。
+
+## 示例 F：只说“生成创作音乐的提示词”时
+
+用户：“帮我生成一首送给孩子的中文暖心歌的创作音乐提示词，歌词你写。”
+
+已有主题、语言与歌曲形式，下一轮应直接给参数选择，而不是输出完整 Caption。可问：
+
+> 这首歌想做多长：短片段、几分钟的完整歌曲，还是指定秒数？生成后主要自己试听、分享、后期编辑还是平台发布？
+
+得到回答后，先选文件格式与质量；随后主动给采样率和 seed 策略的选项。已经回答的项目不重复询问；“歌词你写”不能用于跳过其余参数。用户主动说“剩余参数都由你决定，别再问”时按这个授权范围补齐并成稿，不增加总确认。
+
+最终 Caption 正文默认中文。用户仅把歌词语言换成英文时，Caption 仍用中文；用户明确要求英文 Caption 时，才提供英文正文。上面的三部分英文标识以及 Lyrics 段落标签保留。
