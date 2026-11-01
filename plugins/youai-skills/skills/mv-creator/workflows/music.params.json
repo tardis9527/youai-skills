@@ -1,0 +1,41 @@
+{
+  "description": "MiniMax Music 3 文生音乐（官方模板 audio_minimax_music_3）。导出为 API 格式并保存为 music.api.json。",
+  "workflow": "music.api.json",
+  "output_ext": [".flac", ".mp3", ".opus", ".wav"],
+  "params": {
+    "caption": {
+      "required": true,
+      "targets": [
+        {"title": "@caption", "input": "caption"},
+        {"class_type": "MiniMaxMusic3TextEncode", "input": "caption"}
+      ]
+    },
+    "lyrics": {
+      "targets": [
+        {"title": "@lyrics", "input": "lyrics"},
+        {"class_type": "MiniMaxMusic3TextEncode", "input": "lyrics"}
+      ]
+    },
+    "max_duration": {
+      "targets": [
+        {"title": "@duration", "input": "max_duration"},
+        {"class_type": "MiniMaxMusic3TextEncode", "input": "max_duration"}
+      ]
+    },
+    "seed": {
+      "mode": "all",
+      "optional": true,
+      "targets": [
+        {"class_type": "MiniMaxMusic3TextEncode", "input": "seed", "multi": true},
+        {"title": "@seed", "input": "seed", "multi": true}
+      ]
+    },
+    "filename_prefix": {
+      "optional": true,
+      "targets": [
+        {"title": "@output", "input": "filename_prefix"},
+        {"class_type": ["SaveAudio", "SaveAudioAdvanced", "SaveAudioMP3", "SaveAudioOpus"], "input": "filename_prefix", "multi": true}
+      ]
+    }
+  }
+}

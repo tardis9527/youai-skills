@@ -1,0 +1,61 @@
+{
+  "description": "Wan2.2 14B 图生视频（官方模板 Wan2.2 I2V，可带 4 步加速 LoRA）。导出为 API 格式并保存为 i2v.api.json。",
+  "workflow": "i2v.api.json",
+  "output_ext": [".mp4", ".webm", ".mov"],
+  "params": {
+    "image": {
+      "required": true,
+      "targets": [
+        {"title": "@image", "input": "image"},
+        {"class_type": "LoadImage", "input": "image"}
+      ]
+    },
+    "positive": {
+      "required": true,
+      "targets": [
+        {"title": "@positive", "input": "text"},
+        {"class_type": "CLIPTextEncode", "upstream": {"class_type": "WanImageToVideo", "input": "positive"}, "input": "text"}
+      ]
+    },
+    "negative": {
+      "optional": true,
+      "targets": [
+        {"title": "@negative", "input": "text"},
+        {"class_type": "CLIPTextEncode", "upstream": {"class_type": "WanImageToVideo", "input": "negative"}, "input": "text"}
+      ]
+    },
+    "width": {
+      "targets": [
+        {"title": "@size", "input": "width"},
+        {"class_type": "WanImageToVideo", "input": "width"}
+      ]
+    },
+    "height": {
+      "targets": [
+        {"title": "@size", "input": "height"},
+        {"class_type": "WanImageToVideo", "input": "height"}
+      ]
+    },
+    "length": {
+      "targets": [
+        {"title": "@size", "input": "length"},
+        {"class_type": "WanImageToVideo", "input": "length"}
+      ]
+    },
+    "seed": {
+      "mode": "all",
+      "targets": [
+        {"class_type": "KSamplerAdvanced", "input": "noise_seed", "multi": true},
+        {"class_type": "KSampler", "input": "seed", "multi": true},
+        {"title": "@seed", "input": "seed", "multi": true}
+      ]
+    },
+    "filename_prefix": {
+      "optional": true,
+      "targets": [
+        {"title": "@output", "input": "filename_prefix"},
+        {"class_type": ["SaveVideo", "VHS_VideoCombine", "SaveWEBM"], "input": "filename_prefix", "multi": true}
+      ]
+    }
+  }
+}

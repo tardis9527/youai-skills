@@ -1,7 +1,7 @@
 {
   "name": "youai-skills",
   "version": "1.4.1",
-  "description": "面向独立开发者的 11 个 AI Skill：在写代码前，把产品想法变成产品简报、PRD 和原型方案；还支持项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑与 MiniMax 音乐创作。",
+  "description": "面向独立开发者的 12 个 AI Skill：在写代码前，把产品想法变成产品简报、PRD 和原型方案；还支持项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑、MiniMax 音乐创作与歌曲 MV 制作。",
   "author": {
     "name": "tardis9527",
     "url": "https://github.com/tardis9527"
@@ -25,6 +25,9 @@
     "music-generation",
     "comfyui",
     "minimax-music",
+    "mv-creator",
+    "music-video",
+    "image-to-video",
     "image-generation",
     "ui-design",
     "wireframe",

@@ -2,7 +2,7 @@
 
 [返回首页](../README.md) · [首次体验教程](../examples/teamlog-walkthrough.md) · [English walkthrough](../examples/teamlog-walkthrough_en.md)
 
-首次使用建议先跑“需求探索 → PRD → 原型方案”。本指南提供安装路径、十一个 Skill 的说明和常见问题。
+首次使用建议先跑“需求探索 → PRD → 原型方案”。本指南提供安装路径、十二个 Skill 的说明和常见问题。
 
 ## 目录
 
@@ -12,7 +12,7 @@
 - [Cursor 与 Claude Code：项目级安装](#cursor-与-claude-code项目级安装)
 - [Codex：手动目录安装](#codex手动目录安装)
 - [Windsurf：Workflow 入口](#windsurfworkflow-入口)
-- [十一个 Skill 详解](#十一个-skill-详解)
+- [十二个 Skill 详解](#十二个-skill-详解)
 - [工作流组合指南](#工作流组合指南)
 - [产物校验与仓库维护](#产物校验与仓库维护)
 - [最佳实践](#最佳实践)
@@ -52,7 +52,7 @@ codex plugin marketplace add https://github.com/tardis9527/youai-skills.git --re
 codex plugin add youai-skills@youai-skills
 ```
 
-插件包包含十一个 Skill 的入口、完整定义和支撑文件；使用时无需再从 GitHub 下载定义。AI 模型本身和调研检索仍可能需要联网。若当前版本没有插件入口或命令，使用下面的手动目录安装。
+插件包包含十二个 Skill 的入口、完整定义和支撑文件；使用时无需再从 GitHub 下载定义。AI 模型本身和调研检索仍可能需要联网。若当前版本没有插件入口或命令，使用下面的手动目录安装。
 
 调用示例：
 
@@ -145,7 +145,7 @@ mkdir -p ~/.agents/skills
 cp -R "$youai_root/plugins/youai-skills/skills/." ~/.agents/skills/
 ```
 
-开启新会话后，通过 `$skill-name` 显式调用，十一个名称见后面的 Skill 详解。插件市场安装和手动安装选一种即可，避免同时加载同名 Skill。
+开启新会话后，通过 `$skill-name` 显式调用，十二个名称见后面的 Skill 详解。插件市场安装和手动安装选一种即可，避免同时加载同名 Skill。
 
 ## Windsurf：Workflow 入口
 
@@ -173,7 +173,7 @@ done
 
 ---
 
-## 十一个 Skill 详解
+## 十二个 Skill 详解
 
 ### 01 项目理解与分析
 
@@ -398,6 +398,18 @@ done
 歌词或器乐主题确定后，未命名的作品会生成 3–5 个名称候选并说明依据，由用户选定或委托助手定名；已有名称直接保留。最终交付先展示名称，再给 Caption、Lyrics 和参数，不额外把标题插进模型输入。
 
 **文件落地**：有写文件能力时，完整成稿默认保存到当前项目的 `output/music-prompts/YYYY-MM-DD-安全化标题.md`，可遵循用户指定目录。文件使用 UTF-8，含元数据、创作简报、完整双文本、参数来源与映射、导出目标和实测状态、自查及版本记录；[标准结构与完整示例](../skills/comfyui-minimax-music/references/prompt-document-template.md) 可直接查阅。同名默认另存为 `-v2.md` 等版本，用户明确要求更新原文件时才覆盖。阶段草稿标为 `draft`，创作文本就绪标为 `ready`，音频未检测仍写 `PENDING`。仅聊天查看、局部修改或明确不保存时跳过自动落地；没有文件工具时提供完整 Markdown 供手动保存，不声称已写入。
+
+### 12 歌曲 MV 创作流水线
+
+完整入口：[mv-creator](../skills/mv-creator/SKILL.md)。
+
+**何时使用**：从零制作原创歌曲 MV（默认 30–60 秒竖屏剧情短片，不对口型），或续做已有 MV 项目、重跑个别镜头、重新导出剪映素材时。
+
+**流程**：创意简报 → 原创歌曲（作词作曲与 AI 演唱）→ 节拍分析与分镜 → 角色与关键帧 → 图生视频 → 剪映素材与粗剪。简报、歌曲参数卡、分镜和全部生图/生视频提示词由 Skill 先起草，用户确认或修改；交给 comfyui-minimax-music 前会把能从简报推出的参数预填成一张卡，一次确认。角色图和关键帧合并为一次确认。
+
+**产出**：项目目录 `projects/<作品名>/`，含简报、歌曲各版本、`beats.json`、`shots.json` 与分镜表、角色参考图、关键帧、视频片段，以及 `final/capcut/` 剪映素材包（按时间线编号的片段、歌曲 WAV、歌词 SRT、小节线、剪辑清单）和 `final/roughcut.mp4` 粗剪参考。
+
+**运行条件**：Python 3.10+ 与 `skills/mv-creator/requirements.txt`、imagegen-tardis 的密钥、可访问的 ComfyUI（可以在局域网另一台电脑），以及用户从官方模板导出的 API 工作流（MiniMax Music 3、Wan2.2 图生视频，可选首尾帧），放在工作区的 `workflows/`；粗剪需要 ffmpeg。先运行 `mv.py doctor` 检查环境，详见 [环境准备](../skills/mv-creator/references/setup.md)。Tardis 生图按次计费，ComfyUI 生成占用 GPU，Skill 会在生成前说明数量。
 
 ---
 

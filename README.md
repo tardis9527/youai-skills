@@ -64,7 +64,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 
 ## 全部 Skill
 
-十一个 Skill 可独立使用，也可将产出文档交给下一步。首次体验建议从上面的三个核心 Skill 开始。
+十二个 Skill 可独立使用，也可将产出文档交给下一步。首次体验建议从上面的三个核心 Skill 开始。
 
 | Skill | 适用场景 | 主要产出 |
 |---|---|---|
@@ -79,6 +79,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 | [moments-writer](./skills/09_moments-writer.md) | 朋友圈文案与风格积累 | 候选文案、配图方案与本地学习记录 |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片文件、预览与下载链接 |
 | [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | 在 ComfyUI 中使用 MiniMax Music 3 创作歌曲或纯音乐 | 作品名称、Caption、Lyrics、工作流与导出设置，保存为标准 Markdown 文档 |
+| [mv-creator](./skills/mv-creator/SKILL.md) | 从零制作原创歌曲 MV：写歌演唱 → 节拍分镜 → 关键帧 → ComfyUI 图生视频 | 原创歌曲、分镜表、角色与关键帧、视频片段、剪映素材包与粗剪参考 |
 
 其他常用组合：
 
@@ -86,6 +87,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 - **接手已有项目：** 项目分析 → PRD；需要改版时接 UI/UX 设计重塑。
 - **准备融资：** 产品简报 + 市场调研 / PRD → 投资人 BP。
 - **内容创作：** 公众号、朋友圈 Skill 可独立使用，图片生成按需接入。
+- **歌曲 MV：** mv-creator 串联 MiniMax 音乐创作与 Tardis 生图，再调用 ComfyUI 生成视频。
 
 ## 为什么使用这套工作流
 

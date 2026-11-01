@@ -1,0 +1,4 @@
+interface:
+  display_name: "歌曲 MV 创作流水线"
+  short_description: "从写歌、节拍分镜、Tardis 关键帧到 ComfyUI 图生视频，产出剪映素材与粗剪"
+  default_prompt: "使用 $mv-creator 帮我从零制作一支 30–60 秒的竖屏歌曲 MV。"

@@ -1,0 +1,34 @@
+{
+  "comfyui": {
+    "url": "http://127.0.0.1:8188",
+    "timeout_sec": 3600,
+    "poll_interval_sec": 2
+  },
+  "workflows_dir": "workflows",
+  "projects_dir": "projects",
+  "video": {
+    "width": 720,
+    "height": 1280,
+    "fps": 16,
+    "max_frames": 81,
+    "clip_slack_sec": 0.5
+  },
+  "image": {
+    "model": "gpt-image-2",
+    "size": "1024x1536",
+    "quality": null
+  },
+  "tardis": {
+    "script": null
+  },
+  "music": {
+    "duration_sec": 60
+  },
+  "roughcut": {
+    "fps": 30,
+    "scale": 1.5,
+    "crf": 20,
+    "font": "Microsoft YaHei"
+  },
+  "ffmpeg": null
+}
