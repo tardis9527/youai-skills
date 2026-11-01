@@ -80,7 +80,7 @@ The eleven skills work independently or use previous documents as input. Start w
 | [wechat-writer](./skills/08_wechat-writer.md) | Write WeChat articles and develop a personal voice | Article, image prompts, and local learning records |
 | [moments-writer](./skills/09_moments-writer.md) | Write WeChat Moments captions | Caption candidates, image concepts, and local learning records |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image files, previews, and download links |
-| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | Create songs or instrumental music in ComfyUI with MiniMax Music 3 | Caption, Lyrics, workflow parameters, and export guidance |
+| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | Create songs or instrumental music in ComfyUI with MiniMax Music 3 | Work title, Caption, Lyrics, workflow and export settings, saved as a standard Markdown document |
 
 Other useful combinations:
 

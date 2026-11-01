@@ -63,8 +63,8 @@ description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品
 - 入口：`skills/imagegen-tardis/SKILL.md`；首次使用时向用户索取密钥并保存到当前用户主目录下的 `~/.tardis-skill/imagegen-tardis/credentials.json`，后续直接读取该文件，并需要 Python `openai` 包
 
 ### 11. MiniMax 音乐创作引导（MiniMax Music）
-在 ComfyUI 中使用 MiniMax Music 3 / MiniMaxMusic 3.0 梳理歌曲或纯音乐的方向、听感、人声、歌词和编曲，生成可复制的 Caption、Lyrics、工作流参数及音质导出建议。
-- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带 `references/` 工作流契约、作曲指南和音质建议
+在 ComfyUI 中使用 MiniMax Music 3 / MiniMaxMusic 3.0 梳理歌曲或纯音乐的方向、听感、人声、歌词和编曲，生成并确定作品名称，交付可复制的 Caption、Lyrics、工作流与导出设置，默认保存为标准 Markdown 文档。
+- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带 `references/` 工作流契约、作曲指南、音质建议和文档规范
 
 ## 使用方式
 
