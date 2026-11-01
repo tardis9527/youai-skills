@@ -23,6 +23,7 @@ from mvlib.common import (  # noqa: E402
 PROJECT_DIRS = ("music/takes", "analysis", "storyboard", "characters/raw", "frames/raw",
                 "frames/prompts", "clips", "final")
 SEED_MAX = 2**32 - 1
+DRY_RUN_HELP = "只校验并列出将生成的内容与调用次数，不实际生成"
 
 
 def _abs(path: Path) -> str:
@@ -31,6 +32,13 @@ def _abs(path: Path) -> str:
 
 def _project(cfg: dict, slug: str) -> Project:
     return Project(cfg, slug).require()
+
+
+def _take_seed(base: int | None, offset: int) -> int:
+    """A fixed seed steps by one per take so takes differ yet stay reproducible."""
+    if base is None:
+        return random.randint(0, SEED_MAX)
+    return (int(base) + offset) % (SEED_MAX + 1)
 
 
 # Setup ---------------------------------------------------------------------
@@ -142,6 +150,10 @@ def cmd_status(args, cfg):
     template = (SKILL_DIR / "assets" / "brief-template.md").read_text(encoding="utf-8")
     brief = (project.root / "brief.md").read_text(encoding="utf-8")
     caption, lyrics = project.root / "music" / "caption.txt", project.root / "music" / "lyrics.txt"
+    selected = music.get("selected")
+    beats = read_json(project.beats_file) if project.beats_file.is_file() else None
+    data = project.load_shots() if project.has_shots() else None
+    beats_stale, shots_stale = _stale(beats, selected), _stale(data, selected)
     rows = [
         ("创意简报", brief.strip() != template.replace("{{title}}", meta["title"]).strip(),
          "填写 brief.md 并与用户确认"),
@@ -150,11 +162,15 @@ def cmd_status(args, cfg):
         (f"歌曲生成（{len(music.get('takes', []))} 版）", bool(music.get("takes")), f"music {args.slug} --takes 4"),
         (f"选定歌曲（{music.get('selected') or '未选'}）", bool(music.get("file")),
          f"music-select {args.slug} <take-N>"),
-        ("节拍分析", project.beats_file.is_file(), f"analyze {args.slug}"),
-        ("分镜骨架", project.has_shots(), f"shots-init {args.slug} --bars-per-shot 2"),
+        ("节拍分析" + ("（基于旧歌曲）" if beats_stale else ""), bool(beats) and not beats_stale,
+         f"analyze {args.slug}"),
+        ("分镜骨架" + (f"（基于旧歌曲 {data['take']}）" if shots_stale else ""),
+         bool(data) and not shots_stale,
+         f"征得用户同意后 shots-init {args.slug} --force 重切；或按新节拍手动调整时间，"
+         f"再把 shots.json 的 take 改为 {selected}" if shots_stale
+         else f"shots-init {args.slug} --bars-per-shot 2"),
     ]
-    if project.has_shots():
-        data = project.load_shots()
+    if data:
         errors, _ = shotlib.check(data, project.video(), None, draft=False)
         chars = data.get("characters", [])
         shots = data["shots"]
@@ -187,6 +203,11 @@ def _nonempty(path: Path) -> bool:
     return path.is_file() and bool(path.read_text(encoding="utf-8-sig").strip())
 
 
+def _stale(record: dict | None, selected: str | None) -> bool:
+    """True when beats/shots were built from a song take other than the selected one."""
+    return bool(record and record.get("take") and record["take"] != selected)
+
+
 # Music ---------------------------------------------------------------------
 
 def cmd_music(args, cfg):
@@ -202,9 +223,9 @@ def cmd_music(args, cfg):
     values = {"caption": caption.read_text(encoding="utf-8-sig").strip(),
               "lyrics": lyrics.read_text(encoding="utf-8-sig").strip() if lyrics.is_file() else "",
               "max_duration": int(duration) if float(duration).is_integer() else duration}
-    for _ in range(args.takes):
+    for take_index in range(args.takes):
         number = max((int(t["id"].split("-")[1]) for t in music.get("takes", [])), default=0) + 1
-        seed = args.seed if args.seed is not None else random.randint(0, SEED_MAX)
+        seed = _take_seed(args.seed, take_index)
         values.update(seed=seed, filename_prefix=f"mv-creator/{args.slug}/take-{number}")
         print(f"生成 take-{number}（seed {seed}，上限 {duration}s）", flush=True)
         saved = comfy.run_kind(cfg, "music", values, {}, f"mv-creator/{args.slug}",
@@ -222,6 +243,7 @@ def cmd_music_select(args, cfg):
     take = next((t for t in music.get("takes", []) if t["id"] == args.take), None)
     if not take:
         raise MVError(f"没有 {args.take}，可选: {', '.join(t['id'] for t in music.get('takes', [])) or '无'}")
+    previous = music.get("selected")
     src = project.path(take["file"])
     dest = project.root / "music" / f"song{src.suffix}"
     for old in (project.root / "music").glob("song.*"):
@@ -231,18 +253,21 @@ def cmd_music_select(args, cfg):
     music.update(selected=take["id"], file=project.rel(dest))
     project.save(meta)
     print(f"已选定 {take['id']} → {_abs(dest)}")
-    if project.beats_file.is_file():
-        print("注意: 已有节拍分析基于之前的歌曲，需要重新运行 analyze")
+    if project.beats_file.is_file() and previous != take["id"]:
+        print("注意: 已有节拍分析基于之前的歌曲，需要重新运行 analyze"
+              + ("；分镜时间也要按新节拍重切或调整" if project.has_shots() else ""))
 
 
 # Analysis and storyboard ----------------------------------------------------
 
 def cmd_analyze(args, cfg):
     project = _project(cfg, args.slug)
-    song = project.path(project.load().get("music", {}).get("file"))
+    music = project.load().get("music", {})
+    song = project.path(music.get("file"))
     if not song or not song.is_file():
         raise MVError("还没有选定歌曲（music-select）")
     result = audio.analyze(song, args.beats_per_bar)
+    result["take"] = music.get("selected")
     write_json(project.beats_file, result)
     print(f"时长 {result['duration']}s，BPM ≈ {result['tempo']}，{len(result['bars'])} 小节 → {_abs(project.beats_file)}")
     print("\n".join(audio.energy_sketch(result["bars"])))
@@ -255,7 +280,12 @@ def cmd_shots_init(args, cfg):
     if not project.beats_file.is_file():
         raise MVError("缺少节拍分析（先运行 analyze）")
     video = project.video()
-    data = shotlib.skeleton(read_json(project.beats_file), video, args.bars_per_shot)
+    beats = read_json(project.beats_file)
+    selected = project.load().get("music", {}).get("selected")
+    if _stale(beats, selected):
+        raise MVError(f"节拍分析基于 {beats['take']}，当前歌曲是 {selected}：先重新运行 analyze")
+    data = shotlib.skeleton(beats, video, args.bars_per_shot)
+    data["take"] = beats.get("take")
     project.save_shots(data)
     print(f"已生成 {len(data['shots'])} 个镜头骨架（片段最长 {max_clip_sec(video):.2f}s，"
           f"镜头最长 {shot_limit_sec(video):.2f}s）→ {_abs(project.shots_file)}")
@@ -300,6 +330,10 @@ def cmd_chars(args, cfg):
     for char in chars:
         if not char.get("prompt"):
             raise MVError(f"角色 {char['id']} 的 prompt 为空")
+    print(f"将为 {len(chars)} 个角色生成设定图，每个 {args.n} 张（{len(chars)} 次 Tardis 调用）："
+          f"{', '.join(c['id'] for c in chars)}", flush=True)
+    if args.dry_run:
+        return
     folder = project.root / "characters" / "raw"
     for char in chars:
         number = next_index(folder, char["id"])
@@ -345,7 +379,10 @@ def cmd_frames(args, cfg):
     if not targets:
         print("没有需要生成的镜头（已有候选的镜头用 --shots 指定重做）")
         return
-    print(f"将为 {len(targets)} 个镜头生成关键帧，每个 {args.n} 张（{len(targets)} 次 Tardis 调用）")
+    print(f"将为 {len(targets)} 个镜头生成关键帧，每个 {args.n} 张（{len(targets)} 次 Tardis 调用）："
+          f"{', '.join(s['id'] for s in targets)}", flush=True)
+    if args.dry_run:
+        return
     folder = project.root / "frames" / "raw"
     for shot in targets:
         refs = [chars[cid] for cid in shot.get("characters", [])]
@@ -365,7 +402,14 @@ def cmd_frame_select(args, cfg):
     project = _project(cfg, args.slug)
     data = project.load_shots()
     _, shot = shotlib.find_shot(data, args.shot)
-    src = pick_candidate(project, shot["frame"].get("candidates", []), args.choice)
+    if args.choice:
+        src = pick_candidate(project, shot["frame"].get("candidates", []), args.choice)
+    else:
+        # Re-crop the previously chosen original, e.g. after changing `crop`.
+        source = shot["frame"].get("source")
+        src = (Path(source) if Path(source).is_absolute() else project.path(source)) if source else None
+        if not src or not src.is_file():
+            raise MVError(f"{shot['id']} 没有可重裁的原图，请指定候选序号或图片路径")
     video = project.video()
     dest = project.root / "frames" / f"{shot['id']}.png"
     frames.normalize(src, dest, video["width"], video["height"], shot.get("crop", "center"))
@@ -432,6 +476,11 @@ def cmd_clips(args, cfg):
         print("没有需要生成的镜头（--shots 指定重做，--more 给所有镜头追加版本）")
         return
     print(f"将生成 {len(plans)} 个镜头 × {args.takes} 版 = {len(plans) * args.takes} 段视频", flush=True)
+    if args.dry_run:
+        for shot, kind, _ in plans:
+            length = clip_frames(shot["end"] - shot["start"], video["fps"], video["max_frames"])
+            print(f"  {shot['id']}  {kind}  {length} 帧  × {args.takes} 版")
+        return
     for shot, kind, uploads in plans:
         duration = shot["end"] - shot["start"]
         length = clip_frames(duration, video["fps"], video["max_frames"])
@@ -442,10 +491,7 @@ def cmd_clips(args, cfg):
         for take_index in range(args.takes):
             takes = shot["clip"].setdefault("takes", [])
             number = max((int(t["id"].split("-")[1]) for t in takes), default=0) + 1
-            if shot.get("seed") is not None:
-                seed = int(shot["seed"]) + take_index
-            else:
-                seed = random.randint(0, SEED_MAX)
+            seed = _take_seed(shot.get("seed"), take_index)
             values.update(seed=seed, filename_prefix=f"mv-creator/{args.slug}/{shot['id']}")
             print(f"{shot['id']} take-{number}：{kind}，{length} 帧，seed {seed}", flush=True)
             saved = comfy.run_kind(cfg, kind, values, uploads, f"mv-creator/{args.slug}",
@@ -560,7 +606,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("slug")
     p.add_argument("--takes", type=int, default=4)
     p.add_argument("--duration", type=float, help="max_duration 秒数（默认沿用项目设置）")
-    p.add_argument("--seed", type=int, help="固定 seed（默认每版随机）")
+    p.add_argument("--seed", type=int, help="固定起始 seed，多版时依次加 1（默认每版随机）")
     p = add("music-select", cmd_music_select, "选定一版歌曲")
     p.add_argument("slug")
     p.add_argument("take")
@@ -580,6 +626,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("slug")
     p.add_argument("--ids", help="逗号分隔的角色 id（默认只做还没有候选的角色）")
     p.add_argument("--n", type=int, default=2)
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("char-select", cmd_char_select, "选定角色参考图")
     p.add_argument("slug")
     p.add_argument("char_id")
@@ -588,16 +635,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("slug")
     p.add_argument("--shots", help="逗号分隔的镜号（默认只做还没有候选的镜头）")
     p.add_argument("--n", type=int, default=2)
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("frame-select", cmd_frame_select, "选定关键帧并裁切到视频尺寸")
     p.add_argument("slug")
     p.add_argument("shot")
-    p.add_argument("choice", help="候选序号，或图片路径")
+    p.add_argument("choice", nargs="?", help="候选序号，或图片路径；省略时按当前 crop 重裁上次选定的原图")
 
     p = add("clips", cmd_clips, "用 ComfyUI 图生视频工作流生成镜头片段")
     p.add_argument("slug")
     p.add_argument("--shots", help="逗号分隔的镜号（指定后总会新增版本）")
     p.add_argument("--takes", type=int, default=2)
     p.add_argument("--more", action="store_true", help="给所有镜头追加版本")
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("clip-select", cmd_clip_select, "选定镜头视频版本")
     p.add_argument("slug")
     p.add_argument("shot")

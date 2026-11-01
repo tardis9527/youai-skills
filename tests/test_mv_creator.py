@@ -12,6 +12,7 @@ import unittest
 SCRIPTS = Path(__file__).resolve().parents[1] / "skills" / "mv-creator" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
+import mv  # noqa: E402
 from mvlib import comfy, frames, shots  # noqa: E402
 from mvlib.common import DEFAULT_CONFIG, MVError, clip_frames, shot_limit_sec  # noqa: E402
 
@@ -154,6 +155,19 @@ class FramePromptTest(unittest.TestCase):
         prompt = frames.shot_prompt(data, shot, [{"id": "lead", "name": "林夏"}], VIDEO, "1024x1536")
         self.assertIn("参考图 1：角色「林夏」", prompt)
         self.assertIn("整体视觉风格：冷色霓虹", prompt)
+
+
+class CommandHelpersTest(unittest.TestCase):
+    def test_fixed_seed_steps_per_take(self):
+        self.assertEqual([mv._take_seed(7, i) for i in range(3)], [7, 8, 9])
+        self.assertEqual(mv._take_seed(mv.SEED_MAX, 1), 0)
+        self.assertTrue(0 <= mv._take_seed(None, 0) <= mv.SEED_MAX)
+
+    def test_stale_only_when_take_differs(self):
+        self.assertTrue(mv._stale({"take": "take-1"}, "take-2"))
+        self.assertFalse(mv._stale({"take": "take-2"}, "take-2"))
+        self.assertFalse(mv._stale({}, "take-2"))  # projects made before take was recorded
+        self.assertFalse(mv._stale(None, "take-2"))
 
 
 if __name__ == "__main__":

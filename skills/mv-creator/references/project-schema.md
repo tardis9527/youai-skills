@@ -52,6 +52,7 @@ projects/<slug>/
 ```json
 {
   "version": 1,
+  "take": "take-1",
   "style": "电影感，冷色调霓虹夜景，35mm 胶片颗粒，浅景深",
   "negative": "",
   "characters": [
@@ -78,6 +79,7 @@ projects/<slug>/
 
 | 字段 | 谁填写 | 说明 |
 | --- | --- | --- |
+| `take` | 脚本 | 切分镜头时依据的歌曲版本（`beats.json` 同样记录）；换歌后 `status` 据此提示过期。手动按新节拍调整完时间后改为当前选定版本 |
 | `style` | 你 | 全局视觉风格，自动附加到每张图和每段视频的提示词 |
 | `negative` | 你（可空） | Wan 负面提示词；为空时沿用工作流里的设置 |
 | `characters[].prompt` | 你 | 角色外貌描述，用于生成设定图 |
