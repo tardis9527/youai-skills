@@ -1,0 +1,48 @@
+{
+  "workflow": "minimax-music3.api.json",
+  "output_nodes": [
+    "35"
+  ],
+  "params": {
+    "description": [
+      {
+        "node": "37:13",
+        "class_type": "MiniMaxMusic3TextEncode",
+        "input": "caption"
+      }
+    ],
+    "lyrics": [
+      {
+        "node": "37:13",
+        "class_type": "MiniMaxMusic3TextEncode",
+        "input": "lyrics"
+      }
+    ],
+    "seed": [
+      {
+        "node": "37:13",
+        "class_type": "MiniMaxMusic3TextEncode",
+        "input": "seed"
+      },
+      {
+        "node": "37:9",
+        "class_type": "KSampler",
+        "input": "seed"
+      }
+    ],
+    "max_duration": [
+      {
+        "node": "37:13",
+        "class_type": "MiniMaxMusic3TextEncode",
+        "input": "max_duration"
+      }
+    ],
+    "filename_prefix": [
+      {
+        "node": "35",
+        "class_type": "SaveAudioAdvanced",
+        "input": "filename_prefix"
+      }
+    ]
+  }
+}

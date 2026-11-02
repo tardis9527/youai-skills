@@ -1,5 +1,7 @@
 # 工作流：音乐、MiniMax H3 与可选旁白
 
+新增 Wan5B、视频配置选择、歌曲收尾余量、缓存与运行记录见 [资源与时长优化](resource-and-duration.md)。下文 H3 设置仅适用于 H3；Wan5B 不复用其帧数与首尾帧逻辑。
+
 ## 三种 JSON 的用途
 
 | 后缀 | 内容 | 交给谁 |
@@ -16,6 +18,7 @@
 | --- | --- | --- | --- |
 | `music` | `music.workflow.json` | `music.api.json` | MiniMax Music 3，保持原歌曲流程 |
 | `i2v` | `i2v.workflow.json` | `i2v.api.json` | MiniMax H3 FL2VA，仅连接首帧 |
+| `wan5b-i2v`（可选） | `wan5b-i2v.workflow.json` | `wan5b-i2v.api.json` | Wan2.2 TI2V-5B，仅首帧，分块解码 |
 | `flf2v`（可选） | `flf2v.workflow.json` | `flf2v.api.json` | 同一 MiniMax H3 FL2VA，连接首尾帧 |
 | `tts-design`（可选） | `tts-design.workflow.json` | `tts-design.api.json` | Breeze TTS 2 音色试镜 |
 | `tts-direction`（可选） | `tts-direction.workflow.json` | `tts-direction.api.json` | Breeze TTS 2 固定参考音色配音 |

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .common import MVError, Project, ffmpeg_bin, fmt_time, now_iso, read_json, write_json
 from .shots import to_srt
-from . import voice
+from . import voice, music
 
 
 def _selected_take(shot: dict) -> dict | None:
@@ -44,6 +44,7 @@ def package(project: Project, cfg: dict) -> dict:
     meta = project.load()
     data = project.load_shots()
     shots = data["shots"]
+    music.require_full_song(project, cfg, max((s["end"] for s in shots), default=0))
     plan = voice.load_plan(project)
     voice_outputs = voice.mix(project, cfg) if plan and plan["enabled"] else []
     dest = project.root / "final" / "capcut"
@@ -139,7 +140,7 @@ def _edit_list(meta: dict, data: dict, rows: list, missing: list[str], song: Pat
         span = shot["end"] - shot["start"]
         clip_sec = take.get("duration_sec") if take else None
         if clip_sec is None and take and take.get("frames"):
-            offset = 0 if take.get("model") == "minimax-h3" else 1
+            offset = 0 if take.get("model") in ("minimax-h3", "wan2.2-5b") else 1
             clip_sec = (take["frames"] - offset) / take["fps"]
         clip_len = f"{clip_sec:.2f}s" if clip_sec else "—"
         transition = "首尾帧过渡" if shot.get("workflow") == "flf2v" else "硬切"
@@ -159,6 +160,7 @@ def roughcut(project: Project, cfg: dict, burn_subs: bool) -> list[Path]:
     if not ffmpeg:
         raise MVError("没有找到 ffmpeg，按 references/setup.md 安装，或在配置中写明 ffmpeg 路径")
     data = project.load_shots()
+    song_duration = music.require_full_song(project, cfg, max((s["end"] for s in data["shots"]), default=0))
     plan = voice.load_plan(project)
     voice_outputs = voice.mix(project, cfg) if plan and plan["enabled"] else []
     video = project.video()
@@ -253,7 +255,8 @@ def roughcut(project: Project, cfg: dict, burn_subs: bool) -> list[Path]:
                   "-c:a", "copy", str(narrated_subs)], cwd=work)
             outputs.append(narrated_subs)
     write_json(project.root / "final" / "roughcut-manifest.json", {"created": now_iso(),
-               "audio_fingerprint": audio_fingerprint, "files": [project.rel(p) for p in outputs]})
+               "audio_fingerprint": audio_fingerprint, "song_duration_sec": song_duration,
+               "timeline_duration_sec": cursor, "files": [project.rel(p) for p in outputs]})
 
     shutil.rmtree(work)
     if stills:

@@ -11,7 +11,7 @@ description: 基于 ComfyUI API 与 Tardis 生图，从原创演唱歌曲、节�
 
 - `<SKILL_DIR>` 指本 SKILL.md 所在目录。所有命令用 `python <SKILL_DIR>/scripts/mv.py <命令>`，在**用户工作区根目录**（放 `mv-creator.config.json` 的目录）执行。示例按 Windows PowerShell 书写。
 - 依赖两个 skill：**imagegen-tardis**（所有生图/改图）与 **comfyui-minimax-music**（歌曲 Caption 与 Lyrics）。脚本会通过子进程调用 imagegen-tardis 的 `image_gen.py`，你仍需先读它的 SKILL.md，按其提示词规则写图片提示词、按其流程配置密钥。
-- ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。视频默认使用本地 **MiniMax H3 FL2VA**，单图与首尾帧共用 H3 节点；脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
+- ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。视频支持 **Wan2.2 TI2V-5B** 本地单图候选与 **MiniMax H3 FL2VA**（单图/首尾帧）；未明确选择时保留现有 H3 配置，样片验收后才更改工作区默认。配置与验收见 [references/resource-and-duration.md](references/resource-and-duration.md)；脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
 - 叙事需要时，使用 **Breeze TTS 2** 制作旁白、独白或画外对白，先定音色再逐句配音，独立混入已选歌曲。没有叙事收益时保持纯歌曲流程；启用前读 [references/voice-guide.md](references/voice-guide.md)，注意模型及自托管输出的非商业许可范围。
 - 每个命令运行后，都以命令输出为准汇报结果：成功说成功，失败贴出关键报错，不粉饰。
 - 图片与视频默认单版：每个角色 1 张参考图、每个分镜 1 张关键帧、每个已确认镜头 1 段视频。仅在用户明确要求多版或指定重做时追加，不能把历史候选全部送去生视频。歌曲试听与可选音色试镜沿用各自流程。
@@ -20,7 +20,7 @@ description: 基于 ComfyUI API 与 Tardis 生图，从原创演唱歌曲、节�
 
 1. 工作区没有 `mv-creator.config.json` 时运行 `mv.py init-config`，再请用户确认 `comfyui.url`。
 2. 新机器首次使用、或任何命令报环境错误时运行 `mv.py doctor`，按 [references/setup.md](references/setup.md) 逐项处理。不要替用户安装软件或改系统设置，给出命令让用户确认。
-3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)。**项目本地默认没有工作流，直接从 `<SKILL_DIR>/workflows/` 获取所需的 `.api.json` 和 `.params.json`**；脚本自动读取，无需先复制或要求用户导出。技能内置 `music`、`i2v`、`flf2v`、`tts-design`、`tts-direction` 的执行图；工作区 `workflows/` 的同名文件仅用于自定义覆盖，已有文件优先且不覆盖。`.workflow.json` 是界面模板，`.params.json` 只是参数映射，二者不能当 API 执行图提交。调用前只对实际使用的类型运行 `mv.py comfy-validate <kind...>`；缺模型、节点或接口不兼容时报告实际错误，不擅自改模型或采样参数。自定义工作流才需要按需从界面 Export (API)。
+3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)。**项目本地默认没有工作流，直接从 `<SKILL_DIR>/workflows/` 获取所需的 `.api.json` 和 `.params.json`**；脚本自动读取，无需先复制或要求用户导出。新项目可用 `new "<作品名>" --video-profile wan5b`；已有项目先 `video-profile <slug> wan5b --dry-run`，确认后切换并从原图重裁关键帧，保留已生成视频。技能内置 `music`、`i2v`、`flf2v`、`wan5b-i2v`、`tts-design`、`tts-direction` 的执行图；工作区 `workflows/` 的同名文件仅用于自定义覆盖，已有文件优先且不覆盖。`.workflow.json` 是界面模板，`.params.json` 只是参数映射，二者不能当 API 执行图提交。调用前只对实际使用的类型运行 `mv.py comfy-validate <kind...>`；缺模型、节点或接口不兼容时报告实际错误，不擅自改模型或采样参数。自定义工作流才需要按需从界面 Export (API)。
 
 ## 项目与断点续跑
 
@@ -48,13 +48,13 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 1. 按 [references/music-handoff.md](references/music-handoff.md) 把简报转换成 comfyui-minimax-music 需要的选择状态，**一次性给出预填好的参数卡**（作品名称候选、用途、时长、听感、人声、歌词方向、文件格式、采样率与 seed 策略），每项标明来源和推荐理由。⏸ 用户回复"确认"或只改个别项即可。
 2. 参数确认后，按 **comfyui-minimax-music** 的规则写出 Caption 与完整 Lyrics，并按它的模板保存 Markdown 文档到 `projects/<slug>/music/`。它的创作规则和自查照常执行；已在参数卡中确认的项目不再重复提问。
 3. 把成稿的 Caption、Lyrics 原样分别写入 `music/caption.txt`、`music/lyrics.txt`（UTF-8，与文档一致，不加说明文字）。
-4. 生成前告知将跑几版、预计占用 GPU 的时间，然后运行 `mv.py music <slug> --takes 4 --duration <秒>`。seed 由脚本每版随机并记录在 `project.json`，可复现。
+4. 生成前告知调用数量和已知的耗时依据，默认先跑 1 版：`mv.py music <slug> --takes 1 --target-duration <目标秒数> --max-duration <含收尾余量的上限秒数>`。先加 `--dry-run` 核对。目标 60 秒可先测试上限 90 秒；不是保证精确时长。按 [完整性检查](references/resource-and-duration.md) 读取实际时长和临近上限提示，并试听末句及尾奏，确认完整后再追加版本。旧 `--duration` 保留生成上限语义。seed 由脚本每版随机并记录在 `project.json`，可复现。
 5. ⏸ 列出各版文件的绝对路径请用户试听，用户选定后运行 `mv.py music-select <slug> <take-N>`。不满意时按 comfyui-minimax-music 的"听后修改"归类问题，只改相关字段再跑。
 
 ### 3. 节拍分析与分镜
 
 1. `mv.py analyze <slug>`：估算 BPM、拍点、小节线和每小节能量，写入 `analysis/beats.json`。
-2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（默认 H3 124 帧/24fps ≈ 5.17 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐；短镜头生成后裁切）。H3 帧数按 `17k+5` 对齐，不沿用 Wan 的 `4n+1`。已有 `shots.json` 时拒绝覆盖，需要重切先征得用户同意再加 `--force`。
+2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（默认 H3 124 帧/24fps ≈ 5.17 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐；短镜头生成后裁切）。H3 帧数按 `17k+5` 对齐；Wan5B 使用 121 帧/24fps ≈ 5.04 秒及 `4n+1`，两者不可混用。已有 `shots.json` 时拒绝覆盖，需要重切先征得用户同意再加 `--force`。
 3. 按 [references/storyboard-guide.md](references/storyboard-guide.md) 填写全局 `style`、`characters` 和每个镜头的 `section`、`lyric`、`scene`、`characters`、`image_prompt`、`motion_prompt`、`camera`、`workflow`。可合并或拆分镜头，但时间要连续且每段不超时。
 4. `mv.py shots-check <slug>` 校验并生成 `storyboard/storyboard.md`。⏸ 把分镜表给用户确认。
 
@@ -77,7 +77,9 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 
 ### 5. 图生视频（ComfyUI，耗时）
 
-默认模型与截图式 H3 蓝图一致：`minimax_h3_fl2va_pruned_int8_convrot`、`qwen3vl_32b_minimax_h3_nvfp4_awq`、INT8 视频 VAE 与 FP32 音频 VAE。Turbo 默认关闭；开启时使用 8 步 LoRA。模型文件和首次导出步骤见 [references/workflows.md](references/workflows.md)。旧 Wan API 与 16fps 项目需按该文档迁移，不能只改权重文件名。
+资源紧张时按 [资源优化与三镜头验收](references/resource-and-duration.md) 显式选 Wan5B：单图镜头自动使用内置 `wan5b-i2v`，配套编码器和 VAE、普通 20 步与分块解码。首尾帧镜头不支持，先调整分镜或保留 H3。先用近景、动作、环境运镜各 1 段验收；不把配置可用等同于本机画质已通过。
+
+保留的 H3 配置与原蓝图一致：`minimax_h3_fl2va_pruned_int8_convrot`、`qwen3vl_32b_minimax_h3_nvfp4_awq`、INT8 视频 VAE 与 FP32 音频 VAE。Turbo 默认关闭；开启时使用 8 步 LoRA。模型文件和首次导出步骤见 [references/workflows.md](references/workflows.md)。旧 Wan API 与 16fps 项目需按该文档迁移，不能只改权重文件名。
 
 1. 用 `mv.py clips <slug> --takes 1 --dry-run` 核对并告知待生成镜头数 × 1 版 = 视频段数；例如 14 个待生成镜头共 14 段视频。只使用每镜头已确认的关键帧；不把图片候选数乘入视频数量。数量已获授权时去掉 `--dry-run` 直接运行，不再要求确认单版策略。默认跳过已有视频的镜头；`--shots` 指定镜头时总会新增版本；仅用户要求全部追加时才用 `--more`。任务串行执行、逐个落盘；默认批次中断后重跑可跳过已完成镜头，指定 `--shots` / `--more` 的批次则先检查状态，只重跑未完成镜头。
 2. `workflow` 为 `flf2v` 的镜头使用首尾帧工作流，用下一镜头的关键帧作为尾帧，用于转场；需要下一镜头先选好关键帧。
@@ -94,6 +96,8 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 
 ### 7. 交付：剪映素材与粗剪
 
+交付前测量已选歌曲；时间线比歌曲短超过 0.05 秒时拒绝导出，先补齐分镜，不静默截断句尾。
+
 1. `mv.py package <slug>`：在 `final/capcut/` 整理按时间顺序编号的视频片段、关键帧、歌曲（有 ffmpeg 时另转 WAV）、按镜头时间生成的 `lyrics.srt`、小节线时间表和《剪辑清单.md》。
 2. `mv.py roughcut <slug>`（需要 ffmpeg）：按分镜时间把选定片段裁切/定格到对应时长、拼接并合入歌曲，输出 `final/roughcut.mp4` 作为剪辑参考；缺视频的镜头用关键帧静帧代替。H3 片段可以自带声音，粗剪仍移除片段音轨并使用已选定的原创歌曲。加 `--burn-subs` 另出一版烧录歌词字幕。
 3. 把素材目录、粗剪路径和清单中的未完成项告诉用户，并按 [references/capcut-handoff.md](references/capcut-handoff.md) 给出剪映导入步骤。
@@ -105,6 +109,7 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 - **花钱或耗时的操作先说数量**：Tardis 生图按次计费；ComfyUI 生成占用 GPU。用户确认范围后再跑，不擅自加量。
 - 密钥只由 imagegen-tardis 的 `configure` 流程保存，不在命令行、提示词、日志或回复中出现。
 - 脚本报错时先读报错：ComfyUI 返回 `node_errors` 多为模型文件名、缺节点或参数映射问题，按 [references/workflows.md](references/workflows.md) 排查并告诉用户，不擅自改工作流里的模型和采样设置。
+- 每次 ComfyUI 生成保存 `.run.json`（prompt ID、参数摘要、耗时、系统资源采样）；切换阶段仅在队列空闲时请求卸载缓存，不中断在途任务。预检失败不提交；超时先凭 prompt ID 查队列，不盲目重跑。
 - 单段视频时长受工作流帧数上限约束；超长镜头拆分，不要靠拉长帧数硬撑。
 - 用户换方向时只调整受影响的阶段与镜头，保留其余已确认内容。
 - 其他 ComfyUI 工作流（补帧、超分等）可用通用命令 `mv.py comfy-run <kind> --upload <参数>=<文件> --set <参数>=<值> --out <目录>` 调用，映射规则同上。

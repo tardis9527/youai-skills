@@ -78,7 +78,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 | [wechat-writer](./skills/08_wechat-writer.md) | 公众号写作与个人文风积累 | 定稿、配图提示词与本地学习记录 |
 | [moments-writer](./skills/09_moments-writer.md) | 朋友圈文案与风格积累 | 候选文案、配图方案与本地学习记录 |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片文件、预览与下载链接 |
-| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | 在 ComfyUI 中使用 MiniMax Music 3 创作歌曲或纯音乐 | 作品名称、Caption、Lyrics、工作流与导出设置，保存为标准 Markdown 文档 |
+| [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | 在在线 ComfyUI 中选择 MiniMax Music 3 或 YuE2 创作歌曲与纯音乐 | 风格与歌词引导、API 自动生成、对话交付无损 FLAC 及创作记录 |
 | [mv-creator](./skills/mv-creator/SKILL.md) | 从零制作原创歌曲 MV：写歌演唱 → 节拍分镜 → 关键帧 → ComfyUI 图生视频 | 原创歌曲、分镜表、角色与关键帧、视频片段、剪映素材包与粗剪参考 |
 
 其他常用组合：

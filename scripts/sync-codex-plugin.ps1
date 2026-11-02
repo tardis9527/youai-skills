@@ -19,7 +19,7 @@ if (-not $destinationPath.StartsWith($pluginPath + [IO.Path]::DirectorySeparator
 }
 
 New-Item -ItemType Directory -Force -Path $destinationPath | Out-Null
-robocopy $source $destinationPath /MIR /NFL /NDL /NJH /NJS /NC /NS | Out-Null
+robocopy $source $destinationPath /MIR /XD __pycache__ /XF *.pyc *.pyo /NFL /NDL /NJH /NJS /NC /NS | Out-Null
 if ($LASTEXITCODE -ge 8) {
     throw "Skill sync failed (robocopy exit code $LASTEXITCODE)."
 }

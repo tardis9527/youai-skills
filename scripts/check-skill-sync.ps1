@@ -16,7 +16,9 @@ function Get-NormalizedText {
     return $text.Replace("`r`n", "`n")
 }
 
-$sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File
+$sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File | Where-Object {
+    $_.FullName -notmatch '[\\/]__pycache__[\\/]' -and $_.Extension -notin '.pyc', '.pyo'
+}
 foreach ($sourceFile in $sourceFiles) {
     $relative = $sourceFile.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')
     $pluginFile = Join-Path $pluginRoot $relative
@@ -29,7 +31,9 @@ foreach ($sourceFile in $sourceFiles) {
     }
 }
 
-$pluginFiles = Get-ChildItem -LiteralPath $pluginRoot -Recurse -File
+$pluginFiles = Get-ChildItem -LiteralPath $pluginRoot -Recurse -File | Where-Object {
+    $_.FullName -notmatch '[\\/]__pycache__[\\/]' -and $_.Extension -notin '.pyc', '.pyo'
+}
 foreach ($pluginFile in $pluginFiles) {
     $relative = $pluginFile.FullName.Substring($pluginRoot.Length).TrimStart('\', '/')
     if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot $relative) -PathType Leaf)) {

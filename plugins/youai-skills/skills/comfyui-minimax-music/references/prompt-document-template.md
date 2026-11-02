@@ -1,5 +1,7 @@
 # 音乐创作提示词 Markdown 文档规范
 
+两模型约定：`model` 填实际选择的 `MiniMax Music 3` 或 `YuE2`。MiniMax 使用下述 Caption 三部分；YuE2 将相应章节/字段改为 Style，并按 [yue2-guide.md](yue2-guide.md) 组织描述，不强套 MiniMax 标识或标签。以下 MP3 示例是仅提示词模式的历史示例，不覆盖独立音频模式默认 FLAC。独立模式的格式、源采样率与随机 seed 可记为“Skill 默认方案”，无需伪造用户逐项选择。生成后链接本次 run.json/FLAC 和检查结果，文档 `ready` 与音频完成状态分开；脚本自带的创作记录是执行证据，不替代本模板的创作简报。
+
 完整创作默认落地一份 UTF-8 Markdown 文档，便于复制、复用与修订。它记录创作输入，不代替 ComfyUI workflow JSON，也不表示已经生成或检测音频。
 
 ## 路径与版本规则

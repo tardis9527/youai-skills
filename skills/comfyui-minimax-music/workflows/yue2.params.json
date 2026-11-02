@@ -1,0 +1,77 @@
+{
+  "workflow": "yue2.api.json",
+  "output_nodes": [
+    "10"
+  ],
+  "music_node": "25",
+  "abc_node": "24",
+  "params": {
+    "description": [
+      {
+        "node": "24",
+        "class_type": "YuE2GenerateABC",
+        "input": "style"
+      },
+      {
+        "node": "25",
+        "class_type": "YuE2GenerateMusic",
+        "input": "style"
+      }
+    ],
+    "lyrics": [
+      {
+        "node": "24",
+        "class_type": "YuE2GenerateABC",
+        "input": "lyrics"
+      },
+      {
+        "node": "25",
+        "class_type": "YuE2GenerateMusic",
+        "input": "lyrics"
+      }
+    ],
+    "mode": [
+      {
+        "node": "24",
+        "class_type": "YuE2GenerateABC",
+        "input": "mode"
+      },
+      {
+        "node": "25",
+        "class_type": "YuE2GenerateMusic",
+        "input": "mode"
+      }
+    ],
+    "max_duration": [
+      {
+        "node": "25",
+        "class_type": "YuE2GenerateMusic",
+        "input": "max_duration"
+      }
+    ],
+    "seed": [
+      {
+        "node": "24",
+        "class_type": "YuE2GenerateABC",
+        "input": "seed"
+      },
+      {
+        "node": "25",
+        "class_type": "YuE2GenerateMusic",
+        "input": "seed"
+      },
+      {
+        "node": "8",
+        "class_type": "KSampler",
+        "input": "seed"
+      }
+    ],
+    "filename_prefix": [
+      {
+        "node": "10",
+        "class_type": "SaveAudioAdvanced",
+        "input": "filename_prefix"
+      }
+    ]
+  }
+}

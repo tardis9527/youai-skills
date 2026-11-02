@@ -232,7 +232,7 @@ class CommandHelpersTest(unittest.TestCase):
             with self.subTest(command=command):
                 self.assertEqual(getattr(parser.parse_args([command, "demo"]), field), 1)
                 self.assertEqual(getattr(parser.parse_args([command, "demo", option, "2"]), field), 2)
-        self.assertEqual(parser.parse_args(["music", "demo"]).takes, 4)
+        self.assertEqual(parser.parse_args(["music", "demo"]).takes, 1)
         self.assertEqual(parser.parse_args(["voice", "demo"]).takes, 2)
 
     def test_frames_generate_one_per_shot_and_resume_without_duplicates(self):

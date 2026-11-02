@@ -123,6 +123,8 @@ def check(data: dict, video: dict, song_duration: float | None, draft: bool) -> 
             errors.append(f"{sid}: workflow 只能是 {'/'.join(WORKFLOWS)}")
         if shot.get("workflow") == "flf2v" and position == len(shots) - 1:
             errors.append(f"{sid}: 最后一个镜头没有下一镜头可作尾帧，不能用 flf2v")
+        if video.get("model") == "wan2.2-5b" and shot.get("workflow") == "flf2v":
+            errors.append(f"{sid}: Wan5B 仅支持 i2v，请调整分镜或保留 H3")
         if shot.get("crop", "center") not in CROPS:
             errors.append(f"{sid}: crop 只能是 {'/'.join(CROPS)}")
         for char in shot.get("characters", []):

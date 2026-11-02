@@ -29,9 +29,11 @@ ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（
 | --- | --- |
 | `comfyui.url` | ComfyUI 地址。ComfyUI 桌面版默认端口 8000，便携版/源码版默认 8188 |
 | `comfyui.timeout_sec` | 单个任务最长等待时间 |
+| `comfyui.release_between_stages` / `record_resources` | 默认开启；阶段切换仅在空闲时请求卸载，记录整机资源采样；详见 [优化指南](resource-and-duration.md) |
+| `music.duration_sec` / `ending_buffer_sec` | 目标时长与收尾余量；默认 60 + 30 秒，显式上限可由命令或项目覆盖 |
 | `workflows_dir` | 可选自定义覆盖目录，默认工作区的 `workflows/`；同名 `.api.json` / `.params.json` 优先，缺少时自动读取 skill 内置文件，无需项目预先提供工作流 |
 | `projects_dir` | 项目目录，相对配置文件所在目录 |
-| `video.model` | 新项目为 `minimax-h3`；旧配置缺少此项时识别为旧 Wan 配置，生成前提示迁移 |
+| `video.model` | 保留默认 `minimax-h3`；可显式选择 `wan2.2-5b`，样片验收后再改工作区默认；旧配置缺少此项时需显式选择新配置 |
 | `video.width/height` | H3 宽高为 32 的倍数，默认竖屏 864×1536，横屏交换宽高；低分辨率预览可用 576×1024 |
 | `video.fps` / `video.max_frames` | H3 为 24fps，默认 124 帧（约 5.17 秒），帧数为 `17k+5`；本技能支持上限 124–362 帧。CreateVideo 也必须为 24fps |
 | `video.clip_slack_sec` | 镜头可比单个片段长出的秒数（默认 0.5），尾部在剪辑时定格或放慢 |
@@ -59,7 +61,7 @@ Tardis 的出图尺寸是固定档位（竖屏 1024×1536，即 2:3），视频�
 
 1. 生图提示词自动加上"后期会裁掉左右各约 8%"的构图提醒（按 `image.size` 和 `video` 自动计算）。
 2. `frame-select` 时用 Pillow 按镜头的 `crop`（默认居中）裁成 9:16 并缩放到 `video` 尺寸，保存为 `frames/Sxx.png`。
-3. ComfyUI 拿到的就是尺寸正确的图；`width/height` 同时注入到 `MiniMaxH3ImageToVideo` 节点。
+3. ComfyUI 拿到的就是尺寸正确的图；`width/height` 注入 H3 的 `MiniMaxH3ImageToVideo` 或 Wan5B 的 `Wan22ImageToVideoLatent` 节点。
 
 这样做的好处：用户挑图时看到的就是最终进入视频的画面；画幅只在配置一处维护；换工作流或换生图模型都不用改裁切逻辑。
 

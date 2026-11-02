@@ -2,6 +2,7 @@
 
 | 文件 | 用途 |
 | --- | --- |
+| `wan5b-i2v.workflow.json` / `.api.json` / `.params.json` | Wan2.2 TI2V-5B 单图候选，576×1024、24fps、121帧，分块解码；模型需单独准备 |
 | `music.workflow.json` | MiniMax Music 3 音乐生成界面模板 |
 | `i2v.workflow.json` | MiniMax H3 图生视频，仅连接首帧 |
 | `flf2v.workflow.json` | MiniMax H3 首尾帧生视频，连接两张图片 |
@@ -32,5 +33,7 @@
 三个音乐/视频 `.api.json` 由上述随附模板展开子图得到，沿用节点 ID 前缀、模型、采样器、分块音频解码开关、Turbo 开关和 H3 秒数计算；去掉界面布局、说明节点和前端专用控件，提示词改为中文占位内容，由项目参数替换。音乐保存沿用 MP3 / V0，动态质量输入使用 `format.quality`。本地离线校验不替代目标 ComfyUI 的节点、模型和实际生成验证。
 
 上游 MIT 许可见 [LICENSE.Comfy-Org.txt](LICENSE.Comfy-Org.txt)。官方 H3 实现核对版本：ComfyUI `17ff1dcce963bd9f23095ec9b28febbfc4db8388` 的 `comfy_extras/nodes_minimax_h3.py`，使用 `24fps`、`17k+5` 规则。正确文件仍加载失败时，核对 ComfyUI 前后端、子图及量化权重支持。
+
+`wan5b-i2v` 来自本机 ComfyUI 官方 `comfyui_workflow_templates_json` 0.1.115 的 `templates/video_wan2_2_5B_ti2v.json`（2026-11-02 核对）。保留配套 FP16 diffusion / FP8 UMT5 / Wan2.2 VAE、20步、CFG 5、uni_pc/simple、shift 8；改为竖屏输入、中文单镜头占位提示及 `VAEDecodeTiled`（256/64，时间块32/8）。API 保持该平铺界面图的相同连接和输入，不含模型权重。上游 MIT 许可沿用本目录许可文件。显式选择和三镜头验收见 [优化指南](../references/resource-and-duration.md)。
 
 `tts-design` / `tts-direction` 为本技能自行组织的界面图、执行图和映射，不是上述官方模板的复制。2026-11-02 按本机 ComfyUI 0.43.0 的 `/object_info` 与 Saganaki22 节点包提交 `53d899bfaa1ea37badc58f901900c068a9755116` 核对；模型及输出适用 Breeze 的独立许可证，详见旁白指南。升级节点包后先验证接口再生成。

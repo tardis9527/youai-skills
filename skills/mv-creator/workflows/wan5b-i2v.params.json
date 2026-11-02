@@ -1,0 +1,86 @@
+{
+  "description": "Wan2.2 TI2V-5B 单图生视频；首尾帧不支持，不可代换 H3 模型名。",
+  "video_model": "wan2.2-5b",
+  "workflow": "wan5b-i2v.api.json",
+  "output_ext": [
+    ".mp4",
+    ".webm",
+    ".mov"
+  ],
+  "params": {
+    "image": {
+      "targets": [
+        {
+          "id": "56",
+          "input": "image"
+        }
+      ],
+      "required": true
+    },
+    "positive": {
+      "targets": [
+        {
+          "id": "6",
+          "input": "text"
+        }
+      ],
+      "required": true
+    },
+    "negative": {
+      "targets": [
+        {
+          "id": "7",
+          "input": "text"
+        }
+      ]
+    },
+    "width": {
+      "targets": [
+        {
+          "id": "55",
+          "input": "width"
+        }
+      ]
+    },
+    "height": {
+      "targets": [
+        {
+          "id": "55",
+          "input": "height"
+        }
+      ]
+    },
+    "length": {
+      "targets": [
+        {
+          "id": "55",
+          "input": "length"
+        }
+      ]
+    },
+    "fps": {
+      "targets": [
+        {
+          "id": "57",
+          "input": "fps"
+        }
+      ]
+    },
+    "seed": {
+      "targets": [
+        {
+          "id": "3",
+          "input": "seed"
+        }
+      ]
+    },
+    "filename_prefix": {
+      "targets": [
+        {
+          "id": "58",
+          "input": "filename_prefix"
+        }
+      ]
+    }
+  }
+}

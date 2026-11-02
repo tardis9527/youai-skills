@@ -13,12 +13,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from mvlib import audio, comfy, frames, media, voice  # noqa: E402
+from mvlib import audio, comfy, frames, media, voice, music as songlib  # noqa: E402
 from mvlib import shots as shotlib  # noqa: E402
 from mvlib.common import (  # noqa: E402
     CONFIG_NAME, SKILL_DIR, MVError, Project, ffmpeg_bin, fmt_time, load_config, max_clip_sec,
     next_index, now_iso, pick_candidate, read_json, shot_limit_sec, slugify, write_json,
-    validate_h3_video, video_frames,
+    validate_video, video_frames, VIDEO_PROFILES,
 )
 
 PROJECT_DIRS = ("music/takes", "analysis", "storyboard", "characters/raw", "frames/raw",
@@ -101,7 +101,8 @@ def cmd_doctor(args, cfg):
         object_info = client.object_info()
     except MVError as exc:
         report("FAIL", str(exc).splitlines()[0])
-    _check_workflows(cfg, object_info, report, ("music", "i2v", "flf2v", "tts-design", "tts-direction"))
+    video_kind = "wan5b-i2v" if cfg["video"].get("model") == "wan2.2-5b" else "i2v"
+    _check_workflows(cfg, object_info, report, ("music", video_kind, "flf2v", "tts-design", "tts-direction"))
     if failed:
         raise MVError("环境检查未通过，按上面的 FAIL 项处理（详见 references/setup.md）")
 
@@ -117,12 +118,10 @@ def _check_workflows(cfg, object_info, report, kinds=("music", "i2v", "flf2v")):
         problems = comfy.validate_kind(workflow, spec)
         if kind in ("tts-design", "tts-direction"):
             problems.extend(voice.validate_workflow(workflow, kind == "tts-direction"))
-        if kind in ("i2v", "flf2v") and spec.get("video_model") != "minimax-h3":
+        if kind in ("i2v", "flf2v") and not spec.get("video_model"):
             problems.extend(comfy.validate_h3_workflow(workflow))
         if object_info is not None:
-            missing = sorted({n["class_type"] for n in workflow.values()} - set(object_info))
-            if missing:
-                problems.append(f"ComfyUI 缺少这些节点（未安装自定义节点？）: {', '.join(missing)}")
+            problems.extend(comfy.validate_server(workflow, object_info))
         if problems:
             report("WARN" if kind.startswith("tts-") else "FAIL",
                    f"工作流 {kind} ({path.name}):\n  - " + "\n  - ".join(problems))
@@ -143,8 +142,10 @@ def cmd_new(args, cfg):
     (project.root / "brief.md").write_text(template.replace("{{title}}", args.title), encoding="utf-8")
     project.save({
         "version": 1, "title": args.title, "slug": slug, "created": now_iso(),
-        "video": dict(cfg["video"]),
-        "music": {"duration_sec": cfg["music"]["duration_sec"], "takes": [], "selected": None, "file": None},
+        "video": dict(VIDEO_PROFILES[args.video_profile] if getattr(args, "video_profile", None) else cfg["video"]),
+        "music": {"duration_sec": cfg["music"]["duration_sec"],
+                  "target_duration_sec": cfg["music"]["duration_sec"],
+                  "takes": [], "selected": None, "file": None},
     })
     print(f"已创建项目 {slug}: {_abs(project.root)}\n下一步: 填写 brief.md")
 
@@ -165,7 +166,7 @@ def cmd_status(args, cfg):
          "填写 brief.md 并与用户确认"),
         ("歌曲提示词", _nonempty(caption) and _nonempty(lyrics),
          "用 comfyui-minimax-music 成稿，写入 music/caption.txt 与 music/lyrics.txt"),
-        (f"歌曲生成（{len(music.get('takes', []))} 版）", bool(music.get("takes")), f"music {args.slug} --takes 4"),
+        (f"歌曲生成（{len(music.get('takes', []))} 版）", bool(music.get("takes")), f"music {args.slug} --takes 1"),
         (f"选定歌曲（{music.get('selected') or '未选'}）", bool(music.get("file")),
          f"music-select {args.slug} <take-N>"),
         ("节拍分析" + ("（基于旧歌曲）" if beats_stale else ""), bool(beats) and not beats_stale,
@@ -240,6 +241,8 @@ def _stale(record: dict | None, selected: str | None) -> bool:
 # Music ---------------------------------------------------------------------
 
 def cmd_music(args, cfg):
+    if args.takes < 1:
+        raise MVError("--takes 必须大于零")
     project = _project(cfg, args.slug)
     meta = project.load()
     folder = project.root / "music"
@@ -247,8 +250,11 @@ def cmd_music(args, cfg):
     if not _nonempty(caption):
         raise MVError(f"缺少 {caption}（用 comfyui-minimax-music 成稿后写入）")
     music = meta.setdefault("music", {"takes": []})
-    duration = args.duration or music.get("duration_sec") or cfg["music"]["duration_sec"]
-    music["duration_sec"] = duration
+    target, duration = songlib.settings(args, music, cfg["music"])
+    if getattr(args, "dry_run", False):
+        print(f"目标约 {target:g}s，生成上限 {duration:g}s；{args.takes} 次音乐生成（不提交）")
+        return
+    music.update(duration_sec=target, target_duration_sec=target, generation_max_duration_sec=duration)
     values = {"caption": caption.read_text(encoding="utf-8-sig").strip(),
               "lyrics": lyrics.read_text(encoding="utf-8-sig").strip() if lyrics.is_file() else "",
               "max_duration": int(duration) if float(duration).is_integer() else duration}
@@ -260,9 +266,55 @@ def cmd_music(args, cfg):
         saved = comfy.run_kind(cfg, "music", values, {}, f"mv-creator/{args.slug}",
                                folder / "takes", f"take-{number}")
         music.setdefault("takes", []).append({"id": f"take-{number}", "file": project.rel(saved[0]),
-                                              "seed": seed, "max_duration": duration, "created": now_iso()})
+                                              "seed": seed, "max_duration": duration,
+                                              "target_duration_sec": target, "created": now_iso()})
+        # Save the successful generation even if probing or a later take fails.
         project.save(meta)
+        take = music["takes"][-1]
+        try:
+            take.update(songlib.inspect(saved[0], cfg, duration))
+        except MVError as exc:
+            take.update(ending_review="pending_listen", probe_error=str(exc))
+            print(f"  注意: 成品已保存，时长未检测：{exc}")
+        run_log = saved[0].parent / f"take-{number}.run.json"
+        if run_log.is_file():
+            take["run_log"] = project.rel(run_log)
+            take["prompt_id"] = read_json(run_log).get("prompt_id")
+        project.save(meta)
+        if take.get("near_limit"):
+            print("  注意: 成品接近生成上限，可能尚未完整收尾；请试听最后一句及尾奏，不自动判定完整。")
         print(f"  已保存 {_abs(saved[0])}", flush=True)
+
+
+def cmd_music_check(args, cfg):
+    project = _project(cfg, args.slug)
+    meta = project.load()
+    for take in meta.get("music", {}).get("takes", []):
+        take.update(songlib.inspect(project.path(take["file"]), cfg, take.get("max_duration")))
+        print(f"{take['id']}: {take['duration_sec']:.3f}s，"
+              + ("接近上限，请试听收尾" if take["near_limit"] else "未接近上限，仍需试听收尾"))
+    project.save(meta)
+
+
+def cmd_video_profile(args, cfg):
+    project = _project(cfg, args.slug)
+    video = dict(VIDEO_PROFILES[args.profile])
+    validate_video(video)
+    if project.has_shots():
+        data = project.load_shots()
+        if video["model"] == "wan2.2-5b" and any(s.get("workflow") == "flf2v" for s in data["shots"]):
+            raise MVError("Wan5B 仅支持 i2v；项目有 flf2v 镜头，请先人工调整分镜或保留 H3")
+        if any(s["end"] - s["start"] > shot_limit_sec(video) + 1e-6 for s in data["shots"]):
+            raise MVError("新配置的单段时长不足，请先拆分过长镜头；不自动重切已确认分镜")
+    print(json.dumps(video, ensure_ascii=False, indent=2))
+    if args.dry_run:
+        print("仅预览，未更改项目")
+        return
+    meta = project.load()
+    meta.setdefault("video_history", []).append({"video": meta.get("video", {}), "changed": now_iso()})
+    meta["video"] = video
+    project.save(meta)
+    print("已更新项目视频配置；请运行 frame-select 从所选原图重裁关键帧，再 clips --dry-run。已有视频保留。")
 
 
 def cmd_music_select(args, cfg):
@@ -474,6 +526,8 @@ def _motion_prompt(data: dict, shot: dict) -> str:
 
 
 def cmd_clips(args, cfg):
+    if args.takes < 1:
+        raise MVError("--takes 必须大于零")
     project = _project(cfg, args.slug)
     data = project.load_shots()
     video = project.video()
@@ -493,6 +547,10 @@ def cmd_clips(args, cfg):
         if not shot.get("motion_prompt"):
             raise MVError(f"{shot['id']} 的 motion_prompt 为空")
         kind = shot.get("workflow", "i2v")
+        if video.get("model") == "wan2.2-5b":
+            if kind != "i2v":
+                raise MVError(f"{shot['id']}: Wan5B 仅支持单图 i2v，不自动降级首尾帧镜头")
+            kind = "wan5b-i2v"
         uploads = {"image": frame}
         if kind == "flf2v":
             nxt = shots[index + 1] if index + 1 < len(shots) else None
@@ -504,20 +562,22 @@ def cmd_clips(args, cfg):
     if not plans:
         print("没有需要生成的镜头（--shots 指定重做，--more 给所有镜头追加版本）")
         return
-    validate_h3_video(video)
+    validate_video(video)
     for shot, _, _ in plans:
         if shot["end"] - shot["start"] > shot_limit_sec(video) + 1e-6:
-            raise MVError(f"{shot['id']} 超过单段上限，请先拆分镜头或调整 H3 max_frames")
+            raise MVError(f"{shot['id']} 超过单段上限，请先拆分镜头或调整 max_frames")
     specs = {}
     for _, kind, _ in plans:
         if kind in specs:
             continue
         spec, workflow, _ = comfy.load_kind(cfg, kind)
-        problems = comfy.validate_kind(workflow, spec) + comfy.validate_h3_workflow(workflow)
+        problems = comfy.validate_kind(workflow, spec)
+        if spec.get("video_model") != video["model"]:
+            problems.append(f"工作流模型 {spec.get('video_model')} 与项目 {video['model']} 不一致")
         if problems:
             raise MVError(f"工作流 {kind} 校验失败:\n" + "\n".join(dict.fromkeys(problems)))
         if not ({"duration", "length"} & set(spec.get("params", {}))):
-            raise MVError(f"工作流 {kind} 缺少 H3 duration 或 length 参数映射")
+            raise MVError(f"工作流 {kind} 缺少 duration 或 length 参数映射")
         specs[kind] = spec
     print(f"将生成 {len(plans)} 个镜头 × {args.takes} 版 = {len(plans) * args.takes} 段视频", flush=True)
     if args.dry_run:
@@ -535,6 +595,8 @@ def cmd_clips(args, cfg):
             values["duration"] = length / video["fps"]
         else:
             values["length"] = length
+        if "fps" in params:
+            values["fps"] = video["fps"]
         if data.get("negative"):
             if "negative" in params:
                 values["negative"] = data["negative"]
@@ -550,8 +612,11 @@ def cmd_clips(args, cfg):
                                    project.root / "clips" / shot["id"], f"take-{number}")
             takes.append({"id": f"take-{number}", "file": project.rel(saved[0]), "workflow": kind,
                           "seed": seed, "frames": length, "fps": video["fps"],
-                          "model": "minimax-h3", "duration_sec": length / video["fps"],
+                          "model": video["model"], "duration_sec": length / video["fps"],
                           "prompt": values["positive"], "created": now_iso()})
+            run_log = saved[0].parent / f"take-{number}.run.json"
+            if run_log.is_file():
+                takes[-1].update(run_log=project.rel(run_log), prompt_id=read_json(run_log).get("prompt_id"))
             project.save_shots(data)
             print(f"  已保存 {_abs(saved[0])}", flush=True)
 
@@ -708,14 +773,24 @@ def build_parser() -> argparse.ArgumentParser:
     p = add("new", cmd_new, "新建 MV 项目")
     p.add_argument("title")
     p.add_argument("--slug", help="项目目录名（默认由作品名生成）")
+    p.add_argument("--video-profile", choices=VIDEO_PROFILES, help="显式选择视频配置；默认沿用工作区")
+    p = add("video-profile", cmd_video_profile, "切换项目视频配置，保留既有素材")
+    p.add_argument("slug")
+    p.add_argument("profile", choices=VIDEO_PROFILES)
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("status", cmd_status, "查看项目进度与下一步")
     p.add_argument("slug")
 
     p = add("music", cmd_music, "用 ComfyUI 音乐工作流生成歌曲")
     p.add_argument("slug")
-    p.add_argument("--takes", type=int, default=4)
-    p.add_argument("--duration", type=float, help="max_duration 秒数（默认沿用项目设置）")
+    p.add_argument("--takes", type=int, default=1)
+    p.add_argument("--duration", type=float, help="旧版生成上限秒数，兼容保留；新任务用 --max-duration")
+    p.add_argument("--target-duration", type=float, help="目标片长，仅用于安排创作与记录")
+    p.add_argument("--max-duration", type=float, help="生成上限；未设时目标时长加收尾余量")
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p.add_argument("--seed", type=int, help="固定起始 seed，多版时依次加 1（默认每版随机）")
+    p = add("music-check", cmd_music_check, "测量已生成歌曲时长并提示临近上限")
+    p.add_argument("slug")
     p = add("music-select", cmd_music_select, "选定一版歌曲")
     p.add_argument("slug")
     p.add_argument("take")

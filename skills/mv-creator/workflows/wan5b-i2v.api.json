@@ -1,0 +1,178 @@
+{
+  "37": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_ti2v_5B_fp16.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "UNETLoader"
+    }
+  },
+  "38": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIPLoader"
+    }
+  },
+  "39": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan2.2_vae.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "8": {
+    "class_type": "VAEDecodeTiled",
+    "inputs": {
+      "samples": [
+        "3",
+        0
+      ],
+      "vae": [
+        "39",
+        0
+      ],
+      "tile_size": 256,
+      "overlap": 64,
+      "temporal_size": 32,
+      "temporal_overlap": 8
+    },
+    "_meta": {
+      "title": "VAEDecode"
+    }
+  },
+  "57": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "fps": 24,
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CreateVideo"
+    }
+  },
+  "58": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "filename_prefix": "mv-creator/wan5b",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "57",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "@output"
+    }
+  },
+  "55": {
+    "class_type": "Wan22ImageToVideoLatent",
+    "inputs": {
+      "width": 576,
+      "height": 1024,
+      "length": 121,
+      "batch_size": 1,
+      "vae": [
+        "39",
+        0
+      ],
+      "start_image": [
+        "56",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Wan22ImageToVideoLatent"
+    }
+  },
+  "56": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "mv-creator/start.png"
+    },
+    "_meta": {
+      "title": "@image"
+    }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "字幕，水印，闪烁，肢体畸形",
+      "clip": [
+        "38",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "@negative"
+    }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "人物保持外貌和服装一致，自然微动，镜头缓慢推进，一个连续镜头。",
+      "clip": [
+        "38",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "@positive"
+    }
+  },
+  "3": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 898471028164125,
+      "steps": 20,
+      "cfg": 5,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "48",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "7",
+        0
+      ],
+      "latent_image": [
+        "55",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "48": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "shift": 8,
+      "model": [
+        "37",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ModelSamplingSD3"
+    }
+  }
+}

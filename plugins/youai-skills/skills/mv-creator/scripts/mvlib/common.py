@@ -16,20 +16,29 @@ SKILL_DIR = Path(__file__).resolve().parents[2]
 CONFIG_NAME = "mv-creator.config.json"
 
 DEFAULT_CONFIG: dict = {
-    "comfyui": {"url": "http://127.0.0.1:8188", "timeout_sec": 3600, "poll_interval_sec": 2},
+    "comfyui": {"url": "http://127.0.0.1:8188", "timeout_sec": 3600, "poll_interval_sec": 2,
+                "release_between_stages": True, "record_resources": True},
     "workflows_dir": "workflows",
     "projects_dir": "projects",
     "video": {"model": "minimax-h3", "width": 864, "height": 1536,
               "fps": 24, "max_frames": 124, "clip_slack_sec": 0.5},
     "image": {"model": "gpt-image-2", "size": "1024x1536", "quality": None},
     "tardis": {"script": None},
-    "music": {"duration_sec": 60},
+    "music": {"duration_sec": 60, "ending_buffer_sec": 30},
     "voice": {"design_workflow": "tts-design", "direction_workflow": "tts-direction",
               "generation": {"cfg_scale": 4.0, "max_new_tokens": 256},
               "music_gain_db": -3, "voice_gain_db": 0, "duck_db": -6,
               "attack_sec": 0.15, "release_sec": 0.25},
     "roughcut": {"fps": 30, "scale": 1.25, "crf": 20, "font": "Microsoft YaHei"},
     "ffmpeg": None,
+}
+
+# Profiles are opt-in until representative clips have passed visual review.
+VIDEO_PROFILES = {
+    "wan5b": {"model": "wan2.2-5b", "width": 576, "height": 1024, "fps": 24,
+              "max_frames": 121, "clip_slack_sec": 0.5},
+    "h3": dict(DEFAULT_CONFIG["video"]),
+    "h3-preview": dict(DEFAULT_CONFIG["video"], width=576, height=1024),
 }
 
 
@@ -145,6 +154,11 @@ def clip_frames(duration: float, fps: int, max_frames: int, model: str = "wan2.2
         needed = max(124, math.ceil(duration * fps))
         aligned = needed + (5 - needed % 17) % 17
         return min(aligned, max_frames)
+    if model == "wan2.2-5b":
+        if fps != 24 or not isinstance(max_frames, int) or max_frames < 5 or (max_frames - 1) % 4:
+            raise MVError("Wan2.2 5B 需 fps=24，max_frames 为 4n+1（推荐 121）")
+        needed = max(5, math.ceil(duration * fps))
+        return min(needed + (1 - needed) % 4, max_frames)
     if model != "wan2.2":
         raise MVError(f"不支持的视频模型: {model}")
     needed = math.ceil(duration * fps) + 1
@@ -166,8 +180,19 @@ def validate_h3_video(video: dict) -> None:
         raise MVError("MiniMax H3 视频宽高需为正整数且为 32 的倍数，例如竖屏 864×1536 或预览 576×1024")
 
 
-def max_clip_sec(video: dict) -> float:
+def validate_video(video: dict) -> None:
     if video.get("model") == "minimax-h3":
+        validate_h3_video(video)
+        return
+    if video.get("model") != "wan2.2-5b":
+        raise MVError("旧 Wan 配置不能直接生成；请选择 video-profile <项目> wan5b 或 h3，并重裁关键帧")
+    video_frames(5, video)
+    if any(not isinstance(video.get(k), int) or video[k] <= 0 or video[k] % 32 for k in ("width", "height")):
+        raise MVError("Wan2.2 5B 视频宽高需为正整数且为 32 的倍数，例如 576×1024")
+
+
+def max_clip_sec(video: dict) -> float:
+    if video.get("model") in ("minimax-h3", "wan2.2-5b"):
         return video["max_frames"] / video["fps"]
     return (video["max_frames"] - 1) / video["fps"]
 

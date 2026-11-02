@@ -1,0 +1,137 @@
+{
+  "37:6": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "minimax_music3_dit_fp16.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "UNETLoader"
+    }
+  },
+  "37:13": {
+    "class_type": "MiniMaxMusic3TextEncode",
+    "inputs": {
+      "caption": "温暖的中文流行歌曲，清晰自然的人声演唱。",
+      "lyrics": "[Verse]\n风吹过熟悉的街角\n[Chorus]\n我们向着光奔跑",
+      "seed": 0,
+      "max_duration": 60,
+      "cfg_scale": 1.7,
+      "top_k": 50,
+      "clip": [
+        "37:3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "MiniMaxMusic3TextEncode"
+    }
+  },
+  "37:3": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "minimax_music3_text_encoder_pruned_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIPLoader"
+    }
+  },
+  "37:7": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_music3_dav.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "37:10": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "37:13",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "37:15": {
+    "class_type": "EmptyMiniMaxMusic3LatentAudio",
+    "inputs": {
+      "seconds": [
+        "37:13",
+        1
+      ],
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "EmptyMiniMaxMusic3LatentAudio"
+    }
+  },
+  "37:9": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 30,
+      "cfg": 1.7,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1,
+      "model": [
+        "37:6",
+        0
+      ],
+      "positive": [
+        "37:13",
+        0
+      ],
+      "negative": [
+        "37:10",
+        0
+      ],
+      "latent_image": [
+        "37:15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "37:42": {
+    "class_type": "VAEDecodeAudioTiled",
+    "inputs": {
+      "tile_size": 1536,
+      "overlap": 64,
+      "samples": [
+        "37:9",
+        0
+      ],
+      "vae": [
+        "37:7",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecodeAudioTiled"
+    }
+  },
+  "35": {
+    "class_type": "SaveAudioAdvanced",
+    "inputs": {
+      "filename_prefix": "audio/music_minimax3",
+      "format": "flac",
+      "audio": [
+        "37:42",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "@output"
+    }
+  }
+}

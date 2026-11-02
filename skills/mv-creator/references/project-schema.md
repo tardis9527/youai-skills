@@ -50,7 +50,10 @@ projects/<slug>/
   "video": {"model": "minimax-h3", "width": 864, "height": 1536, "fps": 24, "max_frames": 124},
   "music": {
     "duration_sec": 60,
-    "takes": [{"id": "take-1", "file": "music/takes/take-1.flac", "seed": 123, "max_duration": 60}],
+    "target_duration_sec": 60,
+    "generation_max_duration_sec": 90,
+    "takes": [{"id": "take-1", "file": "music/takes/take-1.flac", "seed": 123, "max_duration": 90,
+               "duration_sec": 65.4, "near_limit": false, "ending_review": "pending_listen"}],
     "selected": "take-1",
     "file": "music/song.flac"
   }
@@ -106,3 +109,5 @@ projects/<slug>/
 | `frame` / `clip` | 脚本 | 候选、版本与选定结果；不要手工改路径，用 select 命令 |
 
 H3 新版本记录 `model` 和 `duration_sec`。旧视频版本缺少这些字段时，剪辑清单继续按旧 Wan 时间规则展示，不重写历史版本。旧配置和旧项目缺少 `video.model` 时识别为 `wan2.2`，生成前按 [workflows.md](workflows.md) 迁移。
+
+歌曲版本可附 `prompt_id`、`run_log`（相对路径）、`sample_rate`、`channels`；视频版本也可附 `prompt_id` 和 `run_log`。运行记录不含原始提示词或凭据，资源是服务整机的采样最大值。视频切换保存 `video_history`，现有素材不重写。`wan2.2-5b` 原生片段时长为 `frames/fps`；完整流程与兼容规则见 [资源与时长优化](resource-and-duration.md)。

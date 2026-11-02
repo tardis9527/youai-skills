@@ -2,7 +2,9 @@
   "comfyui": {
     "url": "http://127.0.0.1:8188",
     "timeout_sec": 3600,
-    "poll_interval_sec": 2
+    "poll_interval_sec": 2,
+    "release_between_stages": true,
+    "record_resources": true
   },
   "workflows_dir": "workflows",
   "projects_dir": "projects",
@@ -23,7 +25,8 @@
     "script": null
   },
   "music": {
-    "duration_sec": 60
+    "duration_sec": 60,
+    "ending_buffer_sec": 30
   },
   "roughcut": {
     "fps": 30,

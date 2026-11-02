@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import json
 import mimetypes
+import math
 import time
 import uuid
 from pathlib import Path
@@ -80,11 +81,13 @@ class ComfyClient:
             raise MVError("工作流校验失败:\n" + _format_error(json.dumps(info)))
         return info["prompt_id"]
 
-    def wait(self, prompt_id: str) -> dict:
+    def wait(self, prompt_id: str, on_poll=None) -> dict:
         started = time.monotonic()
         last_note = started
         while True:
             history = self.get_json(f"/history/{prompt_id}")
+            if on_poll:
+                on_poll()
             entry = history.get(prompt_id)
             if entry:
                 status = entry.get("status") or {}
@@ -293,6 +296,9 @@ def validate_kind(workflow: dict, spec: dict) -> list[str]:
     problems = []
     if spec.get("video_model") == "minimax-h3":
         problems.extend(validate_h3_workflow(workflow))
+    elif spec.get("video_model") == "wan2.2-5b":
+        if not any(n["class_type"] == "Wan22ImageToVideoLatent" for n in workflow.values()):
+            problems.append("Wan5B 工作流缺少 Wan22ImageToVideoLatent，不可用 H3 API 替换权重冒充")
     for name, param in spec.get("params", {}).items():
         try:
             targets = _resolve_targets(workflow, name, param)
@@ -307,6 +313,39 @@ def validate_kind(workflow: dict, spec: dict) -> list[str]:
             except MVError as exc:
                 problems.append(f"参数 {name}: {exc}")
     return problems
+
+
+def validate_server(workflow: dict, object_info: dict) -> list[str]:
+    """Validate real node availability, model choices and literal numeric limits."""
+    problems = []
+    for node_id, node in workflow.items():
+        typ = node["class_type"]
+        if typ not in object_info:
+            problems.append(f"ComfyUI 缺少节点 {typ}")
+            continue
+        schema = object_info[typ].get("input", {})
+        fields = {**schema.get("required", {}), **schema.get("optional", {})}
+        for name, value in node.get("inputs", {}).items():
+            if _is_link(value) or name not in fields:
+                continue
+            field = fields[name]
+            if not isinstance(field, (list, tuple)) or not field:
+                continue
+            choices = field[0]
+            if name in ("unet_name", "clip_name", "vae_name", "lora_name") and isinstance(choices, list):
+                if value not in choices:
+                    problems.append(f"节点 {node_id} 缺少模型 {value}；请准备模型后重试，不自动下载")
+            limits = field[1] if len(field) > 1 and isinstance(field[1], dict) else {}
+            if isinstance(choices, str) and choices in ("INT", "FLOAT"):
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                    problems.append(f"节点 {node_id}.{name} 需要有限数值")
+                elif choices == "INT" and not isinstance(value, int):
+                    problems.append(f"节点 {node_id}.{name} 需要整数")
+                elif (("min" in limits and value < limits["min"]) or
+                      ("max" in limits and value > limits["max"])):
+                    problems.append(f"节点 {node_id}.{name}={value} 超出当前节点范围 "
+                                    f"[{limits.get('min', '-∞')}, {limits.get('max', '∞')}]；不静默截断")
+    return list(dict.fromkeys(problems))
 
 
 def validate_h3_workflow(workflow: dict) -> list[str]:
@@ -366,21 +405,41 @@ def run_kind(cfg: dict, kind: str, values: dict, uploads: dict[str, Path], subfo
     spec, workflow, _ = load_kind(cfg, kind)
     client = ComfyClient.from_config(cfg)
     values = dict(values)
+    # Preflight the submitted scalar values before uploads or queue mutation.
+    preview = apply_params(workflow, spec, {**values, **{k: p.name for k, p in uploads.items()}})
+    problems = validate_kind(preview, spec) + validate_server(preview, client.object_info())
+    if problems:
+        raise MVError(f"工作流 {kind} 预检失败:\n" + "\n".join(problems))
+    from .runs import RunMonitor
+    monitor = RunMonitor(client, cfg, kind, dest_dir / f"{dest_stem}.run.json")
+    monitor.prepare()
     for name, path in uploads.items():
         print(f"  上传 {name}: {Path(path).name}", flush=True)
         values[name] = client.upload(Path(path), subfolder)
     prompt = apply_params(workflow, spec, values)
-    prompt_id = client.queue(prompt)
-    print(f"  已提交 {kind} 任务 {prompt_id}", flush=True)
-    entry = client.wait(prompt_id)
+    monitor.start(prompt, values)
+    try:
+        prompt_id = client.queue(prompt)
+        monitor.submitted(prompt_id)
+        print(f"  已提交 {kind} 任务 {prompt_id}", flush=True)
+        entry = client.wait(prompt_id, on_poll=monitor.sample)
+    except BaseException:
+        monitor.finish("incomplete")
+        raise
     allowed = [e.lower() for e in spec.get("output_ext", [])]
     files = [f for f in collect_outputs(entry)
              if not allowed or Path(f["filename"]).suffix.lower() in allowed]
     if not files:
+        monitor.finish("missing_output")
         raise MVError(f"{kind} 任务完成但没有找到输出文件（允许的扩展名: {allowed or '任意'}）")
     saved = []
-    for index, item in enumerate(files, start=1):
-        suffix = Path(item["filename"]).suffix
-        name = f"{dest_stem}{suffix}" if len(files) == 1 else f"{dest_stem}-{index}{suffix}"
-        saved.append(client.download(item, dest_dir / name))
+    try:
+        for index, item in enumerate(files, start=1):
+            suffix = Path(item["filename"]).suffix
+            name = f"{dest_stem}{suffix}" if len(files) == 1 else f"{dest_stem}-{index}{suffix}"
+            saved.append(client.download(item, dest_dir / name))
+    except BaseException:
+        monitor.finish("download_incomplete")
+        raise
+    monitor.finish("success", [p.name for p in saved])
     return saved
