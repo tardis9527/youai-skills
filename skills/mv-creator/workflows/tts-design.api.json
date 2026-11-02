@@ -1,0 +1,54 @@
+{
+  "1": {
+    "class_type": "BreezeTTS2LoadModel",
+    "inputs": {
+      "model": "int8 hybrid (recommended)",
+      "dtype": "auto",
+      "device": "auto",
+      "attention": "auto",
+      "decode_mode": "eager",
+      "download_if_missing": false
+    },
+    "_meta": {
+      "title": "模型加载｜Breeze TTS 2"
+    }
+  },
+  "2": {
+    "class_type": "BreezeTTS2VoiceDesign",
+    "inputs": {
+      "breeze_model": [
+        "1",
+        0
+      ],
+      "text": "那天的雨，我一直记得。",
+      "instruction": "年轻女性，中低音，温暖、清晰、自然，语速稍慢，克制地回忆。",
+      "cfg_scale": 4.0,
+      "max_new_tokens": 256,
+      "temperature": 0.9,
+      "top_k": 50,
+      "top_p": 1.0,
+      "repetition_penalty": 1.1,
+      "depth_temperature": 0.9,
+      "depth_top_k": 50,
+      "depth_top_p": 1.0,
+      "seed": 42
+    },
+    "_meta": {
+      "title": "@voice"
+    }
+  },
+  "3": {
+    "class_type": "SaveAudioAdvanced",
+    "inputs": {
+      "audio": [
+        "2",
+        0
+      ],
+      "filename_prefix": "mv-creator/tts-design",
+      "format": "flac"
+    },
+    "_meta": {
+      "title": "@output"
+    }
+  }
+}

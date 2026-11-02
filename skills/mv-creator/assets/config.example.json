@@ -31,5 +31,18 @@
     "crf": 20,
     "font": "Microsoft YaHei"
   },
-  "ffmpeg": null
+  "ffmpeg": null,
+  "voice": {
+    "design_workflow": "tts-design",
+    "direction_workflow": "tts-direction",
+    "generation": {
+      "cfg_scale": 4.0,
+      "max_new_tokens": 256
+    },
+    "music_gain_db": -3,
+    "voice_gain_db": 0,
+    "duck_db": -6,
+    "attack_sec": 0.15,
+    "release_sec": 0.25
+  }
 }

@@ -1,0 +1,144 @@
+{
+  "description": "Breeze 旁白参数映射，不能拖入 ComfyUI",
+  "workflow": "tts-direction.api.json",
+  "output_ext": [
+    ".flac",
+    ".wav"
+  ],
+  "params": {
+    "text": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "text"
+        }
+      ],
+      "required": true
+    },
+    "reference_text": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "reference_text"
+        }
+      ],
+      "required": true
+    },
+    "instruction": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "instruction"
+        }
+      ],
+      "required": true
+    },
+    "cfg_scale": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "cfg_scale"
+        }
+      ],
+      "required": false
+    },
+    "max_new_tokens": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "max_new_tokens"
+        }
+      ],
+      "required": false
+    },
+    "temperature": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "temperature"
+        }
+      ],
+      "required": false
+    },
+    "top_k": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "top_k"
+        }
+      ],
+      "required": false
+    },
+    "top_p": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "top_p"
+        }
+      ],
+      "required": false
+    },
+    "repetition_penalty": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "repetition_penalty"
+        }
+      ],
+      "required": false
+    },
+    "depth_temperature": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "depth_temperature"
+        }
+      ],
+      "required": false
+    },
+    "depth_top_k": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "depth_top_k"
+        }
+      ],
+      "required": false
+    },
+    "depth_top_p": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "depth_top_p"
+        }
+      ],
+      "required": false
+    },
+    "seed": {
+      "targets": [
+        {
+          "class_type": "BreezeTTS2VoiceDirection",
+          "input": "seed"
+        }
+      ],
+      "required": false
+    },
+    "reference_audio": {
+      "required": true,
+      "targets": [
+        {
+          "class_type": "LoadAudio",
+          "input": "audio"
+        }
+      ]
+    },
+    "filename_prefix": {
+      "targets": [
+        {
+          "title": "@output",
+          "input": "filename_prefix"
+        }
+      ]
+    }
+  }
+}

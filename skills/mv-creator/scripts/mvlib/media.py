@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .common import MVError, Project, ffmpeg_bin, fmt_time, now_iso, read_json, write_json
 from .shots import to_srt
+from . import voice
 
 
 def _selected_take(shot: dict) -> dict | None:
@@ -43,6 +44,8 @@ def package(project: Project, cfg: dict) -> dict:
     meta = project.load()
     data = project.load_shots()
     shots = data["shots"]
+    plan = voice.load_plan(project)
+    voice_outputs = voice.mix(project, cfg) if plan and plan["enabled"] else []
     dest = project.root / "final" / "capcut"
     folders = {key: dest / name for key, name in (
         ("audio", "01_音乐"), ("clips", "02_视频片段"), ("frames", "03_关键帧"),
@@ -80,8 +83,45 @@ def package(project: Project, cfg: dict) -> dict:
                   for b in beats["bars"]]
         (folders["beats"] / "小节线.txt").write_text("\n".join(lines) + "\n", encoding="utf-8-sig")
 
-    (dest / "剪辑清单.md").write_text(_edit_list(meta, data, rows, missing, song), encoding="utf-8")
-    write_json(dest / "package.json", {"created": now_iso(), "shots": len(shots), "missing": missing})
+    voice_text = ""
+    audio_fingerprint = None
+    if voice_outputs:
+        voices_folder = dest / "06_旁白"
+        mix_folder = dest / "07_混音参考"
+        voices_folder.mkdir(exist_ok=True)
+        mix_folder.mkdir(exist_ok=True)
+        cues = voice.resolved(project, cfg, plan)
+        timeline_rows = []
+        for cue in cues:
+            name = f"{cue['id']}_{cue['start']:06.2f}_{cue['speaker']}{cue['file'].suffix}"
+            shutil.copy2(cue["file"], voices_folder / name)
+            timeline_rows.append({"id": cue["id"], "speaker": cue["speaker"], "file": f"06_旁白/{name}",
+                                  "start": cue["start"], "end": cue["start"] + cue["duration_sec"],
+                                  "text": cue["text"], "gain_db": cue.get("gain_db", 0),
+                                  "duck_db": cue.get("duck_db", cfg.get("voice", {}).get("duck_db", -6)),
+                                  "subtitle": cue.get("subtitle", True)})
+        voice_text = ("\n## 旁白与混音\n\n旁白放在独立音轨，按声音时间表对齐；原片音轨静音。"
+                      "07_混音参考 中的歌曲版、旁白轨和混音用于对比，不要将混音与原歌曲重复叠加。"
+                      "旁白字幕放上方，歌词放下方；重叠位置需人工试听和校对。\n\n")
+        settings = voice.mix_settings(cfg)
+        voice_text += (f"手工还原混音：歌曲基础增益 {settings['music_gain_db']:g}dB，旁白基础增益 "
+                       f"{settings['voice_gain_db']:g}dB；每句再叠加时间表 gain_db，歌曲在该句期间按 duck_db 额外降低，"
+                       f"{settings['attack_sec']:g} 秒进入、{settings['release_sec']:g} 秒恢复。\n\n"
+                       "| 台词 | 说话人 | 起点 | 终点 | 文件 | 文本 |\n| --- | --- | --- | --- | --- | --- |\n")
+        for cue in timeline_rows:
+            text = cue["text"].replace("|", "/").replace("\n", " ")
+            voice_text += (f"| {cue['id']} | {cue['speaker']} | {cue['start']:.3f} | {cue['end']:.3f} "
+                           f"| {cue['file']} | {text} |\n")
+        write_json(voices_folder / "声音时间表.json", {"settings": settings, "cues": timeline_rows})
+        (voices_folder / "声音时间表.md").write_text(voice_text, encoding="utf-8")
+        for path in voice_outputs:
+            shutil.copy2(path, (folders["subs"] if path.suffix == ".srt" else mix_folder) / path.name)
+        manifest = project.root / "final" / "audio" / "mix-manifest.json"
+        shutil.copy2(manifest, mix_folder / manifest.name)
+        audio_fingerprint = read_json(manifest)["fingerprint"]
+    (dest / "剪辑清单.md").write_text(_edit_list(meta, data, rows, missing, song) + voice_text, encoding="utf-8")
+    write_json(dest / "package.json", {"created": now_iso(), "shots": len(shots), "missing": missing,
+                                      "audio_fingerprint": audio_fingerprint})
     return {"dest": dest, "shots": len(shots), "clips": len(shots) - len(missing), "missing": missing}
 
 
@@ -119,6 +159,8 @@ def roughcut(project: Project, cfg: dict, burn_subs: bool) -> list[Path]:
     if not ffmpeg:
         raise MVError("没有找到 ffmpeg，按 references/setup.md 安装，或在配置中写明 ffmpeg 路径")
     data = project.load_shots()
+    plan = voice.load_plan(project)
+    voice_outputs = voice.mix(project, cfg) if plan and plan["enabled"] else []
     video = project.video()
     rc = cfg["roughcut"]
     width = _even(video["width"] * rc.get("scale", 1))
@@ -175,8 +217,9 @@ def roughcut(project: Project, cfg: dict, burn_subs: bool) -> list[Path]:
     _run(cmd, cwd=work)
     outputs = [out]
 
-    if burn_subs:
-        (work / "lyrics.srt").write_text(to_srt(data["shots"]), encoding="utf-8")
+    lyrics_text = to_srt(data["shots"])
+    if burn_subs and lyrics_text.strip():
+        (work / "lyrics.srt").write_text(lyrics_text, encoding="utf-8")
         font = rc.get("font") or "Microsoft YaHei"
         subbed = project.root / "final" / "roughcut_subs.mp4"
         # Relative subtitle path avoids escaping the drive colon in the filter.
@@ -185,6 +228,32 @@ def roughcut(project: Project, cfg: dict, burn_subs: bool) -> list[Path]:
               "-c:v", "libx264", "-preset", "veryfast", "-crf", crf, "-pix_fmt", "yuv420p",
               "-c:a", "copy", str(subbed)], cwd=work)
         outputs.append(subbed)
+
+    audio_fingerprint = None
+    if voice_outputs:
+        narrated = project.root / "final" / "roughcut_voice.mp4"
+        _run([ffmpeg, "-y", "-v", "error", "-i", str(out), "-i", str(voice_outputs[2]),
+              "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+              "-t", f"{cursor:.3f}", "-movflags", "+faststart", str(narrated)])
+        outputs.append(narrated)
+        audio_fingerprint = read_json(project.root / "final/audio/mix-manifest.json")["fingerprint"]
+        voice_text = voice_outputs[3].read_text(encoding="utf-8-sig")
+        if burn_subs and (lyrics_text.strip() or voice_text.strip()):
+            shutil.copy2(voice_outputs[3], work / "voice.srt")
+            font = rc.get("font") or "Microsoft YaHei"
+            caption_filters = []
+            if lyrics_text.strip():
+                caption_filters.append(f"subtitles=lyrics.srt:force_style='FontName={font},FontSize=14,Outline=1,MarginV=40'")
+            if voice_text.strip():
+                caption_filters.append(f"subtitles=voice.srt:force_style='FontName={font},FontSize=14,Outline=1,Alignment=8,MarginV=40'")
+            captions = ",".join(caption_filters)
+            narrated_subs = project.root / "final" / "roughcut_voice_subs.mp4"
+            _run([ffmpeg, "-y", "-v", "error", "-i", str(narrated), "-vf", captions,
+                  "-c:v", "libx264", "-preset", "veryfast", "-crf", crf, "-pix_fmt", "yuv420p",
+                  "-c:a", "copy", str(narrated_subs)], cwd=work)
+            outputs.append(narrated_subs)
+    write_json(project.root / "final" / "roughcut-manifest.json", {"created": now_iso(),
+               "audio_fingerprint": audio_fingerprint, "files": [project.rel(p) for p in outputs]})
 
     shutil.rmtree(work)
     if stills:

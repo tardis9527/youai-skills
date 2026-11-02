@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from mvlib import audio, comfy, frames, media  # noqa: E402
+from mvlib import audio, comfy, frames, media, voice  # noqa: E402
 from mvlib import shots as shotlib  # noqa: E402
 from mvlib.common import (  # noqa: E402
     CONFIG_NAME, SKILL_DIR, MVError, Project, ffmpeg_bin, fmt_time, load_config, max_clip_sec,
@@ -101,20 +101,22 @@ def cmd_doctor(args, cfg):
         object_info = client.object_info()
     except MVError as exc:
         report("FAIL", str(exc).splitlines()[0])
-    _check_workflows(cfg, object_info, report)
+    _check_workflows(cfg, object_info, report, ("music", "i2v", "flf2v", "tts-design", "tts-direction"))
     if failed:
         raise MVError("环境检查未通过，按上面的 FAIL 项处理（详见 references/setup.md）")
 
 
 def _check_workflows(cfg, object_info, report, kinds=("music", "i2v", "flf2v")):
     for kind in kinds:
-        optional = kind == "flf2v"
+        optional = kind in ("flf2v", "tts-design", "tts-direction")
         try:
             spec, workflow, path = comfy.load_kind(cfg, kind)
         except MVError as exc:
             report("WARN" if optional else "FAIL", f"工作流 {kind}: {exc}")
             continue
         problems = comfy.validate_kind(workflow, spec)
+        if kind in ("tts-design", "tts-direction"):
+            problems.extend(voice.validate_workflow(workflow, kind == "tts-direction"))
         if kind in ("i2v", "flf2v") and spec.get("video_model") != "minimax-h3":
             problems.extend(comfy.validate_h3_workflow(workflow))
         if object_info is not None:
@@ -122,7 +124,8 @@ def _check_workflows(cfg, object_info, report, kinds=("music", "i2v", "flf2v")):
             if missing:
                 problems.append(f"ComfyUI 缺少这些节点（未安装自定义节点？）: {', '.join(missing)}")
         if problems:
-            report("FAIL", f"工作流 {kind} ({path.name}):\n  - " + "\n  - ".join(problems))
+            report("WARN" if kind.startswith("tts-") else "FAIL",
+                   f"工作流 {kind} ({path.name}):\n  - " + "\n  - ".join(problems))
         else:
             report("OK", f"工作流 {kind}: {path.name} 参数映射有效")
 
@@ -193,6 +196,29 @@ def cmd_status(args, cfg):
         ("剪映素材包", (project.root / "final" / "capcut" / "package.json").is_file(), f"package {args.slug}"),
         ("粗剪参考", (project.root / "final" / "roughcut.mp4").is_file(), f"roughcut {args.slug}"),
     ]
+    plan = voice.load_plan(project)
+    if plan and plan["enabled"]:
+        errors, warnings = voice.check(project, cfg, plan, ready=True)
+        voice_done = not errors and bool(plan["cues"])
+        rows.insert(-2, (f"旁白（{len(plan['cues'])} 句）", voice_done,
+                         f"voice-check {args.slug}，再试听、voice-select 与 mix-preview"))
+        for message in errors + warnings:
+            print(f"[声音] {message}")
+        manifest = project.root / "final" / "audio" / "mix-manifest.json"
+        mix_done = voice_done and manifest.is_file()
+        if mix_done:
+            record = read_json(manifest)
+            mix_done = record.get("fingerprint") == voice.mix_fingerprint(project, cfg, plan)
+            mix_done = mix_done and set(record.get("outputs", {})) == {"song_only.wav", "voice_track.wav", "mix.wav", "voice.srt"}
+            mix_done = mix_done and all((manifest.parent / name).is_file() and
+                                       voice.file_hash(manifest.parent / name) == checksum
+                                       for name, checksum in record.get("outputs", {}).items())
+        rows.insert(-2, ("旁白混音", mix_done, f"mix-preview {args.slug}"))
+        expected = read_json(manifest).get("fingerprint") if mix_done else None
+        for label, path in (("剪映素材包", project.root / "final/capcut/package.json"),
+                            ("粗剪参考", project.root / "final/roughcut-manifest.json")):
+            current = bool(expected and path.is_file() and read_json(path).get("audio_fingerprint") == expected)
+            rows = [(name, current if name == label else done, hint) for name, done, hint in rows]
     print(f"{meta['title']}（{args.slug}）  {_abs(project.root)}")
     next_step = None
     for label, done, hint in rows:
@@ -558,6 +584,62 @@ def cmd_roughcut(args, cfg):
         print(f"粗剪 → {_abs(path)}")
 
 
+# Optional voice production --------------------------------------------------
+
+def _voice_plan(project):
+    plan = voice.load_plan(project)
+    if plan is None:
+        raise MVError("尚无声音计划，先运行 voice-init，再按 references/voice-guide.md 填写")
+    return plan
+
+
+def cmd_voice_init(args, cfg):
+    print(f"已创建声音计划: {_abs(voice.init_plan(_project(cfg, args.slug)))}（默认关闭）")
+
+
+def cmd_voice_check(args, cfg):
+    project = _project(cfg, args.slug)
+    plan = _voice_plan(project)
+    if args.bind:
+        plan["binding"] = voice.binding(project)
+    errors, warnings = voice.check(project, cfg, plan, args.ready)
+    for message in warnings:
+        print(f"[WARN] {message}")
+    for message in errors:
+        print(f"[FAIL] {message}")
+    if errors:
+        raise MVError(f"声音计划有 {len(errors)} 个问题")
+    if args.bind:
+        write_json(project.root / voice.PLAN, plan)
+    print(f"声音计划校验通过，{'已启用' if plan['enabled'] else '未启用'}；{len(plan['cues'])} 句旁白")
+
+
+def cmd_voice(args, cfg):
+    project = _project(cfg, args.slug)
+    plan = _voice_plan(project)
+    if not args.speakers:
+        errors, warnings = voice.check(project, cfg, plan)
+        # Stale or overlong previous takes may be replaced explicitly.
+        repairable = ("需要重做/重选配音", "超出窗口", "选定音频已被改写")
+        blocking = [e for e in errors if not any(word in e for word in repairable)]
+        if blocking:
+            raise MVError("\n".join(blocking))
+        for warning in warnings:
+            print(f"[WARN] {warning}")
+    voice.generate(project, cfg, plan, args.ids, speakers=args.speakers, takes=args.takes,
+                   more=args.more, dry_run=args.dry_run, seed=args.seed)
+
+
+def cmd_voice_select(args, cfg):
+    project = _project(cfg, args.slug)
+    voice.select(project, cfg, _voice_plan(project), args.id, args.take, args.speaker)
+
+
+def cmd_mix_preview(args, cfg):
+    for path in voice.mix(_project(cfg, args.slug), cfg):
+        print(f"混音素材 → {_abs(path)}")
+
+
 # Generic ComfyUI --------------------------------------------------------------
 
 def cmd_comfy_inspect(args, cfg):
@@ -684,6 +766,28 @@ def build_parser() -> argparse.ArgumentParser:
     p = add("roughcut", cmd_roughcut, "用 ffmpeg 按分镜拼出粗剪参考")
     p.add_argument("slug")
     p.add_argument("--burn-subs", action="store_true", help="另出一版烧录歌词字幕")
+
+    p = add("voice-init", cmd_voice_init, "创建可选的旁白声音计划（默认关闭）")
+    p.add_argument("slug")
+    p = add("voice-check", cmd_voice_check, "检查旁白台词、音色参考与时间窗口")
+    p.add_argument("slug")
+    p.add_argument("--ready", action="store_true", help="要求全部配音已选定且可混音")
+    p.add_argument("--bind", action="store_true", help="复核时间后绑定当前歌曲及分镜，不自动移动旁白")
+    p = add("voice", cmd_voice, "生成音色试镜或逐句配音")
+    p.add_argument("slug")
+    p.add_argument("--speakers", action="store_true", help="音色试镜，使用说话人的 sample_text")
+    p.add_argument("--ids", help="逗号分隔的说话人或台词 id；指定后追加版本")
+    p.add_argument("--takes", type=int, default=2)
+    p.add_argument("--more", action="store_true", help="全部追加版本")
+    p.add_argument("--seed", type=int, help="正整数 seed；多个候选依次递增")
+    p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
+    p = add("voice-select", cmd_voice_select, "选定旁白或音色样音")
+    p.add_argument("slug")
+    p.add_argument("id")
+    p.add_argument("take")
+    p.add_argument("--speaker", action="store_true", help="选定音色样音，并设为固定参考声音")
+    p = add("mix-preview", cmd_mix_preview, "混合歌曲与旁白，另附歌曲版及独立旁白轨")
+    p.add_argument("slug")
 
     p = add("comfy-inspect", cmd_comfy_inspect, "列出 API 工作流中的节点、标题与参数")
     p.add_argument("workflow", help="API 格式工作流 JSON 路径")

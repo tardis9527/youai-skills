@@ -24,6 +24,10 @@ DEFAULT_CONFIG: dict = {
     "image": {"model": "gpt-image-2", "size": "1024x1536", "quality": None},
     "tardis": {"script": None},
     "music": {"duration_sec": 60},
+    "voice": {"design_workflow": "tts-design", "direction_workflow": "tts-direction",
+              "generation": {"cfg_scale": 4.0, "max_new_tokens": 256},
+              "music_gain_db": -3, "voice_gain_db": 0, "duck_db": -6,
+              "attack_sec": 0.15, "release_sec": 0.25},
     "roughcut": {"fps": 30, "scale": 1.25, "crf": 20, "font": "Microsoft YaHei"},
     "ffmpeg": None,
 }

@@ -22,13 +22,23 @@ projects/<slug>/
 │  ├─ prompts/
 │  └─ Sxx.png              # 选定并裁切到视频尺寸的关键帧
 ├─ clips/Sxx/take-N.mp4    # 视频片段各版本
+├─ audio/                 # 可选旁白；旧项目不必创建
+│  ├─ voice-plan.json      # 声音表、说话人、参考、候选与选版
+│  ├─ auditions/<id>/take-N.flac  # 音色试镜
+│  └─ takes/<id>/take-N.flac      # 逐句正式配音
 └─ final/
    ├─ capcut/              # 剪映素材包
-   ├─ roughcut.mp4         # 粗剪参考
-   └─ roughcut_subs.mp4    # 带歌词字幕的粗剪（可选）
+   ├─ audio/               # 启用旁白后：歌曲版、旁白轨、混音、字幕及混音记录
+   ├─ roughcut.mp4         # 原歌曲粗剪参考
+   ├─ roughcut_subs.mp4    # 带歌词字幕的粗剪（可选）
+   ├─ roughcut_voice.mp4   # 旁白混音版（启用旁白时）
+   ├─ roughcut_voice_subs.mp4  # 歌词与旁白分别显示（可选）
+   └─ roughcut-manifest.json   # 当前粗剪的声音版本记录
 ```
 
 所有 JSON 中的文件路径都相对项目根目录，项目文件夹整体移动或换电脑后仍然有效。
+
+`audio/voice-plan.json` 由 `voice-init` 创建且默认关闭。启用后按歌曲与分镜摘要检查时间线是否过期；声音条目按文本、参考音频、参数与 API 摘要判断是否需重做。字段、示例和混音文件说明见 [voice-guide.md](voice-guide.md)。缺少计划或 `enabled=false` 时维持原歌曲流程。
 
 ## project.json
 

@@ -19,7 +19,7 @@ winget install -e --id Gyan.FFmpeg
 
 之后所有命令都用 `.\.venv\Scripts\python <SKILL_DIR>\scripts\mv.py ...`；激活虚拟环境（`.\.venv\Scripts\Activate.ps1`）后也可以直接用 `python`。PowerShell 拒绝运行激活脚本时，直接写 `.venv\Scripts\python` 的完整路径即可，不必修改执行策略。
 
-ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（ffmpeg.exe 所在目录或其完整路径）。
+ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（ffmpeg.exe 所在目录或其完整路径）。旁白混音同样需要 ffmpeg；FLAC 时长测量使用 soundfile，或同目录的 ffprobe。优先使用已有工具，缺少时再按用户授权准备。
 
 ## 配置文件 `mv-creator.config.json`
 
@@ -38,8 +38,20 @@ ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（
 | `image.size` | 向 Tardis 请求的尺寸。竖屏 `1024x1536`、横屏 `1536x1024` |
 | `tardis.script` | imagegen-tardis 的 `image_gen.py` 路径；`null` 时自动查找同级 skill 目录与 `~/.codex/skills` 等常见位置 |
 | `roughcut` | 粗剪输出：帧率、放大倍数（864×1536 的 1.25 倍为 1080×1920）、画质、字幕字体 |
+| `voice.design_workflow/direction_workflow` | 可选旁白工作流，默认 `tts-design` / `tts-direction` |
+| `voice.generation` | 默认 `cfg_scale=4`、`max_new_tokens=256`，可在声音条目的 `settings` 覆盖；token 上限不代表精确时长 |
+| `voice.music_gain_db/voice_gain_db` | 混音基础增益，默认歌曲 -3dB、旁白 0dB |
+| `voice.duck_db/attack_sec/release_sec` | 旁白期间歌曲额外降低 -6dB，0.15 秒进入、0.25 秒恢复；每句可覆盖降音值 |
 
 新项目创建时会把 `video` 设置写入 `project.json`，之后改配置不影响已有项目。
+
+## 可选 Breeze TTS 2
+
+仅在声音计划启用后使用。接口对应 Saganaki22 的 `ComfyUI-Breeze-TTS-2`，需要 `BreezeTTS2LoadModel`、`BreezeTTS2VoiceDesign`、`BreezeTTS2VoiceDirection`，以及 ComfyUI 原生 `LoadAudio` 和 `SaveAudioAdvanced`。模型配套文件与许可见 [voice-guide.md](voice-guide.md) 和模板中文 Note。加载器默认禁止自动下载；本技能不安装节点或下载模型。
+
+模板 `tts-design.workflow.json` 用于音色试镜，`tts-direction.workflow.json` 用于参考音色配音。对应 `.api.json` 可直接作为脚本样例，用户导出到工作区的同名 API 优先。先运行 `mv.py comfy-validate tts-design tts-direction` 核对当前服务接口。`doctor` 把这两个可选类型的缺依赖标为警告，纯歌曲项目仍可继续。
+
+参考录音经 ComfyUI 上传接口传送，无需两台电脑共享目录；录音和准确转写均保存在项目内。生成输出保留 24kHz 单声道 FLAC，交付混音为 48kHz 立体声 24-bit PCM WAV。
 
 ## 画幅：在 mv-creator 这一侧统一处理
 
@@ -77,3 +89,5 @@ Tardis 的出图尺寸是固定档位（竖屏 1024×1536，即 2:3），视频�
 | 连不上 ComfyUI | 检查地址、端口、`--listen`、防火墙；ComfyUI 是否已启动 |
 | 工作流缺失 | 拖入技能自带的 `*.workflow.json` 配置并导出 API 到工作区 `workflows/`，见 [workflows.md](workflows.md)；`*.params.json` 不能拖入 ComfyUI |
 | ComfyUI 缺少节点 | 在 ComfyUI Manager 中安装缺失的自定义节点，或更新 ComfyUI |
+| 可选旁白工作流警告 | 不使用旁白可继续；使用时核对 Breeze 节点包及模型配套文件，再验证指定 TTS 类型 |
+| 配音保存后无法测量时长 | 配置现有 ffprobe 或 soundfile；不要仅按 token 数推测音频时长 |

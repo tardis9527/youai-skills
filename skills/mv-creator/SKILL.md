@@ -1,6 +1,6 @@
 ---
 name: mv-creator
-description: 基于 ComfyUI API 与 Tardis 生图，按"创意简报 → 原创歌曲（作词作曲与 AI 演唱） → 节拍分镜 → 角色与关键帧 → 图生视频 → 剪映素材与粗剪"全流程制作歌曲 MV（默认 30–60 秒竖屏剧情短片，不对口型）。适用于从零创作 AI 歌曲 MV、续做已有 MV 项目、重跑某个镜头或重新导出剪映素材；歌曲提示词交给 comfyui-minimax-music，生图交给 imagegen-tardis。不用于 ComfyUI 安装维护、模型下载或对口型数字人视频。
+description: 基于 ComfyUI API 与 Tardis 生图，从原创演唱歌曲、节拍分镜、角色与关键帧、MiniMax H3 视频到剪映素材与粗剪制作歌曲 MV，可选 Breeze TTS 2 旁白、独白与画外对白。默认 30–60 秒竖屏剧情短片，不对口型。适用于从零创作、续做 MV、重跑镜头或重新交付；歌曲提示词交给 comfyui-minimax-music，生图交给 imagegen-tardis。不用于 ComfyUI 安装维护或模型下载。
 ---
 
 # 歌曲 MV 创作流水线
@@ -12,13 +12,14 @@ description: 基于 ComfyUI API 与 Tardis 生图，按"创意简报 → 原创�
 - `<SKILL_DIR>` 指本 SKILL.md 所在目录。所有命令用 `python <SKILL_DIR>/scripts/mv.py <命令>`，在**用户工作区根目录**（放 `mv-creator.config.json` 的目录）执行。示例按 Windows PowerShell 书写。
 - 依赖两个 skill：**imagegen-tardis**（所有生图/改图）与 **comfyui-minimax-music**（歌曲 Caption 与 Lyrics）。脚本会通过子进程调用 imagegen-tardis 的 `image_gen.py`，你仍需先读它的 SKILL.md，按其提示词规则写图片提示词、按其流程配置密钥。
 - ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。视频默认使用本地 **MiniMax H3 FL2VA**，单图与首尾帧共用 H3 节点；脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
+- 叙事需要时，使用 **Breeze TTS 2** 制作旁白、独白或画外对白，先定音色再逐句配音，独立混入已选歌曲。没有叙事收益时保持纯歌曲流程；启用前读 [references/voice-guide.md](references/voice-guide.md)，注意模型及自托管输出的非商业许可范围。
 - 每个命令运行后，都以命令输出为准汇报结果：成功说成功，失败贴出关键报错，不粉饰。
 
 ## 开始之前
 
 1. 工作区没有 `mv-creator.config.json` 时运行 `mv.py init-config`，再请用户确认 `comfyui.url`。
 2. 新机器首次使用、或任何命令报环境错误时运行 `mv.py doctor`，按 [references/setup.md](references/setup.md) 逐项处理。不要替用户安装软件或改系统设置，给出命令让用户确认。
-3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)：skill 的 `workflows/*.workflow.json` 是可拖入画布的官方界面模板，`*.params.json` 只是脚本参数映射，不能拖入画布。模板需按本机模型配置并在界面跑通，再用 Export (API) 导出到**工作区**的 `workflows/<kind>.api.json`（不放进 skill 安装目录）。调用前确认 `mv.py comfy-validate` 通过；不要自行修改用户的模型文件名或采样参数。
+3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)：`workflows/*.workflow.json` 是界面模板，`*.params.json` 只是脚本参数映射，不能拖入画布。音乐与 H3 模板需按本机模型配置并在界面跑通，再用 Export (API) 导出到**工作区**的 `workflows/<kind>.api.json`。旁白另提供已核对接口的 `tts-*.api.json` 执行样例；工作区同名导出优先。调用前对实际使用的类型运行 `mv.py comfy-validate <kind...>`；不要自行修改用户的模型文件名或采样参数。旁白缺依赖只影响启用旁白的项目。
 
 ## 项目与断点续跑
 
@@ -37,6 +38,8 @@ description: 基于 ComfyUI API 与 Tardis 生图，按"创意简报 → 原创�
 
 根据用户的想法直接起草完整的 `projects/<slug>/brief.md`（模板已生成）：主题与情绪、目标时长（默认 30–60 秒）、画幅（默认 9:16 竖屏）、歌曲方向（曲风、人声、语言、副歌 hook）、视觉风格关键词、主要角色、四段故事（起承转合）。用户只有一句话时，先给 2–3 个不同方向的创意种子供选，选定后再起草全文；推断出的内容标为"建议"。⏸ 简报确认后再写歌。
 
+同时提出是否使用旁白的建议及理由。适用时预填说话人、音色、叙事用途与大致位置，歌曲参数中建议前奏、间奏或尾奏留白。30–60 秒 MV 可先从一个主音色、1–3 句短台词开始，避免压住歌曲重点；实际位置要在选歌后试听确定，不能把能量低或无歌词字幕当成无人演唱。
+
 ### 2. 歌曲（原创演唱歌曲）
 
 MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景配乐：歌词、旋律和演唱都要新写，画面围绕这首歌展开。
@@ -53,6 +56,8 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（默认 H3 124 帧/24fps ≈ 5.17 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐；短镜头生成后裁切）。H3 帧数按 `17k+5` 对齐，不沿用 Wan 的 `4n+1`。已有 `shots.json` 时拒绝覆盖，需要重切先征得用户同意再加 `--force`。
 3. 按 [references/storyboard-guide.md](references/storyboard-guide.md) 填写全局 `style`、`characters` 和每个镜头的 `section`、`lyric`、`scene`、`characters`、`image_prompt`、`motion_prompt`、`camera`、`workflow`。可合并或拆分镜头，但时间要连续且每段不超时。
 4. `mv.py shots-check <slug>` 校验并生成 `storyboard/storyboard.md`。⏸ 把分镜表给用户确认。
+
+使用旁白时，此次一并确认声音表：运行 `voice-init <slug>` 创建默认关闭的 `audio/voice-plan.json`，由你填好台词、说话人、表演指令、镜头锚点与时间窗口、字幕开关，再启用计划。音色试镜可在分镜确认后先做，正式配音放在交付前；完整字段与命令见 [references/voice-guide.md](references/voice-guide.md)。内心独白优先配背影、侧脸或环境画面，避免出现对口型预期。
 
 ### 4. 角色与关键帧（Tardis 生图，产生费用，一次确认）
 
@@ -77,11 +82,22 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 2. `workflow` 为 `flf2v` 的镜头使用首尾帧工作流，用下一镜头的关键帧作为尾帧，用于转场；需要下一镜头先选好关键帧。
 3. ⏸ 列出各镜头视频路径请用户挑选，`mv.py clip-select <slug> <镜号> <take-N>`。动作崩坏时只改该镜头的 `motion_prompt`（动作更简单、一个镜头一件事），再 `--shots` 重跑。
 
-### 6. 交付：剪映素材与粗剪
+### 6. 可选：旁白音色、逐句配音与试听混音
+
+仅对已确认启用旁白的项目执行，纯歌曲项目直接交付。按 [references/voice-guide.md](references/voice-guide.md) 操作：
+
+1. `voice-check <slug>` 检查声音计划。先运行 `voice <slug> --speakers --takes 2 --dry-run` 核对调用数量，再生成样音。⏸ 展示音频请用户试听，`voice-select <slug> <说话人id> <take-N> --speaker` 将选定样音固定为参考音色；参考转写必须与实际发音一致。
+2. 核对并说明正式配音的调用数量后，`voice <slug> --takes 2` 逐句生成。⏸ 检查音色、发音、完整句尾、节奏与情绪，按用户选择运行 `voice-select <slug> <台词id> <take-N>`。只对不满意的条目使用 `--ids V01,V03` 追加候选，不重做其他声音。
+3. `voice-check <slug> --ready` 后运行 `mix-preview <slug>`，输出歌曲版、独立旁白轨、混音和独立字幕。旁白期间歌曲默认额外降低 6dB，再平滑恢复。配音超时先改台词、表演或窗口，不截断句尾或强行加速；试听混音可懂度后再交付。
+4. 换歌或改分镜时间后重新核对声音位置，`voice-check <slug> --bind` 记录复核；改台词、音色或生成参数只重做相关声音，改位置、音量或字幕只重新混音。命令均支持断点续跑，规则见声音指南。
+
+### 7. 交付：剪映素材与粗剪
 
 1. `mv.py package <slug>`：在 `final/capcut/` 整理按时间顺序编号的视频片段、关键帧、歌曲（有 ffmpeg 时另转 WAV）、按镜头时间生成的 `lyrics.srt`、小节线时间表和《剪辑清单.md》。
 2. `mv.py roughcut <slug>`（需要 ffmpeg）：按分镜时间把选定片段裁切/定格到对应时长、拼接并合入歌曲，输出 `final/roughcut.mp4` 作为剪辑参考；缺视频的镜头用关键帧静帧代替。H3 片段可以自带声音，粗剪仍移除片段音轨并使用已选定的原创歌曲。加 `--burn-subs` 另出一版烧录歌词字幕。
 3. 把素材目录、粗剪路径和清单中的未完成项告诉用户，并按 [references/capcut-handoff.md](references/capcut-handoff.md) 给出剪映导入步骤。
+
+启用旁白后，`package` 自动附上逐句旁白、声音时间表、独立旁白字幕及混音分轨；`roughcut` 保留原歌曲版，同时增加 `roughcut_voice.mp4`，`--burn-subs` 可另出旁白字幕在上、歌词在下的版本。H3 原片音轨继续移除。剪映选择使用“歌曲与逐句旁白”或“整条混音”，避免重复叠加；详细目录与使用方法见交付指南。
 
 ## 通用规则
 

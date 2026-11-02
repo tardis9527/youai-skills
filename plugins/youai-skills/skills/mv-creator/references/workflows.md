@@ -1,4 +1,4 @@
-# 工作流：MiniMax H3 配置、导出与排查
+# 工作流：音乐、MiniMax H3 与可选旁白
 
 ## 三种 JSON 的用途
 
@@ -17,6 +17,10 @@
 | `music` | `music.workflow.json` | `music.api.json` | MiniMax Music 3，保持原歌曲流程 |
 | `i2v` | `i2v.workflow.json` | `i2v.api.json` | MiniMax H3 FL2VA，仅连接首帧 |
 | `flf2v`（可选） | `flf2v.workflow.json` | `flf2v.api.json` | 同一 MiniMax H3 FL2VA，连接首尾帧 |
+| `tts-design`（可选） | `tts-design.workflow.json` | `tts-design.api.json` | Breeze TTS 2 音色试镜 |
+| `tts-direction`（可选） | `tts-direction.workflow.json` | `tts-direction.api.json` | Breeze TTS 2 固定参考音色配音 |
+
+音乐与视频 API 需要按下文从界面导出。两套 TTS 另附按本机接口核对的 `.api.json` 执行样例，工作区没有同名文件时自动使用；用户导出优先。TTS 使用独立平铺节点，不含 H3 子图；具体节点版本、模型配套目录、中文提示词、音色参考、许可和生成步骤见 [voice-guide.md](voice-guide.md)。纯歌曲项目不要求配置 TTS。
 
 视频模板基于官方 `Image to Video (MiniMax H3)` 子图，使用与用户截图相同的量化模型和 Turbo 配置：
 
@@ -74,6 +78,8 @@ H3 输出 24fps，帧数对齐到 `17k+5`。本技能默认每段至少生成 12
 | 视频 | `width`、`height` | `MiniMaxH3ImageToVideo` 同名输入 |
 | 视频 | `duration` | `@duration` 的 `PrimitiveFloat.value`（秒）；无标题时须只有一个 PrimitiveFloat |
 | 视频 | `seed` | `@seed` 或 `RandomNoise.noise_seed` |
+| TTS | `text`、`instruction`、`seed` 与生成设置 | `@voice` 的 Breeze Design/Direction 同名输入 |
+| TTS Direction | `reference_audio`、`reference_text` | `@reference_audio` 的 `LoadAudio.audio` 和 Direction 的准确转写输入 |
 | 全部 | `filename_prefix` | 保存节点的同名输入，可用 `@output` 标记 |
 
 H3 默认没有独立 negative 输入。`shots.json.negative` 若有旧内容，将附加到正向提示的“画面约束，避免”部分；不会把不存在的输入添加到节点。动作提示只描述当前镜头，不照搬示例中的多段 SHOT 或配乐要求。
