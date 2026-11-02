@@ -1,5 +1,5 @@
 {
-  "description": "MiniMax H3 i2v 参数映射，不能拖入 ComfyUI；请拖入 i2v.workflow.json 后导出 API。",
+  "description": "i2v 参数映射，不能拖入 ComfyUI；默认配合技能自带的 i2v.api.json 执行，工作区同名文件可覆盖。",
   "video_model": "minimax-h3",
   "workflow": "i2v.api.json",
   "output_ext": [

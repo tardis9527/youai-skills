@@ -1,5 +1,5 @@
 {
-  "description": "脚本参数映射，不能拖入 ComfyUI。可拖入 music.workflow.json，配置后导出 API 为 music.api.json。",
+  "description": "music 参数映射，不能拖入 ComfyUI；默认配合技能自带的 music.api.json 执行，工作区同名文件可覆盖。",
   "workflow": "music.api.json",
   "output_ext": [".flac", ".mp3", ".opus", ".wav"],
   "params": {

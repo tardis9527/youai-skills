@@ -171,19 +171,20 @@ def spec_path(cfg: dict, kind: str) -> Path:
 def load_kind(cfg: dict, kind: str) -> tuple[dict, dict, Path]:
     """Return (mapping spec, API workflow, workflow path) for a workflow kind.
 
-    Exported workflows live in the workspace so plugin updates never touch
-    them; mapping specs fall back to the copies shipped with the skill.
+    Workspace overrides take precedence; a fresh workspace uses the API
+    workflows and mapping specs shipped with the skill without copying them.
     """
     spath = spec_path(cfg, kind)
     spec = read_json(spath)
     name = spec.get("workflow", f"{kind}.api.json")
-    candidates = [workflows_dir(cfg) / name, spath.parent / name]
+    candidates = [workflows_dir(cfg) / name, spath.parent / name, SKILL_DIR / "workflows" / name]
     wpath = next((p for p in candidates if p.is_file()), None)
     if wpath is None:
         template = SKILL_DIR / "workflows" / f"{kind}.workflow.json"
         hint = (f"先将 {template} 拖入 ComfyUI，" if template.is_file()
                 else "先在 ComfyUI 中打开对应模板，")
-        raise MVError(f"缺少工作流 {candidates[0]}。{hint}用 Export (API) 导出到目标位置。"
+        raise MVError(f"工作区与技能包均缺少工作流 {name}（工作区目标: {candidates[0]}）。"
+                      f"内置类型请先检查技能包是否完整；自定义类型可{hint}用 Export (API) 导出到目标位置。"
                       "*.params.json 仅供脚本映射参数，不能拖入画布；详见 references/workflows.md。")
     return spec, load_api_workflow(wpath), wpath
 

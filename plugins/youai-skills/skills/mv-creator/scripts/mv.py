@@ -55,7 +55,7 @@ def cmd_init_config(args, cfg):
     workflows = Path.cwd() / data["workflows_dir"]
     workflows.mkdir(parents=True, exist_ok=True)
     print(f"已创建 {_abs(target)}\nComfyUI 地址: {data['comfyui']['url']}（不对时直接编辑该文件）\n"
-          f"把从 ComfyUI 导出的 API 工作流放到: {_abs(workflows)}")
+          f"默认使用技能自带的 API 工作流；自定义覆盖文件可放到: {_abs(workflows)}")
 
 
 def cmd_doctor(args, cfg):
@@ -127,7 +127,7 @@ def _check_workflows(cfg, object_info, report, kinds=("music", "i2v", "flf2v")):
             report("WARN" if kind.startswith("tts-") else "FAIL",
                    f"工作流 {kind} ({path.name}):\n  - " + "\n  - ".join(problems))
         else:
-            report("OK", f"工作流 {kind}: {path.name} 参数映射有效")
+            report("OK", f"工作流 {kind}: {_abs(path)} 参数映射有效")
 
 
 # Project -------------------------------------------------------------------
@@ -186,11 +186,11 @@ def cmd_status(args, cfg):
         rows += [
             (f"分镜内容（{len(errors)} 个问题）", not errors, f"补全 shots.json 后运行 shots-check {args.slug}"),
             (f"角色参考图（{refs}/{len(chars)}）", refs == len(chars),
-             f"chars {args.slug} --n 2，再 char-select"),
+             f"chars {args.slug} --n 1，再 char-select"),
             (f"关键帧（{picked_frames}/{len(shots)}）", picked_frames == len(shots),
-             f"frames {args.slug} --n 2，再 frame-select"),
+             f"frames {args.slug} --n 1，再 frame-select"),
             (f"视频片段（{picked_clips}/{len(shots)}）", picked_clips == len(shots),
-             f"clips {args.slug} --takes 2，再 clip-select"),
+             f"clips {args.slug} --takes 1，再 clip-select"),
         ]
     rows += [
         ("剪映素材包", (project.root / "final" / "capcut" / "package.json").is_file(), f"package {args.slug}"),
@@ -734,7 +734,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = add("chars", cmd_chars, "用 Tardis 生成角色设定图候选")
     p.add_argument("slug")
     p.add_argument("--ids", help="逗号分隔的角色 id（默认只做还没有候选的角色）")
-    p.add_argument("--n", type=int, default=2)
+    p.add_argument("--n", type=int, default=1, help="每个角色生成张数（默认 1）")
     p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("char-select", cmd_char_select, "选定角色参考图")
     p.add_argument("slug")
@@ -743,7 +743,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = add("frames", cmd_frames, "用 Tardis 生成镜头关键帧候选")
     p.add_argument("slug")
     p.add_argument("--shots", help="逗号分隔的镜号（默认只做还没有候选的镜头）")
-    p.add_argument("--n", type=int, default=2)
+    p.add_argument("--n", type=int, default=1, help="每个镜头生成张数（默认 1）")
     p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("frame-select", cmd_frame_select, "选定关键帧并裁切到视频尺寸")
     p.add_argument("slug")
@@ -753,7 +753,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = add("clips", cmd_clips, "用 ComfyUI 图生视频工作流生成镜头片段")
     p.add_argument("slug")
     p.add_argument("--shots", help="逗号分隔的镜号（指定后总会新增版本）")
-    p.add_argument("--takes", type=int, default=2)
+    p.add_argument("--takes", type=int, default=1, help="每个镜头生成版数（默认 1）")
     p.add_argument("--more", action="store_true", help="给所有镜头追加版本")
     p.add_argument("--dry-run", action="store_true", help=DRY_RUN_HELP)
     p = add("clip-select", cmd_clip_select, "选定镜头视频版本")

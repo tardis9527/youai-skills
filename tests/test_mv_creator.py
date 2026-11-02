@@ -225,6 +225,44 @@ class FramePromptTest(unittest.TestCase):
 
 
 class CommandHelpersTest(unittest.TestCase):
+    def test_visual_commands_default_to_one_and_allow_explicit_variants(self):
+        parser = mv.build_parser()
+        for command, option, field in (("chars", "--n", "n"), ("frames", "--n", "n"),
+                                       ("clips", "--takes", "takes")):
+            with self.subTest(command=command):
+                self.assertEqual(getattr(parser.parse_args([command, "demo"]), field), 1)
+                self.assertEqual(getattr(parser.parse_args([command, "demo", option, "2"]), field), 2)
+        self.assertEqual(parser.parse_args(["music", "demo"]).takes, 4)
+        self.assertEqual(parser.parse_args(["voice", "demo"]).takes, 2)
+
+    def test_frames_generate_one_per_shot_and_resume_without_duplicates(self):
+        with TemporaryDirectory() as tmp:
+            cfg = dict(DEFAULT_CONFIG, _root=tmp)
+            project = Project(cfg, "demo")
+            project.save({"video": dict(VIDEO)})
+            scene = [dict(shots.new_shot(i, (i - 1) * 2, i * 2, str(i)), image_prompt="夜景")
+                     for i in (1, 2)]
+            project.save_shots({"shots": scene})
+            args = mv.build_parser().parse_args(["frames", "demo"])
+            calls = []
+
+            def fake_tardis(config, mode, prompt, prompt_file, out, images, n):
+                self.assertEqual(n, 1)
+                calls.append(out)
+                if len(calls) == 2:
+                    raise MVError("interrupted")
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_bytes(b"image placeholder")
+                return [out]
+
+            with patch.object(frames, "run_tardis", side_effect=fake_tardis), redirect_stdout(StringIO()):
+                with self.assertRaisesRegex(MVError, "interrupted"):
+                    mv.cmd_frames(args, cfg)
+                mv.cmd_frames(args, cfg)
+                mv.cmd_frames(args, cfg)
+            self.assertEqual([p.stem for p in calls], ["S01-v01", "S02-v01", "S02-v01"])
+            self.assertEqual([len(s["frame"]["candidates"]) for s in project.load_shots()["shots"]], [1, 1])
+
     def test_fixed_seed_steps_per_take(self):
         self.assertEqual([mv._take_seed(7, i) for i in range(3)], [7, 8, 9])
         self.assertEqual(mv._take_seed(mv.SEED_MAX, 1), 0)
@@ -259,11 +297,99 @@ class WorkflowFilesTest(unittest.TestCase):
                     with self.assertRaises(MVError):
                         comfy.load_api_workflow(path)
 
-    def test_missing_api_points_to_draggable_template(self):
+    def test_fresh_workspace_loads_all_bundled_workflows_without_copying(self):
         with TemporaryDirectory() as tmp:
             cfg = dict(DEFAULT_CONFIG, _root=tmp)
-            with self.assertRaisesRegex(MVError, r"i2v\.workflow\.json"):
+            for kind in ("music", "i2v", "flf2v", "tts-design", "tts-direction"):
+                with self.subTest(kind=kind):
+                    spec, graph, path = comfy.load_kind(cfg, kind)
+                    self.assertEqual(path, SCRIPTS.parent / "workflows" / f"{kind}.api.json")
+                    self.assertEqual(comfy.validate_kind(graph, spec), [])
+                    # Every link resolves, including flattened subgraph boundaries.
+                    for node in graph.values():
+                        for value in node["inputs"].values():
+                            if isinstance(value, list):
+                                self.assertEqual(len(value), 2)
+                                self.assertIn(value[0], graph)
+                                self.assertIsInstance(value[1], int)
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+
+    def test_workspace_api_and_mapping_override_bundled_resources(self):
+        with TemporaryDirectory() as tmp:
+            cfg = dict(DEFAULT_CONFIG, _root=tmp)
+            folder = Path(tmp) / "workflows"
+            custom = h3_workflow()
+            write_json(folder / "i2v.api.json", custom)
+            self.assertEqual(comfy.load_kind(cfg, "i2v")[1:], (custom, folder / "i2v.api.json"))
+            spec = i2v_spec()
+            spec["workflow"] = "custom.api.json"
+            write_json(folder / "i2v.params.json", spec)
+            write_json(folder / "custom.api.json", custom)
+            loaded, graph, path = comfy.load_kind(cfg, "i2v")
+            self.assertEqual(loaded, spec)
+            self.assertEqual(graph, custom)
+            self.assertEqual(path, folder / "custom.api.json")
+            # A broken explicit override must not silently use a different graph.
+            write_json(folder / "custom.api.json", {"nodes": [], "links": []})
+            with self.assertRaisesRegex(MVError, "界面格式"):
                 comfy.load_kind(cfg, "i2v")
+
+    def test_workspace_mapping_can_use_bundled_api_and_explicit_missing_name_fails(self):
+        with TemporaryDirectory() as tmp:
+            cfg = dict(DEFAULT_CONFIG, _root=tmp)
+            path = Path(tmp) / "workflows/i2v.params.json"
+            spec = i2v_spec()
+            write_json(path, spec)
+            self.assertEqual(comfy.load_kind(cfg, "i2v")[2], SCRIPTS.parent / "workflows/i2v.api.json")
+            spec["workflow"] = "missing.api.json"
+            write_json(path, spec)
+            with self.assertRaisesRegex(MVError, "missing.api.json"):
+                comfy.load_kind(cfg, "i2v")
+
+    def test_bundled_music_injects_prompts_duration_and_shared_seed(self):
+        with TemporaryDirectory() as tmp:
+            spec, graph, _ = comfy.load_kind(dict(DEFAULT_CONFIG, _root=tmp), "music")
+            patched = comfy.apply_params(graph, spec, {"caption": "中文歌曲", "lyrics": "唱词",
+                "max_duration": 45, "seed": 42, "filename_prefix": "mv/demo/song"})
+            encoder = patched["37:13"]["inputs"]
+            self.assertEqual((encoder["caption"], encoder["lyrics"], encoder["max_duration"]),
+                             ("中文歌曲", "唱词", 45))
+            self.assertEqual(encoder["seed"], ["37:38", 0])
+            self.assertEqual(patched["37:38"]["inputs"]["seed"], 42)
+            self.assertEqual(patched["37:9"]["inputs"]["seed"], ["37:38", 0])
+            self.assertTrue(patched["37:43"]["inputs"]["switch"])
+            output = patched["35"]["inputs"]
+            self.assertEqual(output["filename_prefix"], "mv/demo/song")
+            self.assertEqual((output["format"], output["format.quality"]), ("mp3", "V0"))
+
+    def test_bundled_h3_preserves_models_sampling_duration_and_frame_inputs(self):
+        with TemporaryDirectory() as tmp:
+            for kind in ("i2v", "flf2v"):
+                with self.subTest(kind=kind):
+                    spec, graph, _ = comfy.load_kind(dict(DEFAULT_CONFIG, _root=tmp), kind)
+                    ui = json.loads((SCRIPTS.parent / "workflows" / f"{kind}.workflow.json").read_text(encoding="utf-8"))
+                    values = next(n for n in ui["nodes"] if "unet_name" in n.get("widgets_values_named", {}))["widgets_values_named"]
+                    for node_id, key, original in (("6", "unet_name", "unet_name"), ("13", "clip_name", "clip_name"),
+                                                   ("11", "vae_name", "vae_name"), ("24", "vae_name", "vae_name_1")):
+                        self.assertEqual(graph[f"105:{node_id}"]["inputs"][key], values[original])
+                    self.assertIs(graph["105:126"]["inputs"]["value"], False)
+                    self.assertEqual(graph["105:124"]["inputs"]["value"], 20)
+                    self.assertEqual(graph["105:125"]["inputs"]["value"], 8)
+                    self.assertEqual(graph["105:91"]["inputs"]["fps"], 24)
+                    image_params = {"image": "start.png"} if kind == "i2v" else {"start_image": "start.png", "end_image": "end.png"}
+                    patched = comfy.apply_params(graph, spec, {**image_params, "positive": "转头", "duration": 124 / 24,
+                                                              "width": 864, "height": 1536, "seed": 42})
+                    h3 = patched["105:104"]["inputs"]
+                    self.assertEqual(h3["prompt"], "转头")
+                    self.assertEqual(h3["length"], ["105:107", 1])
+                    self.assertEqual(patched["105:107"]["inputs"]["values.a"], ["105:111", 0])
+                    self.assertEqual(patched["105:111"]["inputs"]["value"], 124 / 24)
+                    self.assertEqual(patched["105:15"]["inputs"]["noise_seed"], 42)
+                    self.assertEqual(patched[h3["first_frame"][0]]["inputs"]["image"], "start.png")
+                    if kind == "flf2v":
+                        self.assertEqual(patched[h3["last_frame"][0]]["inputs"]["image"], "end.png")
+                    else:
+                        self.assertNotIn("last_frame", h3)
 
     def test_ui_templates_have_nodes_links_and_resolvable_subgraphs(self):
         for kind in ("music", "i2v", "flf2v"):
@@ -372,14 +498,7 @@ class H3WorkflowTest(unittest.TestCase):
                 scene.append(shot)
             scene[0]["workflow"] = "flf2v"
             project.save_shots({"shots": scene, "negative": "闪烁", "style": "电影感"})
-            workflow = h3_workflow()
-            end_workflow = copy.deepcopy(workflow)
-            end_workflow["20"] = {"class_type": "LoadImage", "inputs": {"image": "end.png"}}
-            end_workflow["4"]["inputs"]["last_frame"] = ["20", 0]
-            folder = Path(tmp) / "workflows"
-            write_json(folder / "i2v.api.json", workflow)
-            write_json(folder / "flf2v.api.json", end_workflow)
-            args = argparse.Namespace(slug="demo", shots=None, more=False, dry_run=False, takes=2)
+            args = mv.build_parser().parse_args(["clips", "demo"])
             captured = []
 
             def fake_run(config, kind, values, uploads, subfolder, dest, stem):
@@ -394,17 +513,19 @@ class H3WorkflowTest(unittest.TestCase):
             with patch.object(comfy, "run_kind", side_effect=fake_run), redirect_stdout(StringIO()):
                 mv.cmd_clips(args, cfg)
                 mv.cmd_clips(args, cfg)
-            self.assertEqual(len(captured), 4)
+            self.assertEqual(len(captured), 2)
             kind, values, uploads, patched = captured[0]
             self.assertEqual(kind, "flf2v")
             self.assertEqual(set(uploads), {"start_image", "end_image"})
-            self.assertEqual(patched["1"]["inputs"]["image"], "S01.png")
-            self.assertEqual(patched["20"]["inputs"]["image"], "S02.png")
+            load_images = {n["_meta"]["title"]: n["inputs"]["image"] for n in patched.values()
+                           if n["class_type"] == "LoadImage"}
+            self.assertEqual(load_images, {"@start_image": "S01.png", "@end_image": "S02.png"})
             self.assertEqual(values["duration"], 124 / 24)
             self.assertNotIn("length", values)
             self.assertNotIn("negative", values)
             self.assertIn("闪烁", values["positive"])
-            self.assertEqual(patched["11"]["inputs"]["value"], 124 / 24)
+            self.assertEqual(patched["105:111"]["inputs"]["value"], 124 / 24)
+            self.assertEqual([len(s["clip"]["takes"]) for s in project.load_shots()["shots"]], [1, 1])
             take = project.load_shots()["shots"][0]["clip"]["takes"][0]
             self.assertEqual(take["model"], "minimax-h3")
             self.assertEqual(take["frames"], 124)

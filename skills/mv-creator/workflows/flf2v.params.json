@@ -1,5 +1,5 @@
 {
-  "description": "MiniMax H3 flf2v 参数映射，不能拖入 ComfyUI；请拖入 flf2v.workflow.json 后导出 API。",
+  "description": "flf2v 参数映射，不能拖入 ComfyUI；默认配合技能自带的 flf2v.api.json 执行，工作区同名文件可覆盖。",
   "video_model": "minimax-h3",
   "workflow": "flf2v.api.json",
   "output_ext": [

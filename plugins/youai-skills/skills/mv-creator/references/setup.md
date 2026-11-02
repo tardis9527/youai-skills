@@ -29,7 +29,7 @@ ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（
 | --- | --- |
 | `comfyui.url` | ComfyUI 地址。ComfyUI 桌面版默认端口 8000，便携版/源码版默认 8188 |
 | `comfyui.timeout_sec` | 单个任务最长等待时间 |
-| `workflows_dir` | 放导出工作流的目录，默认工作区的 `workflows/`；同名 `.params.json` 放在这里会覆盖 skill 自带的映射 |
+| `workflows_dir` | 可选自定义覆盖目录，默认工作区的 `workflows/`；同名 `.api.json` / `.params.json` 优先，缺少时自动读取 skill 内置文件，无需项目预先提供工作流 |
 | `projects_dir` | 项目目录，相对配置文件所在目录 |
 | `video.model` | 新项目为 `minimax-h3`；旧配置缺少此项时识别为旧 Wan 配置，生成前提示迁移 |
 | `video.width/height` | H3 宽高为 32 的倍数，默认竖屏 864×1536，横屏交换宽高；低分辨率预览可用 576×1024 |
@@ -87,7 +87,7 @@ Tardis 的出图尺寸是固定档位（竖屏 1024×1536，即 2:3），视频�
 | --- | --- |
 | 缺少 librosa / PIL / openai | 确认用的是 `.venv` 里的 Python，重新 `pip install -r requirements.txt` |
 | 连不上 ComfyUI | 检查地址、端口、`--listen`、防火墙；ComfyUI 是否已启动 |
-| 工作流缺失 | 拖入技能自带的 `*.workflow.json` 配置并导出 API 到工作区 `workflows/`，见 [workflows.md](workflows.md)；`*.params.json` 不能拖入 ComfyUI |
+| 工作流缺失 | 内置类型先检查技能包中的 `.api.json` 是否完整，项目没有本地文件属于正常情况；仅自定义类型需提供 API，见 [workflows.md](workflows.md) |
 | ComfyUI 缺少节点 | 在 ComfyUI Manager 中安装缺失的自定义节点，或更新 ComfyUI |
 | 可选旁白工作流警告 | 不使用旁白可继续；使用时核对 Breeze 节点包及模型配套文件，再验证指定 TTS 类型 |
 | 配音保存后无法测量时长 | 配置现有 ffprobe 或 soundfile；不要仅按 token 数推测音频时长 |

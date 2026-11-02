@@ -14,12 +14,13 @@ description: 基于 ComfyUI API 与 Tardis 生图，从原创演唱歌曲、节�
 - ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。视频默认使用本地 **MiniMax H3 FL2VA**，单图与首尾帧共用 H3 节点；脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
 - 叙事需要时，使用 **Breeze TTS 2** 制作旁白、独白或画外对白，先定音色再逐句配音，独立混入已选歌曲。没有叙事收益时保持纯歌曲流程；启用前读 [references/voice-guide.md](references/voice-guide.md)，注意模型及自托管输出的非商业许可范围。
 - 每个命令运行后，都以命令输出为准汇报结果：成功说成功，失败贴出关键报错，不粉饰。
+- 图片与视频默认单版：每个角色 1 张参考图、每个分镜 1 张关键帧、每个已确认镜头 1 段视频。仅在用户明确要求多版或指定重做时追加，不能把历史候选全部送去生视频。歌曲试听与可选音色试镜沿用各自流程。
 
 ## 开始之前
 
 1. 工作区没有 `mv-creator.config.json` 时运行 `mv.py init-config`，再请用户确认 `comfyui.url`。
 2. 新机器首次使用、或任何命令报环境错误时运行 `mv.py doctor`，按 [references/setup.md](references/setup.md) 逐项处理。不要替用户安装软件或改系统设置，给出命令让用户确认。
-3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)：`workflows/*.workflow.json` 是界面模板，`*.params.json` 只是脚本参数映射，不能拖入画布。音乐与 H3 模板需按本机模型配置并在界面跑通，再用 Export (API) 导出到**工作区**的 `workflows/<kind>.api.json`。旁白另提供已核对接口的 `tts-*.api.json` 执行样例；工作区同名导出优先。调用前对实际使用的类型运行 `mv.py comfy-validate <kind...>`；不要自行修改用户的模型文件名或采样参数。旁白缺依赖只影响启用旁白的项目。
+3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)。**项目本地默认没有工作流，直接从 `<SKILL_DIR>/workflows/` 获取所需的 `.api.json` 和 `.params.json`**；脚本自动读取，无需先复制或要求用户导出。技能内置 `music`、`i2v`、`flf2v`、`tts-design`、`tts-direction` 的执行图；工作区 `workflows/` 的同名文件仅用于自定义覆盖，已有文件优先且不覆盖。`.workflow.json` 是界面模板，`.params.json` 只是参数映射，二者不能当 API 执行图提交。调用前只对实际使用的类型运行 `mv.py comfy-validate <kind...>`；缺模型、节点或接口不兼容时报告实际错误，不擅自改模型或采样参数。自定义工作流才需要按需从界面 Export (API)。
 
 ## 项目与断点续跑
 
@@ -63,24 +64,24 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 
 图片提示词不需要用户写：`characters[].prompt` 和各镜头的 `image_prompt` 已在分镜阶段由你起草，脚本会自动补上用途、角色参考图编号说明、全局风格和裁切安全区，组成符合 imagegen-tardis 规则的完整提示词（保存在 `prompts/` 目录，用户想看时再展示）。
 
-1. 先用 `chars`/`frames` 加 `--dry-run` 核对并告知本阶段总调用次数（角色数 + 镜头数，每次 `--n` 张），然后一口气完成生成：
-   - 角色设定图：`mv.py chars <slug> --n 2`。
-   - 逐张查看候选，挑出与角色描述最贴合、脸部最清晰的一张作为**暂定参考图**：`mv.py char-select <slug> <角色id> <序号>`。
-   - 关键帧：`mv.py frames <slug> --n 2`。有角色的镜头自动走 `edit` 并带上暂定参考图，保持人物一致。
-2. ⏸ **一次确认角色与关键帧**：在回复中按 imagegen-tardis 的交付方式嵌入全部候选图（绝对路径），先列角色候选并标出暂定选择，再按镜号列关键帧候选。请用户一次回复，例如"角色用 2；S01 选 1，S02 选 2，S04 重做：人物再靠近镜头"。
+1. 按项目状态告知本阶段计划数量：缺少的角色参考图数 + 缺少的镜头关键帧数，每项只生成 1 张。各批生成前用对应命令加 `--n 1 --dry-run` 核对实际数量；关键帧预检须在所需角色参考图选定后运行。已有数量授权时直接执行，不重复询问版数。按以下顺序完成生成：
+   - 角色设定图：`mv.py chars <slug> --n 1`。
+   - 查看唯一图片，核对角色外貌与脸部清晰度，作为**暂定参考图**：`mv.py char-select <slug> <角色id> <序号>`（首次生成通常为 `1`）。发现问题时提出具体修改，只对相应角色重做。
+   - 关键帧：`mv.py frames <slug> --n 1`。有角色的镜头自动走 `edit` 并带上暂定参考图，保持人物一致。
+2. ⏸ **一次确认角色与关键帧**：按 imagegen-tardis 的交付方式嵌入角色参考图和每个镜头的单张关键帧（绝对路径），供用户检查。例如回复“全部确认”或“S04 重做：人物再靠近镜头”。续做有历史多版时展示已选或本轮建议使用的一张，不要求重新挑选已确认图片。
 3. 按回复执行：
    - 选定关键帧：`mv.py frame-select <slug> <镜号> <序号或图片路径>`。脚本按项目画幅裁切并缩放为视频输入尺寸（默认 864×1536），所见即所得；构图需要偏上/偏下时把镜头的 `crop` 设为 `top`/`bottom`，再运行 `frame-select <slug> <镜号>`（省略序号即按原图重裁）。
    - 用户换了角色参考图：重新 `char-select`，再对用到该角色、且用户没有明确保留的镜头 `frames --shots ...` 重做（先说明调用次数）。
-   - 用户要求重做的镜头：只改该镜头的 `image_prompt`，`frames --shots ...` 后只展示这些镜头的新候选。
+   - 用户要求重做的镜头：只改该镜头的 `image_prompt`，`frames --shots ... --n 1` 后只展示这些镜头的新图，不默认追加第二版。
 4. 所有镜头都选定关键帧后再进入下一阶段。
 
 ### 5. 图生视频（ComfyUI，耗时）
 
 默认模型与截图式 H3 蓝图一致：`minimax_h3_fl2va_pruned_int8_convrot`、`qwen3vl_32b_minimax_h3_nvfp4_awq`、INT8 视频 VAE 与 FP32 音频 VAE。Turbo 默认关闭；开启时使用 8 步 LoRA。模型文件和首次导出步骤见 [references/workflows.md](references/workflows.md)。旧 Wan API 与 16fps 项目需按该文档迁移，不能只改权重文件名。
 
-1. 用 `mv.py clips <slug> --takes 2 --dry-run` 核对并告知待生成镜头数、每镜头几版，然后去掉 `--dry-run` 运行。默认跳过已有视频的镜头；`--shots` 指定镜头时总会新增版本；`--more` 给所有镜头追加版本。任务串行执行、逐个落盘，中断后重跑同一命令即可续上。
+1. 用 `mv.py clips <slug> --takes 1 --dry-run` 核对并告知待生成镜头数 × 1 版 = 视频段数；例如 14 个待生成镜头共 14 段视频。只使用每镜头已确认的关键帧；不把图片候选数乘入视频数量。数量已获授权时去掉 `--dry-run` 直接运行，不再要求确认单版策略。默认跳过已有视频的镜头；`--shots` 指定镜头时总会新增版本；仅用户要求全部追加时才用 `--more`。任务串行执行、逐个落盘；默认批次中断后重跑可跳过已完成镜头，指定 `--shots` / `--more` 的批次则先检查状态，只重跑未完成镜头。
 2. `workflow` 为 `flf2v` 的镜头使用首尾帧工作流，用下一镜头的关键帧作为尾帧，用于转场；需要下一镜头先选好关键帧。
-3. ⏸ 列出各镜头视频路径请用户挑选，`mv.py clip-select <slug> <镜号> <take-N>`。动作崩坏时只改该镜头的 `motion_prompt`（动作更简单、一个镜头一件事），再 `--shots` 重跑。
+3. ⏸ 展示每镜头的单段视频供检查；确认后用 `mv.py clip-select <slug> <镜号> <take-N>` 记录所用版本，无需在多个候选中选优。动作崩坏时只改该镜头的 `motion_prompt`（动作更简单、一个镜头一件事），再 `clips <slug> --shots <镜号> --takes 1` 重跑，保留旧文件。
 
 ### 6. 可选：旁白音色、逐句配音与试听混音
 

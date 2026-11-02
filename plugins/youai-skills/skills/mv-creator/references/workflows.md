@@ -12,7 +12,7 @@
 
 ## 工作流与模型
 
-| 类型 | 可拖入模板 | 工作区内的 API 导出文件 | 模型 |
+| 类型 | 技能内的可拖入模板 | 技能内的 API 执行文件 | 模型 |
 | --- | --- | --- | --- |
 | `music` | `music.workflow.json` | `music.api.json` | MiniMax Music 3，保持原歌曲流程 |
 | `i2v` | `i2v.workflow.json` | `i2v.api.json` | MiniMax H3 FL2VA，仅连接首帧 |
@@ -20,7 +20,9 @@
 | `tts-design`（可选） | `tts-design.workflow.json` | `tts-design.api.json` | Breeze TTS 2 音色试镜 |
 | `tts-direction`（可选） | `tts-direction.workflow.json` | `tts-direction.api.json` | Breeze TTS 2 固定参考音色配音 |
 
-音乐与视频 API 需要按下文从界面导出。两套 TTS 另附按本机接口核对的 `.api.json` 执行样例，工作区没有同名文件时自动使用；用户导出优先。TTS 使用独立平铺节点，不含 H3 子图；具体节点版本、模型配套目录、中文提示词、音色参考、许可和生成步骤见 [voice-guide.md](voice-guide.md)。纯歌曲项目不要求配置 TTS。
+上述文件均随技能发布，位置为 `<SKILL_DIR>/workflows/`。**新项目默认没有本地工作流，脚本直接读取技能中的 API 执行图与映射，不要求用户先导出或复制文件。** 音乐与视频 API 已展开随附界面模板的子图，保留模型、采样设置、时长计算和保存节点。TTS 使用独立平铺节点；具体节点版本、模型配套目录、中文提示词、音色参考、许可和生成步骤见 [voice-guide.md](voice-guide.md)。纯歌曲项目不要求配置 TTS。
+
+工作区配置的 `workflows_dir`（默认 `workflows/`）用于自定义覆盖：同名 `.api.json` 和 `.params.json` 分别优先于技能默认文件。已有覆盖文件不被改写；覆盖文件无效时报告错误，不静默改用默认图。没有工作区目录也能运行内置类型。显式指定其他工作流文件名时按该文件名查找，不能拿无关默认图替代。
 
 视频模板基于官方 `Image to Video (MiniMax H3)` 子图，使用与用户截图相同的量化模型和 Turbo 配置：
 
@@ -36,15 +38,15 @@
 
 模型下载入口在模板说明节点与 [官方模型仓库](https://huggingface.co/Comfy-Org/MiniMax-H3)。本技能不包含权重，不自动下载模型或安装节点。若 INT8/NVFP4 权重加载失败，检查 ComfyUI、量化运行库和硬件支持，不自动降级为其他模型。
 
-## 首次使用与导出
+## 首次使用与自定义覆盖
 
-1. 把所需 `.workflow.json` 拖入 ComfyUI；选择本机已有模型，替换 `mv-creator/start.png`（及首尾帧模式的 `end.png`）占位输入。
+1. 根据当前阶段选择内置 API：音乐用 `music`，单张关键帧生视频用 `i2v`，需要首尾帧时用 `flf2v`。脚本会上传图片并替换占位输入，不需要用户在界面另跑一遍。只验证实际使用的类型，如 `mv.py comfy-validate i2v --offline` 后再 `mv.py comfy-validate i2v`。
 2. 默认竖屏 864×1536（宽高均为 32 的倍数），24fps；可按硬件改为 576×1024 等预览尺寸，并同步修改项目 `video`。模板无额外分辨率选择器，脚本直接注入宽高。
 3. 模板的 `duration` 为秒，默认 5.0；保留内部计算节点，它将秒数对齐到 H3 的 `17k+5` 帧数网格。**不要沿用 Wan 工作流中断开计算帧数连线的操作。**
-4. 界面手动跑通后，用 Workflow → **Export (API)** 保存到工作区的 `workflows/<kind>.api.json`。找不到 API 导出时，查看设置中的开发者模式。普通界面 JSON 不能直接交给脚本。
-5. 运行 `mv.py comfy-validate --offline` 检查格式、映射、H3 节点和 24fps 输出；再运行 `mv.py comfy-validate` 检查服务端节点。仅检查视频可用 `mv.py comfy-validate i2v flf2v --offline`，不使用首尾帧时可只检查 `i2v`。
+4. 只有需要自定义模型或采样配置时，才把技能中的 `.workflow.json` 拖入 ComfyUI，按用户选择调整并 Export (API) 到工作区 `workflows/<kind>.api.json`；必要时在同目录放匹配的 `.params.json`。不要改技能安装目录内的默认文件。普通界面 JSON 不能直接交给脚本。
+5. `--offline` 检查格式、参数映射、H3 节点和 24fps 输出；在线验证再检查服务端节点。缺模型或接口不兼容时核对实际错误，不能把“项目本地没有 API 文件”当作生成阻塞。离线通过不代表已经在目标 GPU 上生成成功。
 
-API 文件、配置及用户修改后的界面文件保存在工作区。映射随技能提供；工作区中同名 `.params.json` 优先。ComfyUI 前端负责展开子图，导出的节点 ID 含 `:` 属正常情况，脚本不自行将界面文件转换为执行图。
+用户自定义的 API、配置及界面文件保存在工作区。内置 API 和用户导出的 API 节点 ID 含 `:` 属正常情况；脚本直接读取执行图，不在运行时转换界面文件。
 
 ## 时长和帧数
 
@@ -55,7 +57,7 @@ H3 输出 24fps，帧数对齐到 `17k+5`。本技能默认每段至少生成 12
 ## 从旧 Wan 工作流迁移
 
 1. 保留已生成的视频及其选定版本，不清空 `shots.json` 或重切已确认分镜。
-2. 用新的 H3 模板重新导出 `i2v.api.json` / `flf2v.api.json`。旧 Wan API 不能只改权重名；将工作区覆盖默认映射的旧视频 `.params.json` 备份到其他文件名，或更新为 H3 映射。脚本会拒绝将旧 API 当成 H3。
+2. 使用技能内置 H3 API；若工作区有旧 Wan `.api.json` / `.params.json` 覆盖，先保留备份并改为其他文件名，再使用技能默认图，或按用户需求重新导出兼容 H3 的覆盖文件。旧 Wan API 不能只改权重名，脚本会拒绝将旧 API 当成 H3。
 3. 对工作区配置及要继续生成的项目 `project.json`，将 `video` 更新为以下内容；`roughcut.scale` 设为 `1.25` 时默认粗剪仍为 1080×1920。仅更新工作区配置不会改写项目已保存的视频规格。
 
 ```json
@@ -87,7 +89,7 @@ H3 默认没有独立 negative 输入。`shots.json.negative` 若有旧内容，
 查看导出节点：
 
 ```powershell
-python <SKILL_DIR>\scripts\mv.py comfy-inspect workflows\i2v.api.json
+python <SKILL_DIR>\scripts\mv.py comfy-inspect <SKILL_DIR>\workflows\i2v.api.json
 ```
 
 映射示例：
@@ -112,6 +114,7 @@ python <SKILL_DIR>\scripts\mv.py comfy-inspect workflows\i2v.api.json
 | 报错 | 处理 |
 | --- | --- |
 | 拖入 `TypeError: e is not iterable` | 核对是 `.workflow.json`；如正确，查看前端版本、子图支持和错误报告 |
+| 项目没有 `workflows/i2v.api.json` | 正常，直接读取技能内置文件；先确认技能包的 `workflows/i2v.api.json` 完整，勿要求用户导出 |
 | 视频 API 不是 MiniMax H3 | 更新 API 和工作区覆盖默认映射的旧视频 `.params.json` |
 | H3 需 fps=24 / max_frames 不合法 | 同步项目规格；帧数上限须满足 `17k+5`，默认 124 |
 | 参数由计算连线提供，无法赋值 | H3 映射 `@duration` 秒数，不映射计算输出；其他参数定位到可写源节点 |
