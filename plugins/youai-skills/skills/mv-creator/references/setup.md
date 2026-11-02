@@ -31,12 +31,13 @@ ffmpeg 不在 PATH 上时，在配置里写 `"ffmpeg": "D:/tools/ffmpeg/bin"`（
 | `comfyui.timeout_sec` | 单个任务最长等待时间 |
 | `workflows_dir` | 放导出工作流的目录，默认工作区的 `workflows/`；同名 `.params.json` 放在这里会覆盖 skill 自带的映射 |
 | `projects_dir` | 项目目录，相对配置文件所在目录 |
-| `video.width/height` | 视频输入尺寸，竖屏 720×1280，横屏改成 1280×720 |
-| `video.fps` / `video.max_frames` | 与工作流一致；Wan2.2 为 16fps、最多 81 帧（约 5 秒） |
+| `video.model` | 新项目为 `minimax-h3`；旧配置缺少此项时识别为旧 Wan 配置，生成前提示迁移 |
+| `video.width/height` | H3 宽高为 32 的倍数，默认竖屏 864×1536，横屏交换宽高；低分辨率预览可用 576×1024 |
+| `video.fps` / `video.max_frames` | H3 为 24fps，默认 124 帧（约 5.17 秒），帧数为 `17k+5`；本技能支持上限 124–362 帧。CreateVideo 也必须为 24fps |
 | `video.clip_slack_sec` | 镜头可比单个片段长出的秒数（默认 0.5），尾部在剪辑时定格或放慢 |
 | `image.size` | 向 Tardis 请求的尺寸。竖屏 `1024x1536`、横屏 `1536x1024` |
 | `tardis.script` | imagegen-tardis 的 `image_gen.py` 路径；`null` 时自动查找同级 skill 目录与 `~/.codex/skills` 等常见位置 |
-| `roughcut` | 粗剪输出：帧率、放大倍数（1.5 → 1080×1920）、画质、字幕字体 |
+| `roughcut` | 粗剪输出：帧率、放大倍数（864×1536 的 1.25 倍为 1080×1920）、画质、字幕字体 |
 
 新项目创建时会把 `video` 设置写入 `project.json`，之后改配置不影响已有项目。
 
@@ -46,7 +47,7 @@ Tardis 的出图尺寸是固定档位（竖屏 1024×1536，即 2:3），视频�
 
 1. 生图提示词自动加上"后期会裁掉左右各约 8%"的构图提醒（按 `image.size` 和 `video` 自动计算）。
 2. `frame-select` 时用 Pillow 按镜头的 `crop`（默认居中）裁成 9:16 并缩放到 `video` 尺寸，保存为 `frames/Sxx.png`。
-3. ComfyUI 拿到的就是尺寸正确的图，工作流保持模板原样；`width/height` 同时注入到 Wan 节点。
+3. ComfyUI 拿到的就是尺寸正确的图；`width/height` 同时注入到 `MiniMaxH3ImageToVideo` 节点。
 
 这样做的好处：用户挑图时看到的就是最终进入视频的画面；画幅只在配置一处维护；换工作流或换生图模型都不用改裁切逻辑。
 
@@ -74,5 +75,5 @@ Tardis 的出图尺寸是固定档位（竖屏 1024×1536，即 2:3），视频�
 | --- | --- |
 | 缺少 librosa / PIL / openai | 确认用的是 `.venv` 里的 Python，重新 `pip install -r requirements.txt` |
 | 连不上 ComfyUI | 检查地址、端口、`--listen`、防火墙；ComfyUI 是否已启动 |
-| 工作流缺失 | 按 [workflows.md](workflows.md) 导出 API 格式工作流放入 `workflows/` |
+| 工作流缺失 | 拖入技能自带的 `*.workflow.json` 配置并导出 API 到工作区 `workflows/`，见 [workflows.md](workflows.md)；`*.params.json` 不能拖入 ComfyUI |
 | ComfyUI 缺少节点 | 在 ComfyUI Manager 中安装缺失的自定义节点，或更新 ComfyUI |

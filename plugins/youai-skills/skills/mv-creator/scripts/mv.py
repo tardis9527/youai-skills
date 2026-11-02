@@ -16,8 +16,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mvlib import audio, comfy, frames, media  # noqa: E402
 from mvlib import shots as shotlib  # noqa: E402
 from mvlib.common import (  # noqa: E402
-    CONFIG_NAME, SKILL_DIR, MVError, Project, clip_frames, ffmpeg_bin, fmt_time, load_config, max_clip_sec,
+    CONFIG_NAME, SKILL_DIR, MVError, Project, ffmpeg_bin, fmt_time, load_config, max_clip_sec,
     next_index, now_iso, pick_candidate, read_json, shot_limit_sec, slugify, write_json,
+    validate_h3_video, video_frames,
 )
 
 PROJECT_DIRS = ("music/takes", "analysis", "storyboard", "characters/raw", "frames/raw",
@@ -114,6 +115,8 @@ def _check_workflows(cfg, object_info, report, kinds=("music", "i2v", "flf2v")):
             report("WARN" if optional else "FAIL", f"工作流 {kind}: {exc}")
             continue
         problems = comfy.validate_kind(workflow, spec)
+        if kind in ("i2v", "flf2v") and spec.get("video_model") != "minimax-h3":
+            problems.extend(comfy.validate_h3_workflow(workflow))
         if object_info is not None:
             missing = sorted({n["class_type"] for n in workflow.values()} - set(object_info))
             if missing:
@@ -475,19 +478,42 @@ def cmd_clips(args, cfg):
     if not plans:
         print("没有需要生成的镜头（--shots 指定重做，--more 给所有镜头追加版本）")
         return
+    validate_h3_video(video)
+    for shot, _, _ in plans:
+        if shot["end"] - shot["start"] > shot_limit_sec(video) + 1e-6:
+            raise MVError(f"{shot['id']} 超过单段上限，请先拆分镜头或调整 H3 max_frames")
+    specs = {}
+    for _, kind, _ in plans:
+        if kind in specs:
+            continue
+        spec, workflow, _ = comfy.load_kind(cfg, kind)
+        problems = comfy.validate_kind(workflow, spec) + comfy.validate_h3_workflow(workflow)
+        if problems:
+            raise MVError(f"工作流 {kind} 校验失败:\n" + "\n".join(dict.fromkeys(problems)))
+        if not ({"duration", "length"} & set(spec.get("params", {}))):
+            raise MVError(f"工作流 {kind} 缺少 H3 duration 或 length 参数映射")
+        specs[kind] = spec
     print(f"将生成 {len(plans)} 个镜头 × {args.takes} 版 = {len(plans) * args.takes} 段视频", flush=True)
     if args.dry_run:
         for shot, kind, _ in plans:
-            length = clip_frames(shot["end"] - shot["start"], video["fps"], video["max_frames"])
+            length = video_frames(shot["end"] - shot["start"], video)
             print(f"  {shot['id']}  {kind}  {length} 帧  × {args.takes} 版")
         return
     for shot, kind, uploads in plans:
         duration = shot["end"] - shot["start"]
-        length = clip_frames(duration, video["fps"], video["max_frames"])
+        length = video_frames(duration, video)
+        params = specs[kind]["params"]
         values = {"positive": _motion_prompt(data, shot), "width": video["width"],
-                  "height": video["height"], "length": length}
+                  "height": video["height"]}
+        if "duration" in params:
+            values["duration"] = length / video["fps"]
+        else:
+            values["length"] = length
         if data.get("negative"):
-            values["negative"] = data["negative"]
+            if "negative" in params:
+                values["negative"] = data["negative"]
+            else:
+                values["positive"] += f"。画面约束，避免：{data['negative']}"
         for take_index in range(args.takes):
             takes = shot["clip"].setdefault("takes", [])
             number = max((int(t["id"].split("-")[1]) for t in takes), default=0) + 1
@@ -498,6 +524,7 @@ def cmd_clips(args, cfg):
                                    project.root / "clips" / shot["id"], f"take-{number}")
             takes.append({"id": f"take-{number}", "file": project.rel(saved[0]), "workflow": kind,
                           "seed": seed, "frames": length, "fps": video["fps"],
+                          "model": "minimax-h3", "duration_sec": length / video["fps"],
                           "prompt": values["positive"], "created": now_iso()})
             project.save_shots(data)
             print(f"  已保存 {_abs(saved[0])}", flush=True)

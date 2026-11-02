@@ -1,5 +1,5 @@
 {
-  "description": "MiniMax Music 3 文生音乐（官方模板 audio_minimax_music_3）。导出为 API 格式并保存为 music.api.json。",
+  "description": "脚本参数映射，不能拖入 ComfyUI。可拖入 music.workflow.json，配置后导出 API 为 music.api.json。",
   "workflow": "music.api.json",
   "output_ext": [".flac", ".mp3", ".opus", ".wav"],
   "params": {
@@ -27,6 +27,7 @@
       "optional": true,
       "targets": [
         {"class_type": "MiniMaxMusic3TextEncode", "input": "seed", "multi": true},
+        {"class_type": "KSampler", "input": "seed", "multi": true},
         {"title": "@seed", "input": "seed", "multi": true}
       ]
     },

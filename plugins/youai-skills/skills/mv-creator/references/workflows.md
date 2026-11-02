@@ -1,88 +1,116 @@
-# 工作流：导出、映射与排查
+# 工作流：MiniMax H3 配置、导出与排查
 
-## 需要哪些工作流
+## 三种 JSON 的用途
 
-| 类型 | 文件 | 必需 | 来源（ComfyUI 菜单 Workflow → Browse Templates） |
-| --- | --- | --- | --- |
-| `music` | `music.api.json` | 是 | MiniMax Music 3 音乐生成模板 |
-| `i2v` | `i2v.api.json` | 是 | Wan2.2 14B Image to Video 模板 |
-| `flf2v` | `flf2v.api.json` | 否 | Wan2.2 14B First-Last Frame to Video 模板（只有分镜用到首尾帧转场时需要） |
-| 其他 | `<kind>.api.json` | 否 | 补帧、超分等，用 `comfy-run` 通用命令调用 |
-
-导出的 `<kind>.api.json` 放在工作区的 `workflows/` 目录（`init-config` 会创建，可用配置 `workflows_dir` 修改）。参数映射 `<kind>.params.json` 随 skill 提供（`<SKILL_DIR>/workflows/`），一般不用动；需要自定义时，复制一份到工作区的 `workflows/` 再改，工作区的版本优先。
-
-## 导出步骤
-
-1. 在 ComfyUI 中打开模板，按提示下载模型，**先在界面里手动跑通一次**，确认模型、显存和效果都没问题。
-2. 加速 LoRA、分辨率、步数等在界面里调好；脚本只会改下表中的参数，其余保持你导出时的设置。
-3. 菜单 Workflow → **Export (API)**，保存为 `<kind>.api.json` 放进工作区的 `workflows/` 目录。注意不是普通的 Save/Export，普通格式会被脚本拒绝。
-4. 运行 `mv.py comfy-validate`，全部 `[OK]` 即可使用。
-
-模板更新、换模型后重新导出覆盖即可；只要节点结构不变，映射文件不用改。
-
-## 脚本会注入的参数
-
-| 类型 | 参数 | 默认怎么找节点 |
+| 后缀 | 内容 | 交给谁 |
 | --- | --- | --- |
-| music | `caption` `lyrics` `max_duration` | `MiniMaxMusic3TextEncode` 节点的同名输入 |
-| music | `seed` | 编码节点的 `seed`（若有），以及标题为 `@seed` 的节点 |
-| i2v | `image` | 唯一的 `LoadImage` 节点 |
-| i2v | `positive` / `negative` | 连到 `WanImageToVideo` 的 positive / negative 的 `CLIPTextEncode` |
-| i2v | `width` `height` `length` | `WanImageToVideo` 节点 |
-| i2v / flf2v | `seed` | 所有 `KSamplerAdvanced.noise_seed`（以及 `KSampler.seed`） |
-| flf2v | `start_image` / `end_image` | 连到 `WanFirstLastFrameToVideo` 的 start_image / end_image 的 `LoadImage` |
-| 全部 | `filename_prefix` | `SaveAudio*` / `SaveVideo` / `VHS_VideoCombine` 节点 |
+| `.workflow.json` | 界面节点、连线、布局及子图 | 拖入 ComfyUI 画布 |
+| `.api.json` | 以节点 ID 为键的执行图，节点包含 `class_type`、`inputs` | MV 脚本读取并提交 |
+| `.params.json` | 脚本参数映射，包含 `workflow`、`params` | 脚本内部读取，不能拖入画布 |
 
-## 自动找不到节点时：用标题标记
+误拖 `.params.json` 可能出现 `TypeError: e is not iterable`；改后缀不能转换格式。技能提供了真正可拖入的界面模板，来源与许可见 [workflows/README.md](../workflows/README.md)。
 
-工作流改过结构（中间插了别的节点、有多个同类节点）时，`comfy-validate` 会报"匹配到多个节点"或"没有匹配到节点"。这时在 ComfyUI 里**把对应节点的标题改成约定名**再导出，标题优先于自动查找：
+## 工作流与模型
 
-`@caption` `@lyrics` `@duration` `@seed` `@image` `@start_image` `@end_image` `@positive` `@negative` `@size`（宽高帧数所在节点） `@output`（保存节点）
+| 类型 | 可拖入模板 | 工作区内的 API 导出文件 | 模型 |
+| --- | --- | --- | --- |
+| `music` | `music.workflow.json` | `music.api.json` | MiniMax Music 3，保持原歌曲流程 |
+| `i2v` | `i2v.workflow.json` | `i2v.api.json` | MiniMax H3 FL2VA，仅连接首帧 |
+| `flf2v`（可选） | `flf2v.workflow.json` | `flf2v.api.json` | 同一 MiniMax H3 FL2VA，连接首尾帧 |
 
-查看工作流里有哪些节点、标题和参数：
+视频模板基于官方 `Image to Video (MiniMax H3)` 子图，使用与用户截图相同的量化模型和 Turbo 配置：
+
+| 目录（相对 ComfyUI/models/） | 文件 |
+| --- | --- |
+| `diffusion_models/` | `minimax_h3_fl2va_pruned_int8_convrot.safetensors` |
+| `text_encoders/` | `qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors` |
+| `vae/` | `minimax_h3_video_vae_int8_convrot.safetensors` |
+| `vae/` | `minimax_h3_audio_vae_fp32.safetensors` |
+| `loras/`（开启 Turbo 时使用） | `minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors` |
+
+默认 `turbo_mode=false`，普通采样 20 步；开启 Turbo 时使用模型强度 1.0、8 步。脚本不擅自切换 Turbo、修改模型文件名或采样设置。音频 VAE 用于解码 H3 的联合音视频输出；粗剪会移除片段音轨并合入已确认的原创歌曲。
+
+模型下载入口在模板说明节点与 [官方模型仓库](https://huggingface.co/Comfy-Org/MiniMax-H3)。本技能不包含权重，不自动下载模型或安装节点。若 INT8/NVFP4 权重加载失败，检查 ComfyUI、量化运行库和硬件支持，不自动降级为其他模型。
+
+## 首次使用与导出
+
+1. 把所需 `.workflow.json` 拖入 ComfyUI；选择本机已有模型，替换 `mv-creator/start.png`（及首尾帧模式的 `end.png`）占位输入。
+2. 默认竖屏 864×1536（宽高均为 32 的倍数），24fps；可按硬件改为 576×1024 等预览尺寸，并同步修改项目 `video`。模板无额外分辨率选择器，脚本直接注入宽高。
+3. 模板的 `duration` 为秒，默认 5.0；保留内部计算节点，它将秒数对齐到 H3 的 `17k+5` 帧数网格。**不要沿用 Wan 工作流中断开计算帧数连线的操作。**
+4. 界面手动跑通后，用 Workflow → **Export (API)** 保存到工作区的 `workflows/<kind>.api.json`。找不到 API 导出时，查看设置中的开发者模式。普通界面 JSON 不能直接交给脚本。
+5. 运行 `mv.py comfy-validate --offline` 检查格式、映射、H3 节点和 24fps 输出；再运行 `mv.py comfy-validate` 检查服务端节点。仅检查视频可用 `mv.py comfy-validate i2v flf2v --offline`，不使用首尾帧时可只检查 `i2v`。
+
+API 文件、配置及用户修改后的界面文件保存在工作区。映射随技能提供；工作区中同名 `.params.json` 优先。ComfyUI 前端负责展开子图，导出的节点 ID 含 `:` 属正常情况，脚本不自行将界面文件转换为执行图。
+
+## 时长和帧数
+
+H3 输出 24fps，帧数对齐到 `17k+5`。本技能默认每段至少生成 124 帧（约 5.17 秒），短镜头在粗剪中裁切，以避免依赖训练范围以外的短片段。`video.max_frames` 默认 124，可设为 124–362 中符合 `17k+5` 的值。
+
+脚本先计算覆盖镜头所需的帧数并按项目上限封顶，然后将 `frames/24` 作为秒数写入模板的 `@duration` 节点。这样内部公式返回相同帧数，不会把帧数误当秒数。镜头可再比片段长 `clip_slack_sec`（默认 0.5 秒），尾部定格补齐；更长镜头应拆分。原生片段时长按 `frames/fps` 记录。
+
+## 从旧 Wan 工作流迁移
+
+1. 保留已生成的视频及其选定版本，不清空 `shots.json` 或重切已确认分镜。
+2. 用新的 H3 模板重新导出 `i2v.api.json` / `flf2v.api.json`。旧 Wan API 不能只改权重名；将工作区覆盖默认映射的旧视频 `.params.json` 备份到其他文件名，或更新为 H3 映射。脚本会拒绝将旧 API 当成 H3。
+3. 对工作区配置及要继续生成的项目 `project.json`，将 `video` 更新为以下内容；`roughcut.scale` 设为 `1.25` 时默认粗剪仍为 1080×1920。仅更新工作区配置不会改写项目已保存的视频规格。
+
+```json
+{"model": "minimax-h3", "width": 864, "height": 1536, "fps": 24, "max_frames": 124, "clip_slack_sec": 0.5}
+```
+
+4. 尺寸变更后可用 `frame-select <slug> <镜号>` 从已选原图重裁，无需再次调用图片接口。运行 `shots-check <slug>` 确认时间线，再执行 `clips --dry-run` 核对数量后生成。
+
+缺少 `video.model` 的旧配置/项目仍按 Wan 时间规则读取，生成前给出迁移提示；旧片段帧数和时长不会被批量重写。新片段追加版本，不覆盖旧视频。
+
+## 注入参数及定位
+
+| 类型 | 参数 | 目标 |
+| --- | --- | --- |
+| music | `caption`、`lyrics`、`max_duration` | `MiniMaxMusic3TextEncode` 同名输入 |
+| music | `seed` | 编码器、`KSampler.seed`，可跟随 `SeedNode.seed` |
+| i2v | `image` | `@image` 或连到 H3 `first_frame` 的 `LoadImage.image` |
+| flf2v | `start_image`、`end_image` | `@start_image` / `@end_image`，或连到 H3 首尾帧的 LoadImage |
+| 视频 | `positive` | `MiniMaxH3ImageToVideo.prompt` |
+| 视频 | `width`、`height` | `MiniMaxH3ImageToVideo` 同名输入 |
+| 视频 | `duration` | `@duration` 的 `PrimitiveFloat.value`（秒）；无标题时须只有一个 PrimitiveFloat |
+| 视频 | `seed` | `@seed` 或 `RandomNoise.noise_seed` |
+| 全部 | `filename_prefix` | 保存节点的同名输入，可用 `@output` 标记 |
+
+H3 默认没有独立 negative 输入。`shots.json.negative` 若有旧内容，将附加到正向提示的“画面约束，避免”部分；不会把不存在的输入添加到节点。动作提示只描述当前镜头，不照搬示例中的多段 SHOT 或配乐要求。
+
+查看导出节点：
 
 ```powershell
 python <SKILL_DIR>\scripts\mv.py comfy-inspect workflows\i2v.api.json
 ```
 
-## 映射文件格式（`<kind>.params.json`）
+映射示例：
 
 ```json
 {
+  "video_model": "minimax-h3",
   "workflow": "i2v.api.json",
-  "output_ext": [".mp4"],
   "params": {
-    "positive": {
-      "required": true,
-      "targets": [
-        {"title": "@positive", "input": "text"},
-        {"class_type": "CLIPTextEncode", "upstream": {"class_type": "WanImageToVideo", "input": "positive"}, "input": "text"}
-      ]
-    }
+    "positive": {"required": true, "targets": [{"class_type": "MiniMaxH3ImageToVideo", "input": "prompt"}]},
+    "duration": {"targets": [{"title": "@duration", "input": "value"}]}
   }
 }
 ```
 
-- `targets` 是候选位置。`mode` 为 `first`（默认）时用第一个能匹配上的；为 `all` 时写入所有匹配到的位置（如两个采样器的 seed）。
-- 选择器字段可组合：`id`（节点编号）、`title`（节点标题）、`class_type`（字符串或列表）、`upstream`（连到某节点某输入的上游节点）、`where`（输入值等于给定值）。
-- 一个选择器匹配到多个节点会报错，除非写 `"multi": true`。
-- `required` 表示调用时必须提供；`optional` 表示工作流里没有该节点时跳过。
-- 输入如果由 Primitive 节点连线提供，脚本会改写那个 Primitive 节点的值。
+`targets` 默认为 first，使用第一个匹配位置；`mode=all` 写入所有匹配位置。选择器支持 `id`、`title`、`class_type`、`upstream`、`where`；匹配多个节点时须明确 `multi=true`。`required` 表示调用必须提供；`optional` 表示无目标时跳过。Primitive 的 value 连线可自动跟随，但不会强行覆盖计算节点的输出。自定义平铺 H3 API 可以将映射改为 `length`，直接注入已对齐帧数，此时不得同时使用秒数计算连线。
 
-新增其他工作流（如补帧）：在工作区 `workflows/` 里放 `post.params.json` 和 `post.api.json`，然后：
+补帧或超分仍可在工作区放 `<kind>.params.json` 与 `<kind>.api.json`，用 `comfy-run` 调用。
 
-```powershell
-python <SKILL_DIR>\scripts\mv.py comfy-run post --upload video=projects\xx\clips\S01\take-1.mp4 --set filename_prefix=mv-creator/post --out projects\xx\clips\S01 --name take-1-post
-```
+## 排查
 
-## 运行时报错排查
-
-| 报错 | 常见原因 |
+| 报错 | 处理 |
 | --- | --- |
-| `Value not in list: ckpt_name/unet_name ...` | 工作流里的模型文件名在这台 ComfyUI 上不存在：在界面里改成已有模型后重新导出 |
-| `ComfyUI 缺少这些节点` | 自定义节点没装；用 Manager 安装或更新 ComfyUI |
-| `执行失败 ... out of memory` | 降低分辨率/帧数，或在工作流里换 fp8/GGUF 模型、开启分块解码后重新导出 |
-| 任务完成但没有输出文件 | 保存节点被禁用或换成了预览节点；`output_ext` 不包含实际扩展名 |
-| 等待超时 | 任务仍在 ComfyUI 队列中，可在界面查看；需要时调大 `comfyui.timeout_sec` |
-
-不要为了"跑通"擅自修改用户工作流中的模型、采样器或步数，先把报错告诉用户。
+| 拖入 `TypeError: e is not iterable` | 核对是 `.workflow.json`；如正确，查看前端版本、子图支持和错误报告 |
+| 视频 API 不是 MiniMax H3 | 更新 API 和工作区覆盖默认映射的旧视频 `.params.json` |
+| H3 需 fps=24 / max_frames 不合法 | 同步项目规格；帧数上限须满足 `17k+5`，默认 124 |
+| 参数由计算连线提供，无法赋值 | H3 映射 `@duration` 秒数，不映射计算输出；其他参数定位到可写源节点 |
+| 匹配到多个 PrimitiveFloat | 给实际秒数输入源节点标记 `@duration` 后重新导出 |
+| 模型不在可选列表 / 缺少节点 | 核对模型目录、文件名、ComfyUI 版本及具体 node_errors |
+| out of memory | 按用户选择降低 32 倍数尺寸或调整解码配置；不自动换权重 |
+| 成功但没有输出 | 确认 SaveVideo 启用且 output_ext 包含实际格式 |
+| 等待超时 | 查看队列，必要时调大 timeout_sec，避免盲目重复提交 |

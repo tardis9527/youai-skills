@@ -19,11 +19,12 @@ DEFAULT_CONFIG: dict = {
     "comfyui": {"url": "http://127.0.0.1:8188", "timeout_sec": 3600, "poll_interval_sec": 2},
     "workflows_dir": "workflows",
     "projects_dir": "projects",
-    "video": {"width": 720, "height": 1280, "fps": 16, "max_frames": 81, "clip_slack_sec": 0.5},
+    "video": {"model": "minimax-h3", "width": 864, "height": 1536,
+              "fps": 24, "max_frames": 124, "clip_slack_sec": 0.5},
     "image": {"model": "gpt-image-2", "size": "1024x1536", "quality": None},
     "tardis": {"script": None},
     "music": {"duration_sec": 60},
-    "roughcut": {"fps": 30, "scale": 1.5, "crf": 20, "font": "Microsoft YaHei"},
+    "roughcut": {"fps": 30, "scale": 1.25, "crf": 20, "font": "Microsoft YaHei"},
     "ffmpeg": None,
 }
 
@@ -84,7 +85,10 @@ def load_config(path: Path | None = None) -> dict:
     path = Path(path) if path else find_config()
     cfg = copy.deepcopy(DEFAULT_CONFIG)
     if path:
-        cfg = deep_merge(cfg, read_json(path))
+        stored = read_json(path)
+        cfg = deep_merge(cfg, stored)
+        if "video" in stored and "model" not in stored["video"]:
+            cfg["video"]["model"] = "wan2.2"
         cfg["_path"] = str(path.resolve())
         cfg["_root"] = str(path.resolve().parent)
     else:
@@ -129,14 +133,38 @@ def slugify(name: str) -> str:
     return slug[:60]
 
 
-def clip_frames(duration: float, fps: int, max_frames: int) -> int:
-    """Wan-style frame counts are 4n+1; round up so the clip covers the shot."""
+def clip_frames(duration: float, fps: int, max_frames: int, model: str = "wan2.2") -> int:
+    """Keep legacy Wan timing; H3 uses complete frames on a 17k+5 grid."""
+    if model == "minimax-h3":
+        if fps != 24 or max_frames < 124 or max_frames > 362 or max_frames % 17 != 5:
+            raise MVError("MiniMax H3 需 fps=24，max_frames 为 17k+5 且在 124–362 之间（默认 124）")
+        needed = max(124, math.ceil(duration * fps))
+        aligned = needed + (5 - needed % 17) % 17
+        return min(aligned, max_frames)
+    if model != "wan2.2":
+        raise MVError(f"不支持的视频模型: {model}")
     needed = math.ceil(duration * fps) + 1
     frames = 4 * math.ceil((needed - 1) / 4) + 1
     return max(5, min(frames, max_frames))
 
 
+def video_frames(duration: float, video: dict) -> int:
+    return clip_frames(duration, video["fps"], video["max_frames"], video.get("model", "wan2.2"))
+
+
+def validate_h3_video(video: dict) -> None:
+    if video.get("model") != "minimax-h3":
+        raise MVError("视频流程已切换为 MiniMax H3；旧项目需更新 project.json 的 video："
+                      "model=minimax-h3、fps=24、max_frames=124，并使用 32 倍数尺寸。"
+                      "更新尺寸后用 frame-select 重裁关键帧；已有视频版本可继续保留。")
+    video_frames(5, video)
+    if any(not isinstance(video.get(k), int) or video[k] <= 0 or video[k] % 32 for k in ("width", "height")):
+        raise MVError("MiniMax H3 视频宽高需为正整数且为 32 的倍数，例如竖屏 864×1536 或预览 576×1024")
+
+
 def max_clip_sec(video: dict) -> float:
+    if video.get("model") == "minimax-h3":
+        return video["max_frames"] / video["fps"]
     return (video["max_frames"] - 1) / video["fps"]
 
 
@@ -207,7 +235,11 @@ class Project:
 
     def video(self) -> dict:
         """Video settings frozen into the project at creation time."""
-        return deep_merge(self.cfg["video"], self.load().get("video", {}))
+        stored = self.load().get("video", {})
+        result = deep_merge(self.cfg["video"], stored)
+        if stored and "model" not in stored:
+            result["model"] = "wan2.2"
+        return result
 
 
 def pick_candidate(project: Project, candidates: list[str], choice: str) -> Path:

@@ -97,7 +97,10 @@ def _edit_list(meta: dict, data: dict, rows: list, missing: list[str], song: Pat
               "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for order, shot, clip_name, take in rows:
         span = shot["end"] - shot["start"]
-        clip_sec = (take["frames"] - 1) / take["fps"] if take and take.get("frames") else None
+        clip_sec = take.get("duration_sec") if take else None
+        if clip_sec is None and take and take.get("frames"):
+            offset = 0 if take.get("model") == "minimax-h3" else 1
+            clip_sec = (take["frames"] - offset) / take["fps"]
         clip_len = f"{clip_sec:.2f}s" if clip_sec else "—"
         transition = "首尾帧过渡" if shot.get("workflow") == "flf2v" else "硬切"
         notes = [str(shot.get("notes", "")).replace("|", "/")]

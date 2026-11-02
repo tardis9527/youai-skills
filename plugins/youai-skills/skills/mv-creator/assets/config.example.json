@@ -7,10 +7,11 @@
   "workflows_dir": "workflows",
   "projects_dir": "projects",
   "video": {
-    "width": 720,
-    "height": 1280,
-    "fps": 16,
-    "max_frames": 81,
+    "model": "minimax-h3",
+    "width": 864,
+    "height": 1536,
+    "fps": 24,
+    "max_frames": 124,
     "clip_slack_sec": 0.5
   },
   "image": {
@@ -26,7 +27,7 @@
   },
   "roughcut": {
     "fps": 30,
-    "scale": 1.5,
+    "scale": 1.25,
     "crf": 20,
     "font": "Microsoft YaHei"
   },

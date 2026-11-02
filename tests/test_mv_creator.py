@@ -3,36 +3,45 @@
 from __future__ import annotations
 
 import json
+import copy
+import argparse
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "skills" / "mv-creator" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import mv  # noqa: E402
-from mvlib import comfy, frames, shots  # noqa: E402
-from mvlib.common import DEFAULT_CONFIG, MVError, clip_frames, shot_limit_sec  # noqa: E402
+from mvlib import comfy, frames, shots, media  # noqa: E402
+from mvlib.common import (  # noqa: E402
+    DEFAULT_CONFIG, MVError, Project, clip_frames, shot_limit_sec, video_frames, load_config, write_json,
+)
 
 VIDEO = dict(DEFAULT_CONFIG["video"])
 
 
-def wan_workflow() -> dict:
-    """A trimmed Wan2.2 I2V graph in API format, with a primitive-fed seed."""
+def h3_workflow() -> dict:
+    """H3 API shape after the official subgraph is expanded, with scalar sources."""
     return {
         "1": {"class_type": "LoadImage", "inputs": {"image": "x.png"}},
-        "2": {"class_type": "CLIPTextEncode", "inputs": {"text": "pos", "clip": ["7", 0]}},
-        "3": {"class_type": "CLIPTextEncode", "inputs": {"text": "neg", "clip": ["7", 0]}},
-        "4": {"class_type": "WanImageToVideo", "inputs": {
-            "positive": ["2", 0], "negative": ["3", 0], "start_image": ["1", 0],
-            "width": 640, "height": 640, "length": 81, "batch_size": 1}},
-        "5": {"class_type": "KSamplerAdvanced", "inputs": {"add_noise": "enable", "noise_seed": 1}},
-        "6": {"class_type": "KSamplerAdvanced", "inputs": {"add_noise": "disable", "noise_seed": ["8", 0]}},
-        "7": {"class_type": "CLIPLoader", "inputs": {"clip_name": "umt5.safetensors"}},
+        "4": {"class_type": "MiniMaxH3ImageToVideo", "inputs": {
+            "prompt": "pos", "first_frame": ["1", 0], "clip": ["7", 0],
+            "width": 864, "height": 1536, "length": ["10", 1]}},
+        "6": {"class_type": "RandomNoise", "inputs": {"noise_seed": ["8", 0]}},
+        "7": {"class_type": "CLIPLoader", "inputs": {"clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"}},
         "8": {"class_type": "PrimitiveInt", "inputs": {"value": 5}},
         "9": {"class_type": "SaveVideo", "inputs": {"filename_prefix": "video/ComfyUI"}},
+        "10": {"class_type": "ComfyMathExpression", "inputs": {
+            "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17",
+            "values.a": ["11", 0]}},
+        "11": {"class_type": "PrimitiveFloat", "inputs": {"value": 5}, "_meta": {"title": "@duration"}},
+        "12": {"class_type": "CreateVideo", "inputs": {"fps": 24}},
     }
 
 
@@ -57,6 +66,25 @@ class ClipFramesTest(unittest.TestCase):
         self.assertEqual(clip_frames(5.22, 16, 81), 81)
         for duration in (0.3, 1.0, 2.5, 4.9):
             self.assertEqual((clip_frames(duration, 16, 81) - 1) % 4, 0)
+
+    def test_h3_uses_24fps_grid_minimum_and_cap(self):
+        self.assertEqual(video_frames(1.6, VIDEO), 124)
+        self.assertEqual(video_frames(5, VIDEO), 124)
+        self.assertEqual(video_frames(10, VIDEO), 124)
+        extended = dict(VIDEO, max_frames=362)
+        self.assertEqual(video_frames(5.2, extended), 141)
+        self.assertEqual(video_frames(15, extended), 362)
+        for duration in (0.3, 4.9, 5.2, 8, 15):
+            count = video_frames(duration, extended)
+            self.assertEqual(count % 17, 5)
+            seconds = count / 24
+            rounded = round(seconds * 24)
+            self.assertEqual(rounded + (5 - rounded % 17) % 17, count)
+
+    def test_h3_rejects_legacy_timing_and_invalid_grid(self):
+        for override in ({"fps": 16}, {"max_frames": 81}, {"max_frames": 125}, {"max_frames": 379}):
+            with self.subTest(override=override), self.assertRaises(MVError):
+                video_frames(5, dict(VIDEO, **override))
 
 
 class SkeletonTest(unittest.TestCase):
@@ -101,34 +129,73 @@ class CheckTest(unittest.TestCase):
 
 class ApplyParamsTest(unittest.TestCase):
     def test_injects_into_template_without_titles(self):
-        patched = comfy.apply_params(wan_workflow(), i2v_spec(), {
-            "image": "mv-creator/demo/S01.png", "positive": "雨丝落下", "negative": "模糊",
-            "width": 720, "height": 1280, "length": 45, "seed": 42, "filename_prefix": "mv/S01"})
+        patched = comfy.apply_params(h3_workflow(), i2v_spec(), {
+            "image": "mv-creator/demo/S01.png", "positive": "雨丝落下",
+            "width": 864, "height": 1536, "duration": 124 / 24, "seed": 42, "filename_prefix": "mv/S01"})
         self.assertEqual(patched["1"]["inputs"]["image"], "mv-creator/demo/S01.png")
-        self.assertEqual(patched["2"]["inputs"]["text"], "雨丝落下")
-        self.assertEqual(patched["3"]["inputs"]["text"], "模糊")
-        self.assertEqual([patched["4"]["inputs"][k] for k in ("width", "height", "length")], [720, 1280, 45])
-        self.assertEqual(patched["5"]["inputs"]["noise_seed"], 42)
+        self.assertEqual(patched["4"]["inputs"]["prompt"], "雨丝落下")
+        self.assertEqual([patched["4"]["inputs"][k] for k in ("width", "height")], [864, 1536])
+        self.assertEqual(patched["4"]["inputs"]["length"], ["10", 1])
+        self.assertEqual(patched["11"]["inputs"]["value"], 124 / 24)
         self.assertEqual(patched["8"]["inputs"]["value"], 42)  # seed fed through a primitive node
         self.assertEqual(patched["9"]["inputs"]["filename_prefix"], "mv/S01")
 
-    def test_title_overrides_automatic_match(self):
-        workflow = wan_workflow()
-        workflow["10"] = {"class_type": "CLIPTextEncode", "inputs": {"text": ""}, "_meta": {"title": "@positive"}}
-        patched = comfy.apply_params(workflow, i2v_spec(), {"image": "a.png", "positive": "p"})
-        self.assertEqual(patched["10"]["inputs"]["text"], "p")
-        self.assertEqual(patched["2"]["inputs"]["text"], "pos")
+    def test_duration_title_overrides_automatic_match(self):
+        workflow = h3_workflow()
+        # Prefer the marked duration source when another float is present.
+        workflow["20"] = {"class_type": "PrimitiveFloat", "inputs": {"value": 99}}
+        patched = comfy.apply_params(workflow, i2v_spec(), {"image": "a.png", "positive": "p", "duration": 6})
+        self.assertEqual(patched["11"]["inputs"]["value"], 6)
+        self.assertEqual(patched["20"]["inputs"]["value"], 99)
 
     def test_ambiguous_and_unknown_params_fail(self):
-        workflow = wan_workflow()
-        workflow["11"] = {"class_type": "LoadImage", "inputs": {"image": "b.png"}}
+        workflow = h3_workflow()
+        workflow["20"] = {"class_type": "LoadImage", "inputs": {"image": "b.png"}}
+        workflow["21"] = {"class_type": "MiniMaxH3ImageToVideo", "inputs": {"first_frame": ["20", 0]}}
         with self.assertRaises(MVError):
             comfy.apply_params(workflow, i2v_spec(), {"image": "a.png", "positive": "p"})
         with self.assertRaises(MVError):
-            comfy.apply_params(wan_workflow(), i2v_spec(), {"image": "a.png", "positive": "p", "typo": 1})
+            comfy.apply_params(h3_workflow(), i2v_spec(), {"image": "a.png", "positive": "p", "typo": 1})
 
     def test_validate_reports_nothing_for_template(self):
-        self.assertEqual(comfy.validate_kind(wan_workflow(), i2v_spec()), [])
+        self.assertEqual(comfy.validate_kind(h3_workflow(), i2v_spec()), [])
+
+    def test_music_seed_updates_shared_seed_node_and_separate_sampler(self):
+        workflow = {
+            "37:13": {"class_type": "MiniMaxMusic3TextEncode", "inputs": {
+                "caption": "old", "lyrics": "old", "max_duration": 60, "seed": ["37:38", 0]}},
+            "37:38": {"class_type": "SeedNode", "inputs": {"seed": 123}},
+            "37:9": {"class_type": "KSampler", "inputs": {"seed": ["37:38", 0]}},
+            "40": {"class_type": "KSampler", "inputs": {"seed": 456}},
+        }
+        spec = json.loads((SCRIPTS.parent / "workflows/music.params.json").read_text(encoding="utf-8"))
+        self.assertEqual(comfy.validate_kind(workflow, spec), [])
+        patched = comfy.apply_params(workflow, spec, {"caption": "新歌", "seed": 42})
+        self.assertEqual(patched["37:38"]["inputs"]["seed"], 42)
+        self.assertEqual(patched["40"]["inputs"]["seed"], 42)
+        self.assertEqual(patched["37:13"]["inputs"]["seed"], ["37:38", 0])
+        self.assertEqual(patched["37:9"]["inputs"]["seed"], ["37:38", 0])
+        self.assertEqual(workflow["37:38"]["inputs"]["seed"], 123)
+
+    def test_computed_width_is_reported_before_execution(self):
+        workflow = h3_workflow()
+        workflow["4"]["inputs"]["width"] = ["10", 1]
+        problems = comfy.validate_kind(workflow, i2v_spec())
+        self.assertEqual(len(problems), 1)
+        self.assertIn("width", problems[0])
+        self.assertIn("连线", problems[0])
+        with self.assertRaises(MVError):
+            comfy.apply_params(workflow, i2v_spec(), {"image": "a.png", "positive": "p", "width": 864})
+        self.assertEqual(workflow["4"]["inputs"]["width"], ["10", 1])
+
+    def test_primitive_chain_and_cycle(self):
+        workflow = h3_workflow()
+        workflow["8"]["inputs"]["value"] = ["20", 0]
+        workflow["20"] = {"class_type": "PrimitiveInt", "inputs": {"value": 7}}
+        patched = comfy.apply_params(workflow, i2v_spec(), {"image": "a.png", "positive": "p", "seed": 42})
+        self.assertEqual(patched["20"]["inputs"]["value"], 42)
+        workflow["20"]["inputs"]["value"] = ["8", 0]
+        self.assertTrue(any("循环" in p for p in comfy.validate_kind(workflow, i2v_spec())))
 
     def test_ui_format_is_rejected(self):
         with TemporaryDirectory() as tmp:
@@ -168,6 +235,181 @@ class CommandHelpersTest(unittest.TestCase):
         self.assertFalse(mv._stale({"take": "take-2"}, "take-2"))
         self.assertFalse(mv._stale({}, "take-2"))  # projects made before take was recorded
         self.assertFalse(mv._stale(None, "take-2"))
+
+
+class WorkflowFilesTest(unittest.TestCase):
+    def test_mapping_files_are_rejected_with_actionable_error(self):
+        for path in (SCRIPTS.parent / "workflows").glob("*.params.json"):
+            with self.subTest(path=path.name), self.assertRaisesRegex(MVError, "参数映射文件"):
+                comfy.load_api_workflow(path)
+
+    def test_raw_and_wrapped_api_formats_are_accepted(self):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "workflow.json"
+            for data in (h3_workflow(), {"prompt": h3_workflow()}):
+                path.write_text(json.dumps(data), encoding="utf-8-sig")
+                self.assertEqual(comfy.load_api_workflow(path), h3_workflow())
+
+    def test_malformed_json_structures_have_friendly_errors(self):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "invalid.json"
+            for data in ([], None, 3, "invalid", {}, {"1": {"class_type": "LoadImage", "inputs": []}}):
+                with self.subTest(data=data):
+                    path.write_text(json.dumps(data), encoding="utf-8")
+                    with self.assertRaises(MVError):
+                        comfy.load_api_workflow(path)
+
+    def test_missing_api_points_to_draggable_template(self):
+        with TemporaryDirectory() as tmp:
+            cfg = dict(DEFAULT_CONFIG, _root=tmp)
+            with self.assertRaisesRegex(MVError, r"i2v\.workflow\.json"):
+                comfy.load_kind(cfg, "i2v")
+
+    def test_ui_templates_have_nodes_links_and_resolvable_subgraphs(self):
+        for kind in ("music", "i2v", "flf2v"):
+            path = SCRIPTS.parent / "workflows" / f"{kind}.workflow.json"
+            with self.subTest(kind=kind):
+                data = json.loads(path.read_text(encoding="utf-8"))
+                self.assertEqual(data["version"], 0.4)
+                subgraphs = data.get("definitions", {}).get("subgraphs", [])
+                subgraph_ids = {graph["id"] for graph in subgraphs}
+                for graph in [data, *subgraphs]:
+                    self.assertIsInstance(graph["nodes"], list)
+                    self.assertIsInstance(graph["links"], list)
+                    nodes = {node["id"]: node for node in graph["nodes"]}
+                    self.assertTrue(nodes)
+                    self.assertEqual(len(nodes), len(graph["nodes"]))
+                    endpoints = set(nodes)
+                    for boundary in ("inputNode", "outputNode"):
+                        if boundary in graph:
+                            endpoints.add(graph[boundary]["id"])
+                    for node in nodes.values():
+                        self.assertIsInstance(node.get("inputs", []), list)
+                        if len(node["type"]) == 36 and "-" in node["type"]:
+                            self.assertIn(node["type"], subgraph_ids)
+                    for link in graph["links"]:
+                        if isinstance(link, list):
+                            self.assertEqual(len(link), 6)
+                            _, origin, _, target, _, _ = link
+                        else:
+                            origin, target = link["origin_id"], link["target_id"]
+                        self.assertIn(origin, endpoints)
+                        self.assertIn(target, endpoints)
+                with self.assertRaisesRegex(MVError, "界面格式"):
+                    comfy.load_api_workflow(path)
+
+
+class H3WorkflowTest(unittest.TestCase):
+    def test_both_video_templates_use_requested_models_and_frame_connections(self):
+        for kind in ("i2v", "flf2v"):
+            with self.subTest(kind=kind):
+                data = json.loads((SCRIPTS.parent / "workflows" / f"{kind}.workflow.json").read_text(encoding="utf-8"))
+                graph = data["definitions"]["subgraphs"][0]
+                nodes = graph["nodes"]
+                self.assertTrue(any(n["type"] == "MiniMaxH3ImageToVideo" for n in nodes))
+                self.assertFalse(any("Wan" in n["type"] for n in nodes))
+                main = next(n for n in data["nodes"] if n["type"] == graph["id"])
+                values = main["widgets_values_named"]
+                self.assertEqual(values["unet_name"], "minimax_h3_fl2va_pruned_int8_convrot.safetensors")
+                self.assertEqual(values["clip_name"], "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors")
+                self.assertEqual(values["vae_name"], "minimax_h3_video_vae_int8_convrot.safetensors")
+                self.assertEqual(values["vae_name_1"], "minimax_h3_audio_vae_fp32.safetensors")
+                self.assertIs(values["value"], False)
+                self.assertEqual(values["value_2"], 8)
+                self.assertEqual(main["widgets_values"], list(values.values()))
+                self.assertIsNotNone(main["inputs"][0]["link"])
+                self.assertEqual(main["inputs"][1]["link"] is not None, kind == "flf2v")
+                frame_links = [link for link in data["links"] if link[3] == main["id"]]
+                self.assertEqual(len(frame_links), 1 if kind == "i2v" else 2)
+                durations = [n for n in nodes if n.get("title") == "@duration"]
+                self.assertEqual(len(durations), 1)
+                self.assertEqual(durations[0]["type"], "PrimitiveFloat")
+
+    def test_h3_validation_rejects_wrong_model_and_output_fps(self):
+        old = {"1": {"class_type": "WanImageToVideo", "inputs": {}}}
+        self.assertTrue(any("不是 MiniMax H3" in e for e in comfy.validate_kind(old, i2v_spec())))
+        workflow = h3_workflow()
+        workflow["12"]["inputs"]["fps"] = 16
+        self.assertTrue(any("24fps" in e for e in comfy.validate_kind(workflow, i2v_spec())))
+
+    def test_legacy_project_and_config_are_not_reinterpreted_as_h3(self):
+        with TemporaryDirectory() as tmp:
+            cfg = copy.deepcopy(DEFAULT_CONFIG)
+            cfg["_root"] = tmp
+            project = Project(cfg, "legacy")
+            old_video = {"width": 720, "height": 1280, "fps": 16, "max_frames": 81}
+            project.save({"video": old_video})
+            self.assertEqual(project.video()["model"], "wan2.2")
+            config_path = Path(tmp) / "mv-creator.config.json"
+            write_json(config_path, {"video": old_video})
+            self.assertEqual(load_config(config_path)["video"]["model"], "wan2.2")
+            self.assertEqual(json.loads(config_path.read_text(encoding="utf-8"))["video"], old_video)
+
+    def test_edit_list_uses_h3_duration_and_preserves_legacy_calculation(self):
+        shot = shots.new_shot(1, 0, 5, "1")
+        take = {"model": "minimax-h3", "frames": 124, "fps": 24, "duration_sec": 124 / 24}
+        meta = {"title": "test", "slug": "test"}
+        text = media._edit_list(meta, {}, [(1, shot, "clip.mp4", take)], [], None)
+        self.assertIn("5.17s", text)
+        legacy = {"frames": 81, "fps": 16}
+        text = media._edit_list(meta, {}, [(1, shot, "clip.mp4", legacy)], [], None)
+        self.assertIn("5.00s", text)
+
+    def test_clips_injects_h3_seconds_and_two_frames_and_resumes(self):
+        with TemporaryDirectory() as tmp:
+            cfg = copy.deepcopy(DEFAULT_CONFIG)
+            cfg["_root"] = tmp
+            project = Project(cfg, "demo")
+            project.save({"video": dict(VIDEO)})
+            scene = []
+            for i in (1, 2):
+                shot = shots.new_shot(i, (i - 1) * 2, i * 2, str(i))
+                shot.update(scene="夜景", image_prompt="关键帧", motion_prompt="缓慢转头")
+                shot["frame"]["selected"] = f"frames/S0{i}.png"
+                path = project.path(shot["frame"]["selected"])
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"offline image placeholder")
+                scene.append(shot)
+            scene[0]["workflow"] = "flf2v"
+            project.save_shots({"shots": scene, "negative": "闪烁", "style": "电影感"})
+            workflow = h3_workflow()
+            end_workflow = copy.deepcopy(workflow)
+            end_workflow["20"] = {"class_type": "LoadImage", "inputs": {"image": "end.png"}}
+            end_workflow["4"]["inputs"]["last_frame"] = ["20", 0]
+            folder = Path(tmp) / "workflows"
+            write_json(folder / "i2v.api.json", workflow)
+            write_json(folder / "flf2v.api.json", end_workflow)
+            args = argparse.Namespace(slug="demo", shots=None, more=False, dry_run=False, takes=2)
+            captured = []
+
+            def fake_run(config, kind, values, uploads, subfolder, dest, stem):
+                spec, graph, _ = comfy.load_kind(config, kind)
+                patched = comfy.apply_params(graph, spec, dict(values, **{k: p.name for k, p in uploads.items()}))
+                captured.append((kind, values, uploads, patched))
+                path = dest / f"{stem}.mp4"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"offline video placeholder")
+                return [path]
+
+            with patch.object(comfy, "run_kind", side_effect=fake_run), redirect_stdout(StringIO()):
+                mv.cmd_clips(args, cfg)
+                mv.cmd_clips(args, cfg)
+            self.assertEqual(len(captured), 4)
+            kind, values, uploads, patched = captured[0]
+            self.assertEqual(kind, "flf2v")
+            self.assertEqual(set(uploads), {"start_image", "end_image"})
+            self.assertEqual(patched["1"]["inputs"]["image"], "S01.png")
+            self.assertEqual(patched["20"]["inputs"]["image"], "S02.png")
+            self.assertEqual(values["duration"], 124 / 24)
+            self.assertNotIn("length", values)
+            self.assertNotIn("negative", values)
+            self.assertIn("闪烁", values["positive"])
+            self.assertEqual(patched["11"]["inputs"]["value"], 124 / 24)
+            take = project.load_shots()["shots"][0]["clip"]["takes"][0]
+            self.assertEqual(take["model"], "minimax-h3")
+            self.assertEqual(take["frames"], 124)
+            self.assertEqual(take["fps"], 24)
+            self.assertEqual(take["duration_sec"], 124 / 24)
 
 
 if __name__ == "__main__":

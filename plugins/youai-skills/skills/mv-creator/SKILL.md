@@ -11,14 +11,14 @@ description: 基于 ComfyUI API 与 Tardis 生图，按"创意简报 → 原创�
 
 - `<SKILL_DIR>` 指本 SKILL.md 所在目录。所有命令用 `python <SKILL_DIR>/scripts/mv.py <命令>`，在**用户工作区根目录**（放 `mv-creator.config.json` 的目录）执行。示例按 Windows PowerShell 书写。
 - 依赖两个 skill：**imagegen-tardis**（所有生图/改图）与 **comfyui-minimax-music**（歌曲 Caption 与 Lyrics）。脚本会通过子进程调用 imagegen-tardis 的 `image_gen.py`，你仍需先读它的 SKILL.md，按其提示词规则写图片提示词、按其流程配置密钥。
-- ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
+- ComfyUI 可以在另一台电脑上，地址写在配置的 `comfyui.url`。视频默认使用本地 **MiniMax H3 FL2VA**，单图与首尾帧共用 H3 节点；脚本负责上传输入、提交 API 工作流、等待完成并把输出下载回项目目录。
 - 每个命令运行后，都以命令输出为准汇报结果：成功说成功，失败贴出关键报错，不粉饰。
 
 ## 开始之前
 
 1. 工作区没有 `mv-creator.config.json` 时运行 `mv.py init-config`，再请用户确认 `comfyui.url`。
 2. 新机器首次使用、或任何命令报环境错误时运行 `mv.py doctor`，按 [references/setup.md](references/setup.md) 逐项处理。不要替用户安装软件或改系统设置，给出命令让用户确认。
-3. 需要调用 ComfyUI 前，确认 `mv.py comfy-validate` 通过。工作流 JSON 由用户从官方模板导出，放在工作区的 `workflows/`（不放进 skill 安装目录），规则见 [references/workflows.md](references/workflows.md)；不要自行修改其中的模型文件名或采样参数。
+3. ComfyUI 首次配置先读 [references/workflows.md](references/workflows.md)：skill 的 `workflows/*.workflow.json` 是可拖入画布的官方界面模板，`*.params.json` 只是脚本参数映射，不能拖入画布。模板需按本机模型配置并在界面跑通，再用 Export (API) 导出到**工作区**的 `workflows/<kind>.api.json`（不放进 skill 安装目录）。调用前确认 `mv.py comfy-validate` 通过；不要自行修改用户的模型文件名或采样参数。
 
 ## 项目与断点续跑
 
@@ -50,7 +50,7 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 ### 3. 节拍分析与分镜
 
 1. `mv.py analyze <slug>`：估算 BPM、拍点、小节线和每小节能量，写入 `analysis/beats.json`。
-2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（单个片段最长 81 帧/16fps ≈ 5 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐）。已有 `shots.json` 时它会拒绝覆盖，需要重切先征得用户同意再加 `--force`。
+2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（默认 H3 124 帧/24fps ≈ 5.17 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐；短镜头生成后裁切）。H3 帧数按 `17k+5` 对齐，不沿用 Wan 的 `4n+1`。已有 `shots.json` 时拒绝覆盖，需要重切先征得用户同意再加 `--force`。
 3. 按 [references/storyboard-guide.md](references/storyboard-guide.md) 填写全局 `style`、`characters` 和每个镜头的 `section`、`lyric`、`scene`、`characters`、`image_prompt`、`motion_prompt`、`camera`、`workflow`。可合并或拆分镜头，但时间要连续且每段不超时。
 4. `mv.py shots-check <slug>` 校验并生成 `storyboard/storyboard.md`。⏸ 把分镜表给用户确认。
 
@@ -64,12 +64,14 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
    - 关键帧：`mv.py frames <slug> --n 2`。有角色的镜头自动走 `edit` 并带上暂定参考图，保持人物一致。
 2. ⏸ **一次确认角色与关键帧**：在回复中按 imagegen-tardis 的交付方式嵌入全部候选图（绝对路径），先列角色候选并标出暂定选择，再按镜号列关键帧候选。请用户一次回复，例如"角色用 2；S01 选 1，S02 选 2，S04 重做：人物再靠近镜头"。
 3. 按回复执行：
-   - 选定关键帧：`mv.py frame-select <slug> <镜号> <序号或图片路径>`。脚本按项目画幅裁切并缩放为视频输入尺寸（如 720×1280），所见即所得；构图需要偏上/偏下时把镜头的 `crop` 设为 `top`/`bottom`，再运行 `frame-select <slug> <镜号>`（省略序号即按原图重裁）。
+   - 选定关键帧：`mv.py frame-select <slug> <镜号> <序号或图片路径>`。脚本按项目画幅裁切并缩放为视频输入尺寸（默认 864×1536），所见即所得；构图需要偏上/偏下时把镜头的 `crop` 设为 `top`/`bottom`，再运行 `frame-select <slug> <镜号>`（省略序号即按原图重裁）。
    - 用户换了角色参考图：重新 `char-select`，再对用到该角色、且用户没有明确保留的镜头 `frames --shots ...` 重做（先说明调用次数）。
    - 用户要求重做的镜头：只改该镜头的 `image_prompt`，`frames --shots ...` 后只展示这些镜头的新候选。
 4. 所有镜头都选定关键帧后再进入下一阶段。
 
 ### 5. 图生视频（ComfyUI，耗时）
+
+默认模型与截图式 H3 蓝图一致：`minimax_h3_fl2va_pruned_int8_convrot`、`qwen3vl_32b_minimax_h3_nvfp4_awq`、INT8 视频 VAE 与 FP32 音频 VAE。Turbo 默认关闭；开启时使用 8 步 LoRA。模型文件和首次导出步骤见 [references/workflows.md](references/workflows.md)。旧 Wan API 与 16fps 项目需按该文档迁移，不能只改权重文件名。
 
 1. 用 `mv.py clips <slug> --takes 2 --dry-run` 核对并告知待生成镜头数、每镜头几版，然后去掉 `--dry-run` 运行。默认跳过已有视频的镜头；`--shots` 指定镜头时总会新增版本；`--more` 给所有镜头追加版本。任务串行执行、逐个落盘，中断后重跑同一命令即可续上。
 2. `workflow` 为 `flf2v` 的镜头使用首尾帧工作流，用下一镜头的关键帧作为尾帧，用于转场；需要下一镜头先选好关键帧。
@@ -78,7 +80,7 @@ MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景�
 ### 6. 交付：剪映素材与粗剪
 
 1. `mv.py package <slug>`：在 `final/capcut/` 整理按时间顺序编号的视频片段、关键帧、歌曲（有 ffmpeg 时另转 WAV）、按镜头时间生成的 `lyrics.srt`、小节线时间表和《剪辑清单.md》。
-2. `mv.py roughcut <slug>`（需要 ffmpeg）：按分镜时间把选定片段裁切/定格到对应时长、拼接并合入歌曲，输出 `final/roughcut.mp4` 作为剪辑参考；缺视频的镜头用关键帧静帧代替。加 `--burn-subs` 另出一版烧录歌词字幕。
+2. `mv.py roughcut <slug>`（需要 ffmpeg）：按分镜时间把选定片段裁切/定格到对应时长、拼接并合入歌曲，输出 `final/roughcut.mp4` 作为剪辑参考；缺视频的镜头用关键帧静帧代替。H3 片段可以自带声音，粗剪仍移除片段音轨并使用已选定的原创歌曲。加 `--burn-subs` 另出一版烧录歌词字幕。
 3. 把素材目录、粗剪路径和清单中的未完成项告诉用户，并按 [references/capcut-handoff.md](references/capcut-handoff.md) 给出剪映导入步骤。
 
 ## 通用规则

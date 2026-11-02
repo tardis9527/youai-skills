@@ -143,12 +143,20 @@ def _execution_error(status: dict) -> str:
 
 def load_api_workflow(path: Path) -> dict:
     data = read_json(path)
+    if not isinstance(data, dict):
+        raise MVError(f"{path} 不是 API 格式的工作流（顶层必须是节点对象）")
+    if isinstance(data.get("params"), dict) and isinstance(data.get("workflow"), str):
+        raise MVError(f"{path} 是参数映射文件，不是 ComfyUI 工作流，不能拖入画布或提交执行。"
+                      f"请拖入同目录的 *.workflow.json，在 ComfyUI 中用 Export (API) 导出为 "
+                      f"{data['workflow']}，放到工作区的 workflows/。")
     if isinstance(data.get("prompt"), dict):
         data = data["prompt"]
     if "nodes" in data and "links" in data:
         raise MVError(f"{path} 是界面格式的工作流。请在 ComfyUI 菜单用 Export (API) 重新导出。")
-    if not data or not all(isinstance(v, dict) and "class_type" in v for v in data.values()):
-        raise MVError(f"{path} 不是 API 格式的工作流（缺少 class_type）")
+    if not data or not all(isinstance(v, dict) and isinstance(v.get("class_type"), str)
+                           and v["class_type"] and isinstance(v.get("inputs", {}), dict)
+                           for v in data.values()):
+        raise MVError(f"{path} 不是 API 格式的工作流（节点需要 class_type 和 inputs 对象）")
     return data
 
 
@@ -172,7 +180,11 @@ def load_kind(cfg: dict, kind: str) -> tuple[dict, dict, Path]:
     candidates = [workflows_dir(cfg) / name, spath.parent / name]
     wpath = next((p for p in candidates if p.is_file()), None)
     if wpath is None:
-        raise MVError(f"缺少工作流 {candidates[0]}。按 references/workflows.md 从模板导出 API 格式后放到这里。")
+        template = SKILL_DIR / "workflows" / f"{kind}.workflow.json"
+        hint = (f"先将 {template} 拖入 ComfyUI，" if template.is_file()
+                else "先在 ComfyUI 中打开对应模板，")
+        raise MVError(f"缺少工作流 {candidates[0]}。{hint}用 Export (API) 导出到目标位置。"
+                      "*.params.json 仅供脚本映射参数，不能拖入画布；详见 references/workflows.md。")
     return spec, load_api_workflow(wpath), wpath
 
 
@@ -193,8 +205,8 @@ def select_nodes(workflow: dict, target: dict) -> list[str]:
         allowed = [allowed] if isinstance(allowed, str) else allowed
         ids = [i for i in ids if workflow[i]["class_type"] in allowed]
     if "upstream" in target:
-        # The node feeding <input> of a node of <class_type>, e.g. the prompt
-        # encoder wired into WanImageToVideo.positive.
+        # The node feeding <input> of a node of <class_type>, e.g. LoadImage
+        # wired into MiniMaxH3ImageToVideo.first_frame.
         up = target["upstream"]
         sources = set()
         for node in workflow.values():
@@ -248,21 +260,38 @@ def apply_params(workflow: dict, spec: dict, values: dict) -> dict:
 
 
 def _set_input(workflow: dict, node_id: str, input_name: str, value) -> None:
-    inputs = workflow[node_id].setdefault("inputs", {})
-    current = inputs.get(input_name)
+    node_id, input_name = _input_target(workflow, node_id, input_name)
+    workflow[node_id]["inputs"][input_name] = value
+
+
+def _input_target(workflow: dict, node_id: str, input_name: str,
+                  seen: set[tuple[str, str]] | None = None) -> tuple[str, str]:
+    """Resolve writable scalar inputs without replacing computed connections."""
+    seen = set() if seen is None else seen
+    key = (node_id, input_name)
+    if key in seen:
+        raise MVError(f"节点 {node_id}.{input_name} 的参数连线存在循环")
+    seen.add(key)
+    inputs = workflow[node_id].get("inputs", {})
+    if input_name not in inputs:
+        raise MVError(f"节点 {node_id} ({workflow[node_id]['class_type']}) 没有输入 {input_name}")
+    current = inputs[input_name]
     if _is_link(current):
-        # Widget converted to an input and fed by a primitive node: set the source.
-        source = workflow.get(str(current[0]), {})
-        if "value" in source.get("inputs", {}) and not _is_link(source["inputs"]["value"]):
-            source["inputs"]["value"] = value
-            return
+        source_id = str(current[0])
+        source = workflow.get(source_id, {})
+        source_input = "seed" if source.get("class_type") == "SeedNode" else "value"
+        if current[1] == 0 and source_input in source.get("inputs", {}):
+            return _input_target(workflow, source_id, source_input, seen)
         raise MVError(f"节点 {node_id}.{input_name} 由其他节点连线提供，无法直接赋值；"
-                      f"请把映射指向源节点 {current[0]}")
-    inputs[input_name] = value
+                      f"请把映射指向可写入的源节点 {source_id}；若源节点在计算帧数等值，"
+                      "请先在界面将目标参数改为直接输入，再重新导出 API。")
+    return node_id, input_name
 
 
 def validate_kind(workflow: dict, spec: dict) -> list[str]:
     problems = []
+    if spec.get("video_model") == "minimax-h3":
+        problems.extend(validate_h3_workflow(workflow))
     for name, param in spec.get("params", {}).items():
         try:
             targets = _resolve_targets(workflow, name, param)
@@ -272,9 +301,28 @@ def validate_kind(workflow: dict, spec: dict) -> list[str]:
         if not targets and not param.get("optional"):
             problems.append(f"参数 {name} 没有匹配到节点")
         for node_id, input_name in targets:
-            if input_name not in workflow[node_id].get("inputs", {}):
-                problems.append(f"参数 {name}: 节点 {node_id} ({workflow[node_id]['class_type']}) "
-                                f"没有输入 {input_name}")
+            try:
+                _input_target(workflow, node_id, input_name)
+            except MVError as exc:
+                problems.append(f"参数 {name}: {exc}")
+    return problems
+
+
+def validate_h3_workflow(workflow: dict) -> list[str]:
+    if not any(n["class_type"] == "MiniMaxH3ImageToVideo" for n in workflow.values()):
+        return ["视频 API 不是 MiniMax H3 首尾帧工作流；请用新的 i2v/flf2v.workflow.json 重新导出，"
+                "并移除或更新工作区中覆盖默认映射的旧 *.params.json。"]
+    problems = []
+    outputs = [i for i, n in workflow.items() if n["class_type"] == "CreateVideo"]
+    if not outputs:
+        problems.append("MiniMax H3 工作流缺少 CreateVideo，无法确认原生 24fps 输出")
+    for node_id in outputs:
+        try:
+            source, name = _input_target(workflow, node_id, "fps")
+            if workflow[source]["inputs"][name] != 24:
+                problems.append(f"MiniMax H3 的 CreateVideo {node_id} 需设为 24fps")
+        except MVError as exc:
+            problems.append(str(exc))
     return problems
 
 

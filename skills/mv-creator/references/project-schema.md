@@ -37,7 +37,7 @@ projects/<slug>/
   "version": 1,
   "title": "雨夜便利店",
   "slug": "雨夜便利店",
-  "video": {"width": 720, "height": 1280, "fps": 16, "max_frames": 81},
+  "video": {"model": "minimax-h3", "width": 864, "height": 1536, "fps": 24, "max_frames": 124},
   "music": {
     "duration_sec": 60,
     "takes": [{"id": "take-1", "file": "music/takes/take-1.flac", "seed": 123, "max_duration": 60}],
@@ -70,7 +70,8 @@ projects/<slug>/
       "frame": {"candidates": ["frames/raw/S01-v01-1.png"], "selected": "frames/S01.png",
                 "source": "frames/raw/S01-v01-1.png"},
       "clip": {"takes": [{"id": "take-1", "file": "clips/S01/take-1.mp4", "workflow": "i2v",
-                          "seed": 42, "frames": 69, "fps": 16, "prompt": "……"}],
+                          "model": "minimax-h3", "seed": 42, "frames": 124, "fps": 24,
+                          "duration_sec": 5.166666666666667, "prompt": "……"}],
                "selected": "take-1"}
     }
   ]
@@ -81,15 +82,17 @@ projects/<slug>/
 | --- | --- | --- |
 | `take` | 脚本 | 切分镜头时依据的歌曲版本（`beats.json` 同样记录）；换歌后 `status` 据此提示过期。手动按新节拍调整完时间后改为当前选定版本 |
 | `style` | 你 | 全局视觉风格，自动附加到每张图和每段视频的提示词 |
-| `negative` | 你（可空） | Wan 负面提示词；为空时沿用工作流里的设置 |
+| `negative` | 你（可空） | 兼容旧数据的避免项；默认 H3 没有独立 negative 输入，脚本将其附为正向提示中的“画面约束，避免” |
 | `characters[].prompt` | 你 | 角色外貌描述，用于生成设定图 |
-| `start` / `end` | 脚本骨架，可调 | 秒；镜头之间应首尾相接，单段不超过 `(max_frames-1)/fps` |
+| `start` / `end` | 脚本骨架，可调 | 秒；镜头之间应首尾相接。H3 片段上限为 `max_frames/fps`，另允许配置中的定格余量 |
 | `bars` | 脚本 | 对应的小节号，仅供参考 |
 | `section` / `lyric` | 你 | 段落名与该镜头期间唱的歌词；多行用 `/` 分隔，会生成 SRT |
 | `scene` | 你 | 给人看的画面描述 |
 | `image_prompt` | 你 | 给 Tardis 的关键帧提示词 |
-| `motion_prompt` / `camera` | 你 | 给 Wan 的动作与镜头运动 |
+| `motion_prompt` / `camera` | 你 | 给 MiniMax H3 的动作与镜头运动 |
 | `workflow` | 你 | `i2v`（默认）或 `flf2v`（首尾帧过渡到下一镜头） |
 | `crop` | 你 | 关键帧裁切锚点：`center` / `top` / `bottom` / `left` / `right` |
 | `seed` | 你（可空） | 固定视频 seed，多版本时依次加 1 |
 | `frame` / `clip` | 脚本 | 候选、版本与选定结果；不要手工改路径，用 select 命令 |
+
+H3 新版本记录 `model` 和 `duration_sec`。旧视频版本缺少这些字段时，剪辑清单继续按旧 Wan 时间规则展示，不重写历史版本。旧配置和旧项目缺少 `video.model` 时识别为 `wan2.2`，生成前按 [workflows.md](workflows.md) 迁移。
