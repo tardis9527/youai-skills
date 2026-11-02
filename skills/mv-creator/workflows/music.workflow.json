@@ -101,17 +101,17 @@
       ],
       "size": [
         520,
-        660
+        1000
       ],
       "flags": {},
       "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [],
-      "title": "Note: MiniMax Music 3",
+      "title": "使用说明｜MiniMax Music 3",
       "properties": {},
       "widgets_values": [
-        "## MiniMax Music 3\n\nA music generation model by MiniMax that creates complete songs up to 5 minutes long with stable structure and high audio quality. Two inputs drive it: **Caption** (structured music description: style, mood, vocals, arrangement) and **Lyrics** (with `[intro]` `[verse]` `[chorus]` `[bridge]` `[outro]` tags controlling song structure).\n\n### Parameters\n\n| Parameter | Description |\n|---|---|\n| Caption | Music description. Write it in three sections — Global Metadata → Vocal Details → Arrangement. The more specific, the closer the result. |\n| Lyrics | Song lyrics + section tags. Tags are the only executable structural instructions; the lyric text itself only conveys mood. |\n| max_duration | Target song length in seconds (default 120 = 2 minutes; the model supports up to ~300 s / 5 minutes). Longer songs take more time and VRAM. |\n| seed | Random seed for the generation. Keep it fixed to reproduce the same song; change it to get a different take. |\n| Model files | diffusion model / text encoder / VAE.|\n| Tiled decode | Decode the audio VAE in overlapping tiles to drastically cut VRAM usage — helpful for long songs on low-VRAM GPUs. Slightly slower, with a small risk of seams at tile boundaries; turn it off on high-VRAM GPUs for the best quality. |\n\n### Prompt Writing Guide\n\nYou can find an official [Music Caption Rewriter Skill here](https://github.com/MiniMax-AI/MiniMax-Music3)"
+        "## MiniMax Music 3｜原创歌曲生成\n\n用于生成带人声的歌曲，作为 MV 的主音轨。先完成歌词与音乐描述，再生成候选版本供试听。\n\n## 开始使用\n\n1. 在音乐子图中替换示例 Caption 和 Lyrics。\n2. 设置歌曲时长与种子，核对配套模型。\n3. 点击“运行”，在保存音频节点试听并保存；格式与质量在该节点选择。\n\n## 常用参数怎么填\n\n- **Caption（音乐描述）**：说明曲风、情绪、节奏、人声和配器。可按“整体风格 → 人声特点 → 编曲与段落变化”组织，描述尽量具体。\n- **Lyrics（歌词）**：填写完整歌词，用 `[Intro]` 前奏、`[Verse]` 主歌、`[Chorus]` 副歌、`[Bridge]` 桥段、`[Outro]` 尾奏等标签区分段落。标签保留英文，歌词可用中文。\n- **max_duration（秒）**：本模板默认 60 秒；这是歌曲时长参数，不是视频片段时长。时长增加会增加生成耗时和显存占用。\n- **seed（随机种子）**：固定种子便于在同一环境和参数下复现；更换种子可生成另一版歌曲。\n- **tiled_decode（分块解码）**：本模板默认开启，将音频分段解码以降低显存占用。显存充足时可关闭后对比听感。\n- **模型文件**：分别选择主模型、文本编码器和音频解码器，存放目录见左侧说明。\n\n## 用于 MV 自动化\n\n手动跑通后，用 **Export (API)** 导出为 `music.api.json`，放入工作区的 `workflows/`。歌曲被选定后，再继续节拍分析和视频分镜。\n\nMV 的中文音乐提示词和歌词按 `comfyui-minimax-music` Skill 准备；也可参考[官方音乐提示词资源](https://github.com/MiniMax-AI/MiniMax-Music3)。"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -125,7 +125,7 @@
       ],
       "size": [
         440,
-        680
+        1150
       ],
       "flags": {},
       "order": 2,
@@ -134,10 +134,11 @@
       "outputs": [],
       "properties": {},
       "widgets_values": [
-        "## Model Links\n\n- [Hugging Face:Comfy-Org/MiniMax-Music-3](https://huggingface.co/Comfy-Org/MiniMax-Music-3)\n- [ModelScope:Comfy-Org/MiniMax-Music-3](https://modelscope.cn/models/Comfy-Org/MiniMax-Music-3)\n\n**diffusion_models**\n- [minimax_music3_dit_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/diffusion_models/minimax_music3_dit_int8_convrot.safetensors) (2.33 GB) # For low VRAM\n- [minimax_music3_dit_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/diffusion_models/minimax_music3_dit_fp16.safetensors) (4.58 GB)\n\n**text_encoders**\n\n- [minimax_music3_text_encoder_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/text_encoders/minimax_music3_text_encoder_pruned_int8_convrot.safetensors) (8.57 GB)\n\n**vae**\n\n- [minimax_music3_dav.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/vae/minimax_music3_dav.safetensors) (206.7 MB)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   ├── 📂 diffusion_models/\n│   │   ├── minimax_music3_dit_int8_convrot.safetensors # For low VRAM\n│   │   └── minimax_music3_dit_fp16.safetensors\n│   ├── 📂 text_encoders/\n│   │   └── minimax_music3_text_encoder_pruned_int8_convrot.safetensors\n│   └── 📂 vae/\n│       └── minimax_music3_dav.safetensors\n```\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
+        "## 模型下载与存放位置\n\n下载入口：[Hugging Face 模型仓库](https://huggingface.co/Comfy-Org/MiniMax-Music-3) · [ModelScope 模型仓库](https://modelscope.cn/models/Comfy-Org/MiniMax-Music-3)\n\n下列目录均相对于 `ComfyUI/models/`。文件名保留英文，方便与节点下拉框核对。\n\n### 音乐主模型 → diffusion_models/\n\n本模板默认选择 FP16：\n[minimax_music3_dit_fp16.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/diffusion_models/minimax_music3_dit_fp16.safetensors)\n\n显存较小时，可按环境支持情况选择 INT8 量化版本：\n[minimax_music3_dit_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/diffusion_models/minimax_music3_dit_int8_convrot.safetensors)\n\n两个主模型按需选择一个，并在节点中选中对应文件。\n\n### 文本编码器 → text_encoders/\n\n[minimax_music3_text_encoder_pruned_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/text_encoders/minimax_music3_text_encoder_pruned_int8_convrot.safetensors)\n\n负责理解音乐描述和歌词。\n\n### 音频解码器 → vae/\n\n[minimax_music3_dav.safetensors](https://huggingface.co/Comfy-Org/MiniMax-Music-3/resolve/main/vae/minimax_music3_dav.safetensors)\n\n负责将模型输出还原为可试听的音频。\n\n## 加载与报错排查\n\n- 找不到模型：核对存放目录和完整文件名，再刷新模型列表。\n- 缺少节点或子图无法加载：核对 ComfyUI 前后端及节点支持；[更新说明](https://docs.comfy.org/installation/update_comfyui)。\n- 生成时显存不足：先缩短歌曲时长或使用分块解码，再评估量化版本。\n- 成功但没有保存音频：检查保存节点是否启用及输出目录；手动运行时可调整保存前缀。\n\n需要反馈问题时，附上报错信息：[运行问题](https://github.com/comfyanonymous/ComfyUI/issues) · [界面问题](https://github.com/Comfy-Org/ComfyUI_frontend/issues) · [上游模板问题](https://github.com/Comfy-Org/workflow_templates/issues)。"
       ],
       "color": "#222",
-      "bgcolor": "#000"
+      "bgcolor": "#000",
+      "title": "模型准备与排错｜MiniMax Music 3"
     }
   ],
   "links": [
