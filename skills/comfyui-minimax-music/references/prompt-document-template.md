@@ -15,14 +15,60 @@
 
 ## 内容规范
 
-使用下方固定顺序：元数据 → 作品名称 → 创作简报 → Caption → Lyrics → 生成参数与工作流映射 → 导出设置 → 复制与映射说明 → 自查状态 → 版本记录。
+使用下方固定顺序：元数据 → 作品名称 → 创作简报 → 创作控制卡 → 情绪曲线 → 歌词时间线计划 → Caption → Lyrics → 生成参数与工作流映射 → 导出设置 → MV 交接（如适用）→ 复制与映射说明 → 自查状态 → 版本记录。
 
 - YAML front matter 至少包含 `title`、`type`（`song` 或 `instrumental`）、`model`、`status`、`version`、`created_at`、`updated_at`、`title_source`。日期按当前用户日期填写；修订保留创建日期，更新修改日期。字符串正确引用/转义，尤其标题中的冒号、引号、`#` 和换行；有 YAML 序列化工具时优先使用。
 - 创作简报记录用途、目标时长、情绪、两种文本的语言、歌词来源、人声/主旋律、乐器与结构、保留和避免项。保留用户原词的要求也写入，纯音乐将歌词语言/来源记为“不适用”。
+- 创作控制卡记录 `work_id`、`version`、`take_id`、目标时长与生成上限，以及风格、人声、节奏、和声四组控制项。控制项和事件必须标明 `planned`、`measured`、`verified` 或 `pending`，不能用预期值冒充实际音频测量。
+- 情绪曲线按约 15 秒粒度记录时间、情绪、能量（1–5）和叙事功能；目标时长变更后重新采样，不把曲线写成精确乐谱。
+- 歌词时间线计划为每句设置稳定的 `section_id` / `line_id`、歌词原文、预计作用和可为空的 `start_sec`、`end_sec`、`beat_anchor`。生成前只能写计划值；实际时间等待音频分析与试听校对。
 - Caption 和 Lyrics 各放一个完整 `text` 代码块，与本轮交付逐字一致。展开所有重复段，不用“同上”“略”或省略号代替。保留三部分标识和支持的段落标签；纯音乐使用工作流契约规定的纯标签文本。
 - 生成参数记录所选策略/数值、来源与真实控件的映射状态，导出表单独记录格式、质量与采样率。每项说明用户已选、明确沿用或委托后推荐；缺少用户选择仅能保存在 `draft` 中。未知控件写“待映射”，音频值写“未检测”，不能用这些标签掩盖尚未选择。
 - 导出表区分目标、来源、实测结果与 `PASS` / `FAIL` / `PENDING`；沿用采样率时不编造 Hz。平台未指定时写“不适用”，不额外要求平台检查。只有实际完成的自查才能勾选。
 - 只保存创作所需内容，不复制 API Key、令牌、凭据、签名 URL 或不必要的个人信息。
+
+## 创作控制卡与时间线计划模板
+
+以下区块可直接复制到文档中。若尚未生成音频，时间戳和试听结果保持 `null` 或 `PENDING`。
+
+```yaml
+work_id: "安全化作品名"
+version: 1
+take_id: null
+model: "MiniMax Music 3"
+target_duration_sec: 60
+max_duration_sec: 90
+metadata_status: planned
+style:
+  genre: ""
+  era: ""
+  instruments: []
+vocal:
+  configuration: ""
+  timbre: ""
+  diction: ""
+  breath_timestamps: {status: pending, items: []}
+rhythm:
+  planned_bpm: null
+  beat_timestamps: {status: pending, items: []}
+  downbeat_timestamps: {status: pending, items: []}
+harmony:
+  progression: ""
+  lift_point: null
+emotion_curve:
+  - {at_sec: 0, emotion: "", energy: 1, function: ""}
+lyrics_timeline:
+  status: planned
+  lines:
+    - {line_id: "V1-01", section: "Verse", text: "", start_sec: null, end_sec: null, beat_anchor: null}
+visual_dna:
+  status: mv_pending
+  palette: []
+  motifs: []
+  character_anchors: []
+```
+
+精确鼓点、气口或副歌重拍只能来自实际分析/人工校对。当前工作流没有这些输出时，保留空数组和 `pending`，再由 MV 流程把选定版本绑定到 `analysis/beats.json`。
 
 ## 完整格式示例
 

@@ -46,16 +46,16 @@ description: 基于 ComfyUI API 与 Tardis 生图，从原创演唱歌曲、节�
 MV 的歌是从零创作、带人声演唱的完整原创歌曲，不是背景配乐：歌词、旋律和演唱都要新写，画面围绕这首歌展开。
 
 1. 按 [references/music-handoff.md](references/music-handoff.md) 把简报转换成 comfyui-minimax-music 需要的选择状态，**一次性给出预填好的参数卡**（作品名称候选、用途、时长、听感、人声、歌词方向、文件格式、采样率与 seed 策略），每项标明来源和推荐理由。⏸ 用户回复"确认"或只改个别项即可。
-2. 参数确认后，按 **comfyui-minimax-music** 的规则写出 Caption 与完整 Lyrics，并按它的模板保存 Markdown 文档到 `projects/<slug>/music/`。它的创作规则和自查照常执行；已在参数卡中确认的项目不再重复提问。
+2. 参数确认后，按 **comfyui-minimax-music** 的规则写出 Caption、完整 Lyrics 和歌曲控制卡，并按它的模板保存 Markdown 文档到 `projects/<slug>/music/`。控制卡保留 15 秒粒度情绪曲线、稳定的 `section_id` / `line_id`、预期段落入点、视觉意象与 `planned` 状态；已在参数卡中确认的项目不再重复提问。详细契约见 `comfyui-minimax-music/references/production-control.md`。
 3. 把成稿的 Caption、Lyrics 原样分别写入 `music/caption.txt`、`music/lyrics.txt`（UTF-8，与文档一致，不加说明文字）。
 4. 生成前告知调用数量和已知的耗时依据，默认先跑 1 版：`mv.py music <slug> --takes 1 --target-duration <目标秒数> --max-duration <含收尾余量的上限秒数>`。先加 `--dry-run` 核对。目标 60 秒可先测试上限 90 秒；不是保证精确时长。按 [完整性检查](references/resource-and-duration.md) 读取实际时长和临近上限提示，并试听末句及尾奏，确认完整后再追加版本。旧 `--duration` 保留生成上限语义。seed 由脚本每版随机并记录在 `project.json`，可复现。
 5. ⏸ 列出各版文件的绝对路径请用户试听，用户选定后运行 `mv.py music-select <slug> <take-N>`。不满意时按 comfyui-minimax-music 的"听后修改"归类问题，只改相关字段再跑。
 
 ### 3. 节拍分析与分镜
 
-1. `mv.py analyze <slug>`：估算 BPM、拍点、小节线和每小节能量，写入 `analysis/beats.json`。
+1. `mv.py analyze <slug>`：对选定 `take_id` 的实际音频估算 BPM、拍点、小节线和每小节能量，写入 `analysis/beats.json`，并把控制卡中对应的时间状态从 `planned` 推进为 `measured`；不能沿用未绑定旧版本的节拍文件。
 2. `mv.py shots-init <slug> --bars-per-shot 2`：按小节切出镜头时间骨架（默认 H3 124 帧/24fps ≈ 5.17 秒，镜头最多再长 0.5 秒，由剪辑定格或放慢补齐；短镜头生成后裁切）。H3 帧数按 `17k+5` 对齐；Wan5B 使用 121 帧/24fps ≈ 5.04 秒及 `4n+1`，两者不可混用。已有 `shots.json` 时拒绝覆盖，需要重切先征得用户同意再加 `--force`。
-3. 按 [references/storyboard-guide.md](references/storyboard-guide.md) 填写全局 `style`、`characters` 和每个镜头的 `section`、`lyric`、`scene`、`characters`、`image_prompt`、`motion_prompt`、`camera`、`workflow`。可合并或拆分镜头，但时间要连续且每段不超时。
+3. 按 [references/storyboard-guide.md](references/storyboard-guide.md) 填写全局 `style`、`characters` 和每个镜头的 `section`、`line_ids`、`lyric`、`scene`、`characters`、`image_prompt`、`motion_prompt`、`camera`、`workflow`。`line_ids` 用于把镜头映射回歌曲控制卡，无法确认时留空；可合并或拆分镜头，但时间要连续且每段不超时。
 4. `mv.py shots-check <slug>` 校验并生成 `storyboard/storyboard.md`。⏸ 把分镜表给用户确认。
 
 使用旁白时，此次一并确认声音表：运行 `voice-init <slug>` 创建默认关闭的 `audio/voice-plan.json`，由你填好台词、说话人、表演指令、镜头锚点与时间窗口、字幕开关，再启用计划。音色试镜可在分镜确认后先做，正式配音放在交付前；完整字段与命令见 [references/voice-guide.md](references/voice-guide.md)。内心独白优先配背影、侧脸或环境画面，避免出现对口型预期。

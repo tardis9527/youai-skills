@@ -1,6 +1,6 @@
 ---
 name: comfyui-minimax-music
-description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯音乐。分步确认风格、歌词和歌名，让用户选择模型并提供在线 ComfyUI 地址，通过 API 执行对应内置工作流，在对话中交付无损 FLAC。也支持仅整理提示词，以及向 mv-creator 提供 Caption/Lyrics；不负责 ComfyUI 安装、模型下载或平台发布。
+description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯音乐，并按情绪曲线、歌曲元数据和版本闸门推进到可交付音频。支持仅整理提示词，以及向 mv-creator 提供带时间线计划的 Caption/Lyrics；不负责 ComfyUI 安装、模型下载或平台发布。
 ---
 
 # ComfyUI 音乐创作
@@ -21,6 +21,8 @@ description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯�
 
 开始创作时按模型读取参考：MiniMax 用 [workflow-contract.md](references/workflow-contract.md)；YuE2 用 [yue2-guide.md](references/yue2-guide.md)。尚未选模型时先完成通用创作简报，不把某个模型的高级参数当作前置问卷。歌词与编曲需要时读 [composition-guide.md](references/composition-guide.md)。
 
+本 Skill 采用六阶段控制框架：核心概念锚定 → 歌曲生成与元数据留存 → 歌词/时间线映射 →（MV 协作时）视觉符号锁定 →（下游）音画对齐 → 统一校验与版本冻结。详细的阶段闸门、控制卡字段和 `planned / measured / verified / pending` 状态见 [production-control.md](references/production-control.md)。每首歌都先建立控制卡，再写 Caption/Lyrics；不要把生成器尚未测得的 BPM、重拍、气口或副歌时间写成事实。
+
 每轮只补 1–2 个重要缺口，提供听得懂的选择，允许自由描述或委托建议。已有信息直接记录，用户给足需求时跳过采访。不得把“歌词你写”扩大为替用户选择全部创作方向。
 
 1. **核心与用途**：歌曲还是纯音乐、主题故事、听众、希望传达的感觉及使用场景。没有方向时给 2–3 个具体创作种子。
@@ -28,6 +30,8 @@ description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯�
 3. **歌词或器乐主题**：确认语言、歌词来源和修改范围。已有歌词逐字保留，配曲请求不等于授权重写；新增歌词先抓具体画面和副歌核心句，用户授权直接写时不多设关卡。纯音乐跳过歌词采访，不加入吟唱、念白或背景人声。
 4. **结构与收尾**：按时长安排进入、展开、高潮与退出，歌词密度适合目标长度。展开所有重复段，不写“副歌同上”。歌词只放演唱文本与所选模型支持的段落标签，编曲说明放音乐描述。发生明显冲突时只询问需要取舍的关键项。
 5. **歌名与内容定稿**：已有歌名直接保留；未命名时给 3–5 个候选及简短依据，用户选定或委托命名。把歌词、方向、歌名的确认合并处理，已经定稿时不再重复总确认。
+
+在定稿时同时保存一份简短控制卡：主题与用途、15 秒粒度情绪曲线、风格/人声/节奏/和声四组控制项、目标时长与生成上限、歌词段落及行号、版本和 seed 策略。MV 协作时再补充视觉意象、主色、角色动作母题和预期段落入点；独立音频不为了“完整链路”虚构视觉内容。
 
 目标片长与 `max_duration` 分开记录。上限可预留收尾空间，如目标 60 秒先测试上限 75–90 秒，说明建议并随创作方案确认；用户明确上限时保留，不能暗中扩大。上限不是准确片长保证，实际范围以目标服务 `/object_info` 为准，不静默截断或自动分段。成品接近上限时提示试听末句和尾奏；不接近也不能证明演唱完整。
 
@@ -48,6 +52,8 @@ description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯�
 
 给出本次完整输入与简短参数卡：名称、模型、目标时长/上限、音乐描述、歌词、导出与 seed 来源。歌词原文、用户选择与实际注入文本必须一致，不擅自翻译。不要编造 negative prompt、声线 ID、高清开关或其他不存在的能力。Caption 不能代替文件编码设置。
 
+参数卡还要标明哪些值是 `planned`、哪些要在音频生成后 `measured`，以及哪些必须试听后 `verified`。如果用户要求“导出鼓点/气口/副歌重拍 JSON”，先记录为待测接口；当前工作流没有真实分析结果时，只交付计划结构和 `pending` 状态，生成后再由音频分析或人工校对补齐。
+
 ## 获取在线 ComfyUI 地址并执行
 
 只在独立音频模式、创作信息与模型已确定后，请用户填写在线 ComfyUI 服务根地址，如 `https://host.example/comfy`。已在本次任务提供的地址直接沿用。若返回登录页、需要认证或不是标准 ComfyUI API，再补最少必要信息；不索取服务器密码或要求用户公开凭据。
@@ -60,13 +66,13 @@ description: 在 ComfyUI 中使用 MiniMax Music 3 或 YuE2 创作歌曲与纯�
 
 ## 文件落地、验证与对话交付
 
-- **创作 Markdown**：按 [prompt-document-template.md](references/prompt-document-template.md) 保存 UTF-8 完整文档，默认 `output/music-prompts/YYYY-MM-DD-安全化标题.md`。记录实际模型；YuE2 的描述节用 Style。阶段草稿为 `draft`，文本就绪为 `ready`，不代表音频已完成。版本递增，不覆盖已有作品。
+- **创作 Markdown**：按 [prompt-document-template.md](references/prompt-document-template.md) 保存 UTF-8 完整文档，默认 `output/music-prompts/YYYY-MM-DD-安全化标题.md`。文档同时保存控制卡、情绪曲线、歌词行号和时间线计划；记录实际模型；YuE2 的描述节用 Style。阶段草稿为 `draft`，文本就绪为 `ready`，不代表音频已完成。版本递增，不覆盖已有作品。
 - **独立生成**：脚本输出到 `output/music/日期-歌名/唯一运行ID/`，含原始 `.flac`、`description.txt`、`lyrics.txt`、实际 `workflow.api.json`、`run.json` 和 `创作记录.md`。用户指定目录时优先；不写入 Skill 安装目录。运行日期采用用户本地日期，跨时区时用 `--date YYYY-MM-DD`。
-- **核验**：检查真实 FLAC 编码头、采样率、声道、位深、实长与文件非空；可用 ffmpeg 时完整解码验证。缺 ffmpeg 则解码为 `PENDING`，不能说“全部验证通过”；优先寻找当前环境已有的 ffmpeg，使用 `--ffmpeg` 路径后续查验证。FLAC 保留生成音频已有数据，不能把 MP3 转 FLAC 冒充原始无损。
+- **核验**：检查真实 FLAC 编码头、采样率、声道、位深、实长与文件非空；可用 ffmpeg 时完整解码验证。缺 ffmpeg 则解码为 `PENDING`，不能说“全部验证通过”；优先寻找当前环境已有的 ffmpeg，使用 `--ffmpeg` 路径后续查验证。生成后把实际时长、音频摘要和版本绑定回控制卡；MV 协作再由 `mv-creator analyze` 生成实际 BPM、拍点、小节线和能量。FLAC 保留生成音频已有数据，不能把 MP3 转 FLAC 冒充原始无损。
 - **试听边界**：文件规格通过不等于歌词完整、听感满意或收尾自然。支持实际试听时检查末句与尾奏；没有音频理解能力就标注待用户试听，不声称听过。
 - **最终对话**：以歌曲为主，使用绝对路径 `![歌名试听](/absolute/path/歌名.flac)` 展示播放器，并提供 `[下载无损 FLAC 原文件](/absolute/path/歌名.flac)`。再简述模型、实长与实测规格，附创作记录链接。播放器不能播放 FLAC 时仍交付原文件，必要时另生成明确标注的兼容试听副本；有副本时用副本播放，原 FLAC 继续下载。不能只给远程 ComfyUI 的文件名、服务器磁盘路径、提示词或 run.json 代替歌曲。
 
-仅提示词或 MV 模式交付名称、完整双文本、参数来源与 Markdown 绝对路径；MV 歌曲沿用调用方工作流，由其生成，不进入本节独立执行链路。环境不能写文件/连接服务时说明实际阻塞，交付已完成文本，不伪称生成成功。
+仅提示词或 MV 模式交付名称、完整双文本、控制卡、时间线计划与 Markdown 绝对路径；MV 歌曲沿用调用方工作流，由其生成，不进入本节独立执行链路。交给 MV 时保留稳定的 `section_id`、`line_id`、`take_id` 和时间状态，换歌后必须让下游重新分析，不能沿用旧拍点。环境不能写文件/连接服务时说明实际阻塞，交付已完成文本，不伪称生成成功。
 
 ## 修改与复现
 

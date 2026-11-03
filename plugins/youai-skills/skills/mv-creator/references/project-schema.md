@@ -6,6 +6,7 @@ projects/<slug>/
 ├─ brief.md                # 创意简报
 ├─ music/
 │  ├─ <comfyui-minimax-music 的提示词文档>.md
+│  ├─ control.yaml              # 歌曲控制卡：情绪曲线、元数据和时间线状态
 │  ├─ caption.txt  lyrics.txt   # 注入工作流的原文
 │  ├─ takes/take-N.flac         # 各版本
 │  └─ song.flac                 # 选定版本
@@ -75,7 +76,7 @@ projects/<slug>/
   "shots": [
     {
       "id": "S01", "start": 0.0, "end": 4.21, "bars": "前奏",
-      "section": "前奏", "lyric": "",
+      "section": "前奏", "line_ids": [], "lyric": "",
       "scene": "雨夜街道全景，便利店灯光倒映在积水里",
       "characters": [],
       "image_prompt": "……", "motion_prompt": "雨丝落下，积水中的倒影轻轻晃动", "camera": "缓慢推进",
@@ -99,7 +100,7 @@ projects/<slug>/
 | `characters[].prompt` | 你 | 角色外貌描述，用于生成设定图 |
 | `start` / `end` | 脚本骨架，可调 | 秒；镜头之间应首尾相接。H3 片段上限为 `max_frames/fps`，另允许配置中的定格余量 |
 | `bars` | 脚本 | 对应的小节号，仅供参考 |
-| `section` / `lyric` | 你 | 段落名与该镜头期间唱的歌词；多行用 `/` 分隔，会生成 SRT |
+| `section` / `line_ids` / `lyric` | 你 | 段落名、控制卡中覆盖的歌词行 ID，以及该镜头期间唱的歌词；多行用 `/` 分隔，会生成 SRT。`line_ids` 可空，不用它时保留空数组 |
 | `scene` | 你 | 给人看的画面描述 |
 | `image_prompt` | 你 | 给 Tardis 的关键帧提示词 |
 | `motion_prompt` / `camera` | 你 | 给 MiniMax H3 的动作与镜头运动 |
@@ -111,3 +112,5 @@ projects/<slug>/
 H3 新版本记录 `model` 和 `duration_sec`。旧视频版本缺少这些字段时，剪辑清单继续按旧 Wan 时间规则展示，不重写历史版本。旧配置和旧项目缺少 `video.model` 时识别为 `wan2.2`，生成前按 [workflows.md](workflows.md) 迁移。
 
 歌曲版本可附 `prompt_id`、`run_log`（相对路径）、`sample_rate`、`channels`；视频版本也可附 `prompt_id` 和 `run_log`。运行记录不含原始提示词或凭据，资源是服务整机的采样最大值。视频切换保存 `video_history`，现有素材不重写。`wan2.2-5b` 原生片段时长为 `frames/fps`；完整流程与兼容规则见 [资源与时长优化](resource-and-duration.md)。
+
+`music/control.yaml` 是可选但推荐的歌曲控制卡，沿用 `comfyui-minimax-music` 的 `planned / measured / verified / pending` 状态。它不替代 `project.json` 或 `analysis/beats.json`：前者保留创作意图和交接字段，后者保存选定音频的实际节拍分析。换歌或换版本时，控制卡中的 `take_id`、`song_sha256` 和时间线状态必须同步更新。

@@ -63,7 +63,7 @@ description: 面向独立开发者的 12 个 AI Skill，从产品想法到产品
 - 入口：`skills/imagegen-tardis/SKILL.md`；首次使用时向用户索取密钥并保存到当前用户主目录下的 `~/.tardis-skill/imagegen-tardis/credentials.json`，后续直接读取该文件，并需要 Python `openai` 包
 
 ### 11. ComfyUI 音乐创作（MiniMax Music 3 / YuE2）
-分步确定风格、时长、人声、歌词与歌名，选择 MiniMax Music 3 或 YuE2，提供在线 ComfyUI 地址后通过 API 生成并在对话中交付无损 FLAC。也可只整理提示词，或向 MV 流程提供创作输入，避免重复生成。
+分步确定核心概念、情绪曲线、风格、人声、歌词与歌名，选择 MiniMax Music 3 或 YuE2，按创作控制卡留存歌曲元数据与版本状态，提供在线 ComfyUI 地址后通过 API 生成并在对话中交付无损 FLAC。也可只整理提示词，或向 MV 流程提供带时间线计划的创作输入，避免重复生成。
 - 入口：`skills/comfyui-minimax-music/SKILL.md`；附带两套 UI/API 工作流、参数映射、独立 Python 脚本与创作参考
 - Python 3.10+ 标准库即可执行；完整解码检查建议已有 ffmpeg；服务器需装好对应模型与节点
 
