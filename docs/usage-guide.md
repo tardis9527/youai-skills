@@ -387,17 +387,17 @@ done
 
 完整入口：[comfyui-minimax-music](../skills/comfyui-minimax-music/SKILL.md)。
 
-**独立创作**：先沟通用途、风格、人声、时长与完整歌词，确认歌名；再选择 MiniMax Music 3 或 YuE2，填写在线 ComfyUI 根地址。Skill 检查服务、节点、模型和最终参数后提交一版，持续查询、下载检查，并在对话中提供音频入口、无损 FLAC 原件和创作记录。默认 FLAC、沿用源采样率、随机 seed 并记录，不再逐项询问编码参数。
+**创作资料**：沟通用途、风格、人声、时长、歌词与歌名后，整理创作简报、控制卡和情绪曲线。未指定模型时分别输出 MiniMax Music 3 与 YuE2 两版；指定模型时只输出该版本。每版包含完整描述、歌词、参数、导出建议与手动填写步骤。
 
-**模型与工作流**：自带两种模型各自的 UI 工作流、API 工作流及映射，不需要普通用户另行准备 JSON。MiniMax 使用中文 Caption 三部分和独立 Lyrics；YuE2 使用独立 Style/Lyrics，默认 full 模式与 ABC 规划。关闭规划时脚本移除 ABC 生成依赖。不会因模型缺失自动切换；自定义工作流需同时提供匹配的 API 与映射覆盖文件。
+**模型区别**：MiniMax 的 Caption 分 Global Metadata、Vocal Details、Arrangement 三部分，Lyrics 独立；YuE2 使用自然 Style 与独立 Lyrics，建议 full 模式与开启 ABC 规划，不套 MiniMax 标识或完整标签表。纯音乐没有已核实的硬性无人声保证，生成后需要用户试听。
 
-**执行条件**：Python 3.10+，客户端仅用标准库；在线服务已安装对应节点和模型。地址经 `COMFYUI_URL`/`--url` 传入，Bearer 认证仅经 `COMFYUI_TOKEN` 环境变量，凭据不写入创作或运行记录。支持反向代理路径前缀；网页登录、签名平台 API 需另行适配。ffmpeg 用于全量解码检查，缺少时明确记录 PENDING，不宣称音频全部验证通过。
+**手动执行**：用户自行打开 ComfyUI，按模型粘贴文本、设置 max_duration、seed 策略与保存选项，再手动点击运行。本 Skill 不索取服务地址/认证、不连接服务、不提交或轮询任务、不下载生成结果。整理资料无需 Python 或 ffmpeg；用户自行准备 ComfyUI 的模型和节点。
 
-**故障恢复**：`scripts/music.py check/run/resume` 分别处理只读预检、单次提交与续查。超时不重复提交；提交结果不明时按 run_id 核查原任务；下载失败或解码失败重试原结果。目标时长与生成上限分开，是否收尾完整需要试听，不自动截短。
+**工作流与导出**：可选使用自带两份 UI 工作流手动导入，不提供 API 执行脚本与参数映射。默认导出建议为 MP3 320 kbps 固定码率、沿用源采样率、保留 FLAC 母版；用户已有选择优先。MP3 是有损分享格式，FLAC 是无损编码留存，不用提示词代替保存设置。步骤见 [手动填写说明](../skills/comfyui-minimax-music/references/manual-comfyui.md)。
 
-**落地与交付**：创作文本仍保存到 `output/music-prompts/日期-标题.md`，保持完整内容、模型、参数来源与版本。独立歌曲保存到 `output/music/日期-标题/运行ID/`，包含 `.flac`、实际工作流快照、`run.json` 和创作记录；不覆盖旧版。最终提供本地绝对路径文件链接，播放器不兼容 FLAC 时可另附明确标记的试听副本。完整命令、模板来源与状态规则见 [API 执行说明](../skills/comfyui-minimax-music/references/comfyui-api.md)。
+**落地与状态**：完整资料保存到 `output/music-prompts/日期-标题.md`，记录模型、参数来源与版本。回复给出可复制文本、填写说明与 Markdown 绝对路径；`ready` 只代表资料就绪，`execution=manual_by_user`、`audio_status=not_generated`，实际文件规格和试听保持 PENDING。用户后来返回音频或检测结果时再更新证据，不生成虚假的播放器或文件链接。
 
-**其他模式**：明确只要提示词时不询问地址、不执行生成；MV 协作时复用参数卡，只提供 Caption/Lyrics 和 Markdown，由 MV 脚本生成，不重复提交。两模式保留用户/调用方的导出策略。纯音乐没有硬性无人声保证，最终需要试听；不负责 ComfyUI 安装、模型下载或发布上传。
+**MV 协作**：沿用调用方已确认模型与参数，只交付对应创作输入和带稳定 ID 的时间线计划，生成、选版和音频分析由调用方负责。不负责 ComfyUI 安装、模型下载或发布上传。
 
 ### 12 歌曲 MV 创作流水线
 

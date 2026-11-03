@@ -63,9 +63,9 @@ description: 面向独立开发者的 12 个 AI Skill，从产品想法到产品
 - 入口：`skills/imagegen-tardis/SKILL.md`；首次使用时向用户索取密钥并保存到当前用户主目录下的 `~/.tardis-skill/imagegen-tardis/credentials.json`，后续直接读取该文件，并需要 Python `openai` 包
 
 ### 11. ComfyUI 音乐创作（MiniMax Music 3 / YuE2）
-分步确定核心概念、情绪曲线、风格、人声、歌词与歌名，选择 MiniMax Music 3 或 YuE2，按创作控制卡留存歌曲元数据与版本状态，提供在线 ComfyUI 地址后通过 API 生成并在对话中交付无损 FLAC。也可只整理提示词，或向 MV 流程提供带时间线计划的创作输入，避免重复生成。
-- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带两套 UI/API 工作流、参数映射、独立 Python 脚本与创作参考
-- Python 3.10+ 标准库即可执行；完整解码检查建议已有 ffmpeg；服务器需装好对应模型与节点
+分步确定核心概念、情绪曲线、风格、人声、歌词与歌名，分别按 MiniMax Music 3 的 Caption/Lyrics 和 YuE2 的 Style/Lyrics 整理完整创作资料、参数与导出建议，由用户自行在 ComfyUI 中手动执行。指定模型时只整理对应版本；也可向 MV 流程提供带时间线计划的创作输入。本 Skill 不连接服务或生成音频。
+- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带两套可手动导入的 UI 工作流、模型创作参考与填写说明
+- 整理提示词无需 Python、ffmpeg、服务地址或认证；用户自行准备 ComfyUI 模型与节点并执行
 
 ### 12. 歌曲 MV 创作流水线（MV Creator）
 从一句想法制作 30–60 秒竖屏剧情 MV：起草创意简报 → 原创歌曲（作词作曲与 AI 演唱，经 comfyui-minimax-music 预填参数卡一次确认）→ 节拍分析与分镜 → Tardis 生成角色与关键帧（一次确认）→ ComfyUI Wan2.2 图生视频 → 剪映素材包与 ffmpeg 粗剪。提示词由 Skill 起草，用户确认或修改。

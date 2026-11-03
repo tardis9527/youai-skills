@@ -1,8 +1,8 @@
 {
   "id": "8946c283-b05c-4bea-84dc-f0ea169054c6",
   "revision": 0,
-  "last_node_id": 40,
-  "last_link_id": 83,
+  "last_node_id": 41,
+  "last_link_id": 84,
   "nodes": [
     {
       "id": 10,
@@ -42,7 +42,8 @@
       "widgets_values_named": {
         "filename_prefix": "audio/YuE2",
         "format": "flac"
-      }
+      },
+      "title": "FLAC master"
     },
     {
       "id": 33,
@@ -92,7 +93,8 @@
           "name": "AUDIO",
           "type": "AUDIO",
           "links": [
-            63
+            63,
+            84
           ]
         }
       ],
@@ -143,13 +145,56 @@
       "title": "About: YuE2",
       "properties": {},
       "widgets_values": [
-        "YuE2 / FLAC\n\n对应 Text to Music (YuE2) 模板。风格和歌词同时送入 ABC 规划与音乐生成。默认 full 模式并开启 ABC 规划；关闭时 API 直接传空 abc。只保存生成原音频的 FLAC，不重采样。API 与参数映射见同目录文件，来源见 ../references/comfyui-api.md。"
+        "YuE2 / 手动创作\n\n将 YuE2 版 Style 与完整 Lyrics 分别粘贴到对应控件。建议 full 模式与开启 ABC 规划；已有选择优先。按资料设置 max_duration 和 seed 策略，由用户点击运行。Style/Lyrics 在 ABC 与 Music 节点保持一致。保存分支为 MP3 320k 与 FLAC 母版，不重采样。手动填写说明见 ../references/manual-comfyui.md；本 Skill 不连接服务或提交任务。"
       ],
       "widgets_values_named": {
         "text": "# YuE2: Text to Music\n\nYuE2 is a music generation model that creates complete songs with vocals and instrumental accompaniment from a **music style** and **lyrics**.\n\nWith ABC Planning enabled, YuE2 first creates an editable symbolic music plan (melody and optionally chords), then generates the final audio from that plan.\n\n## Model Link\n\n- [Hugging Face:Comfy-Org/YuE2](https://huggingface.co/Comfy-Org/YuE2)\n- [ModelScope:Comfy-Org/YuE2](https://modelscope.cn/models/Comfy-Org/YuE2)\n\n**checkpoints**\n\n- [yue2_3b_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/YuE2/resolve/main/checkpoints/yue2_3b_int8_convrot.safetensors) (3.69 GB)\n\n\n## Model Storage Location\n\n```\n📂 ComfyUI/\n├── 📂 models/\n│   └── 📂 checkpoints/\n│       └── yue2_3b_int8_convrot.safetensors\n```\n\n## How to Use\n\n1. Write a description of the music you want in **Style**.\n2. Enter your song lyrics in **Lyrics** using section tags such as `[Verse]` and `[Chorus]`.\n3. Choose a planning **Mode**.\n4. Set the **Max Duration**.\n5. Run the workflow to generate the song.\n\n## Writing the Style\n\nDescribe the main musical characteristics, such as:\n\n- **Genre:** pop, jazz, rock, electronic, folk\n- **Vocals:** warm female vocal, expressive male vocal, soft vocals\n- **Language:** English, Chinese, Japanese, etc.\n- **Tempo:** 90 BPM, slow, upbeat\n- **Instruments:** piano, electric guitar, bass, drums, synths\n\nExample:\n\n> English, warm female vocal, contemporary pop, 96 BPM, piano, rounded electric bass, restrained drums, clear diction\n\nKeep musical instructions in **Style** rather than in the lyrics.\n\n## Writing Lyrics\n\nUse section tags to describe the song structure:\n\n    [Verse]\n    Morning light across the window\n    City waking down below\n\n    [Chorus]\n    Run with me into the sunlight\n    Leave the shadows far behind\n\nYou can structure the song with sections such as:\n\n`[Verse]` · `[Chorus]` · `[Bridge]` · `[Outro]`\n\nPut only the words intended to be sung in the lyrics field.\n\n## ABC Planning\n\n**Full**\nCreates a symbolic plan with **melody and chords** before generating the song. Recommended for general text-to-music generation.\n\n**Melody**\nCreates a **melody-only** plan and allows the accompaniment to be generated more freely.\n\nDisable **ABC Planning** to generate music directly from Style and Lyrics without creating a symbolic plan.\n\n## Max Duration\n\nSets the **maximum** duration of the generated song in seconds.\n\nThe song may finish earlier depending on the generated musical structure and lyrics.\n\n## Prompt Guide\n\nFor better results, describe the musical intent clearly and keep Style and Lyrics separate:\n\n**Style**\n`Language + Genre + Vocal Character + Tempo + Instruments + Musical Characteristics`\n\n**Lyrics**\nUse section tags and provide only the words that should be sung.\n\n## Learn More\n\n- [YuE2 Generation Guide](https://github.com/multimodal-art-projection/YuE/blob/main/docs/generation.md)\n- [YuE2 Music Skill](https://github.com/multimodal-art-projection/YuE/blob/main/skills/yue2-music/SKILL.md)\n- [Generation & Covers Reference](https://github.com/multimodal-art-projection/YuE/blob/main/skills/yue2-music/references/generation-and-covers.md)\n\n## Report Issue\n\nNote: Please update ComfyUI first ([guide](https://docs.comfy.org/installation/update_comfyui)) and prepare required models. Desktop/Cloud updates follow stable releases, so some nightly-supported models may not be available yet.\n\n- Cannot run / runtime errors: [ComfyUI/issues](https://github.com/comfyanonymous/ComfyUI/issues)\n- UI / frontend issues: [ComfyUI_frontend/issues](https://github.com/Comfy-Org/ComfyUI_frontend/issues)\n- Workflow issues: [workflow_templates/issues](https://github.com/Comfy-Org/workflow_templates/issues)\n"
       },
       "color": "#222",
       "bgcolor": "#000"
+    },
+    {
+      "id": 41,
+      "type": "SaveAudioAdvanced",
+      "pos": [
+        1876,
+        -40
+      ],
+      "size": [
+        850,
+        140
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 84
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": []
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveAudioAdvanced"
+      },
+      "widgets_values": [
+        "audio/YuE2",
+        "mp3",
+        "320k"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "audio/YuE2",
+        "format": "mp3",
+        "format.quality": "320k"
+      },
+      "title": "MP3 320 kbps"
     }
   ],
   "links": [
@@ -158,6 +203,14 @@
       33,
       0,
       10,
+      0,
+      "AUDIO"
+    ],
+    [
+      84,
+      33,
+      0,
+      41,
       0,
       "AUDIO"
     ]

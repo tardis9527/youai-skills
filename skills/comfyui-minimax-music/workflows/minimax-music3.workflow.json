@@ -1,8 +1,8 @@
 {
   "id": "08882d3e-437d-43da-b498-083de04a60a6",
   "revision": 0,
-  "last_node_id": 43,
-  "last_link_id": 63,
+  "last_node_id": 44,
+  "last_link_id": 64,
   "nodes": [
     {
       "id": 35,
@@ -39,7 +39,8 @@
       "widgets_values": [
         "audio/music_minimax3",
         "flac"
-      ]
+      ],
+      "title": "FLAC master"
     },
     {
       "id": 37,
@@ -71,7 +72,8 @@
           "name": "AUDIO",
           "type": "AUDIO",
           "links": [
-            42
+            42,
+            64
           ]
         }
       ],
@@ -110,7 +112,7 @@
       "title": "使用说明｜MiniMax Music 3",
       "properties": {},
       "widgets_values": [
-        "MiniMax Music 3 / FLAC\n\n用于独立音乐创作。设置 Caption、完整 Lyrics、生成上限和 seed，直接将生成音频保存为 FLAC。上限不保证准确片长，成品需试听收尾。自动调用使用同目录 minimax-music3.api.json；界面文件不直接提交 API。模型来源与核实记录见 ../references/comfyui-api.md。"
+        "MiniMax Music 3 / 手动创作\n\n将 MiniMax 版 Caption 和完整 Lyrics 分别粘贴到对应控件，按资料设置 max_duration 与 seed 策略，其他参数沿用工作流。由用户点击运行。保存分支为 MP3 320k 与 FLAC 母版，不重采样。上限不保证精确片长，生成后试听末句与尾奏。手动填写说明见 ../references/manual-comfyui.md；本 Skill 不连接服务或提交任务。"
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -133,11 +135,55 @@
       "outputs": [],
       "properties": {},
       "widgets_values": [
-        "MiniMax Music 3 / FLAC\n\n用于独立音乐创作。设置 Caption、完整 Lyrics、生成上限和 seed，直接将生成音频保存为 FLAC。上限不保证准确片长，成品需试听收尾。自动调用使用同目录 minimax-music3.api.json；界面文件不直接提交 API。模型来源与核实记录见 ../references/comfyui-api.md。"
+        "MiniMax Music 3 / 手动创作\n\n将 MiniMax 版 Caption 和完整 Lyrics 分别粘贴到对应控件，按资料设置 max_duration 与 seed 策略，其他参数沿用工作流。由用户点击运行。保存分支为 MP3 320k 与 FLAC 母版，不重采样。上限不保证精确片长，生成后试听末句与尾奏。手动填写说明见 ../references/manual-comfyui.md；本 Skill 不连接服务或提交任务。"
       ],
       "color": "#222",
       "bgcolor": "#000",
       "title": "模型准备与排错｜MiniMax Music 3"
+    },
+    {
+      "id": 44,
+      "type": "SaveAudioAdvanced",
+      "pos": [
+        2150,
+        870
+      ],
+      "size": [
+        750,
+        160
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 64
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.31.0"
+      },
+      "widgets_values": [
+        "audio/music_minimax3",
+        "mp3",
+        "320k"
+      ],
+      "title": "MP3 320 kbps",
+      "widgets_values_named": {
+        "filename_prefix": "audio/music_minimax3",
+        "format": "mp3",
+        "format.quality": "320k"
+      }
     }
   ],
   "links": [
@@ -146,6 +192,14 @@
       37,
       0,
       35,
+      0,
+      "AUDIO"
+    ],
+    [
+      64,
+      37,
+      0,
+      44,
       0,
       "AUDIO"
     ]
