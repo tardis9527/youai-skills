@@ -15,17 +15,20 @@
 
 ## 内容规范
 
-推荐顺序：元数据 → 作品名称 → 共用创作简报/控制卡/情绪曲线/歌词时间线计划 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ MV 交接（如适用）→ 自查状态 → 版本记录。指定单模型时仅保留对应章节。
+推荐顺序：元数据 → 作品名称 → 意图与成功标准 → 共用词曲蓝图/控制卡/情绪曲线/段落与歌词时间线 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ 平台策略/反馈记录/MV 交接（按需）→ 自查状态 → 版本记录。指定单模型只保留该章；局部任务不强加完整结构。
 
 - YAML front matter 至少包含 `title`、`type`（`song` 或 `instrumental`）、`model` 或 `models`、`execution`、`audio_status`、`status`、`version`、`created_at`、`updated_at`、`title_source`。日期按当前用户日期填写；修订保留创建日期，更新修改日期。字符串正确引用/转义，尤其标题中的冒号、引号、`#` 和换行；有 YAML 序列化工具时优先使用。
-- 创作简报记录用途、目标时长、情绪、两种文本的语言、歌词来源、人声/主旋律、乐器与结构、保留和避免项。保留用户原词的要求也写入，纯音乐将歌词语言/来源记为“不适用”。
+- 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、两种文本语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词项记“不适用”。
+- 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录 section_id、功能、前景/表演、声部事件、衔接与收尾；有特殊人声时另列 vocal_events 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
 - 创作控制卡记录 `work_id`、`version`、`take_id`、目标时长与生成上限，以及风格、人声、节奏、和声四组控制项。控制项和事件必须标明 `planned`、`measured`、`verified` 或 `pending`，不能用预期值冒充实际音频测量。
-- 情绪曲线按约 15 秒粒度记录时间、情绪、能量（1–5）和叙事功能；目标时长变更后重新采样，不把曲线写成精确乐谱。
-- 歌词时间线计划为每句设置稳定的 `section_id` / `line_id`、歌词原文、预计作用和可为空的 `start_sec`、`end_sec`、`beat_anchor`。生成前只能写计划值；实际时间等待音频分析与试听校对。
+- 短曲情绪曲线可按约 15 秒粒度记录时间、故事情绪、表演、能量（1–5）和叙事功能，长曲按段落与关键事件补点；目标变化后调整。注明 planned，不把曲线写成精确乐谱或成品切点。
+- 歌词时间线为每句设置稳定 section_id / line_id、原文与作用；预计位置放 planned_position，未测的实际 start_sec、end_sec、beat_anchor 为 null。纯音乐记录器乐事件；不为了编号改写原文或重排已经稳定的 ID。
 - MiniMax Caption/Lyrics、YuE2 Style/Lyrics 分别放完整 `text` 代码块，与本轮交付逐字一致。双模型即使歌词相同也各给完整歌词，不用“同上”“略”或省略号代替。MiniMax 保留三部分标识，YuE2 自然描述 Style，各用本模型的标签。YuE2 纯音乐 Lyrics 留空时在代码块外说明“保持为空”，不把说明粘贴进输入。
 - 生成参数记录所选策略/数值、来源与真实控件的映射状态，导出表单独记录格式、质量与采样率。每项说明用户已选、明确沿用、Skill 默认建议或委托后推荐；默认 MP3 320k + FLAC 母版、源采样率与沿用工作流 seed 不必逐项提问。关键创作选择尚未解决时为 `draft`；用户界面尚未核对可标“待映射”，实际音频值标“未生成/未检测”，不阻塞资料 ready。
 - 导出表区分目标、来源、实测结果与 `PASS` / `FAIL` / `PENDING`；沿用采样率时不编造 Hz。平台未指定时写“不适用”，不额外要求平台检查。只有实际完成的自查才能勾选。
 - 只保存创作所需内容，不复制 API Key、令牌、凭据、签名 URL 或不必要的个人信息。
+
+平台章按 [platform-patterns.md](platform-patterns.md) 记录来源/日期/窗口、观察、策略、适用限制和待验证结果，不把营销数据粘贴进模型描述。反馈章按 [feedback-learning.md](feedback-learning.md) 记录版本、证据、主维度、必要联动、结果与项目学习路径；没有真实反馈时省略，不初始化虚假档案。长期偏好只保存用户明确未来适用的选择。
 
 ## 创作控制卡与时间线计划模板
 
@@ -39,6 +42,20 @@ model: "MiniMax Music 3"
 target_duration_sec: 60
 max_duration_sec: 90
 metadata_status: planned
+intent:
+  use_case: ""
+  music_role: ""
+  audience: ""
+  desired_response: ""
+  success_criteria: []
+  source: recommended
+blueprint:
+  route: ""
+  premise: ""
+  perspective: ""
+  lyric_hook: null
+  melody_intent: ""
+  status: planned
 style:
   genre: ""
   era: ""
@@ -55,12 +72,16 @@ rhythm:
 harmony:
   progression: ""
   lift_point: null
+structure:
+  - {section_id: "V1", function: "", foreground: "", events: [], transition: ""}
+vocal_events: []
+timestamp_status: planned
 emotion_curve:
   - {at_sec: 0, emotion: "", energy: 1, function: ""}
 lyrics_timeline:
   status: planned
   lines:
-    - {line_id: "V1-01", section: "Verse", text: "", start_sec: null, end_sec: null, beat_anchor: null}
+    - {line_id: "V1-01", section_id: "V1", section: "Verse", text: "", planned_position: "第一主歌", start_sec: null, end_sec: null, beat_anchor: null}
 visual_dna:
   status: mv_pending
   palette: []
@@ -100,6 +121,21 @@ title_source: "用户从候选中选定"
 | 听感、人声与乐器 | 温暖、自然贴近，轻柔女声，木吉他为主 | 用户已选；少量钢琴低音为编曲建议 |
 | 结构 | 前奏 → 主歌 → 副歌 → 尾奏 | 按用户目标长度组织 |
 | 必须保留 / 避免 | 保留短曲的完整收尾；全曲无鼓或打击乐 | 收尾为编曲建议；无鼓为用户要求 |
+
+## 意图与词曲蓝图
+
+音乐角色为个人试听的歌曲主体，目标是把下班疲惫转为被接纳的安定感；成功标准是口吻贴近、核心句可辨、末句与收尾完整。以上为根据已知主题作出的编曲推荐，不是用户已经试听的结论。
+
+选择故事先行，以钥匙、门外与灯光作为创作设定；核心句“等我回来”由 Agent 原创。主歌窄音区与短句，副歌舒展但不增加节奏密度，指弹动机在开头和结尾呼应。无特殊人声事件。
+
+| section_id | 功能 | 前景与声部事件 | 衔接 |
+| --- | --- | --- | --- |
+| I1 | 建立亲近感 | 木吉他指弹动机 | 保留指弹进入主歌 |
+| V1 | 叙述疲惫与回家动作 | 女声在前景，吉他留白 | 展开和弦进入副歌 |
+| C1 | 表达被接纳 | 主唱舒展，加入少量钢琴低音 | 减层回到指弹 |
+| O1 | 安定收束 | 器乐动机与最终和弦 | 留自然尾音 |
+
+所有段落位置均 planned，实际时间为空；完整控制卡采用上方模板，时间线行号不粘贴到 Lyrics。
 
 ## Caption
 

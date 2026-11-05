@@ -18,6 +18,8 @@
 
 ## MiniMax Music 3
 
+粘贴前先对照资料中的意图与段落表：人声、禁鼓/无人声、原词与结尾要求要与输入一致。rap/旁白的表演和衔接位于描述中，事件卡、角色标题、行号和研究数据不一起复制；没有已核实标签时不自行补 `[Rap]` 等标记。
+
 1. 用户打开自己的 MiniMax Music 3 工作流，或手动导入上表模板，确认模型加载器已选对应模型。
 2. 将本次完整 Caption 粘贴到 Caption / caption 控件。保留 `Global Metadata:`、`Vocal Details:`、`Arrangement:` 三部分，不粘贴标题、参数表或控制卡。
 3. 将 MiniMax 版本的完整 Lyrics 粘贴到 Lyrics / lyrics 控件。歌词行号只用于资料追踪，不粘贴进模型；纯音乐按 [workflow-contract.md](workflow-contract.md) 的纯标签方案填写。
@@ -50,3 +52,5 @@
 | 采样率 | 默认沿用源音频 | 未检测前不编造 Hz，保存节点没有独立采样率控件 |
 
 导出解释见 [audio-quality.md](audio-quality.md)。手动执行后，用户若希望继续修改，只需提供听感问题或实际参数；无需提供服务地址或凭据。
+
+反馈时优先判断表达目标是否正确，再听核心句/动机、特殊人声进入退出、段落衔接、末句与尾奏。用户口述、实际文件检测与人工试听分别记录，按 [feedback-learning.md](feedback-learning.md) 形成有来源的版本修改；用户未返回证据时不把检查标为通过。

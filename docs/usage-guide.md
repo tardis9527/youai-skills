@@ -387,7 +387,13 @@ done
 
 完整入口：[tardis-music](../skills/tardis-music/SKILL.md)。
 
-**创作资料**：沟通用途、风格、人声、时长、歌词与歌名后，整理创作简报、控制卡和情绪曲线。未指定模型时分别输出 MiniMax Music 3 与 YuE2 两版；指定模型时只输出该版本。每版包含完整描述、歌词、参数、导出建议与手动填写步骤。
+**创作决策**：先提取用途与音乐角色、受众、表达目标、情绪起点/终点、歌词素材与修改权限，每轮只补 1–2 个关键缺口；需求充分跳过采访。按故事、歌词、旋律/律动、Hook 或场景选择路径，再设计核心句、旋律意图、主副歌关系、声部职责、段落变化与收尾。具体规则见 [意图采访](../skills/tardis-music/references/creative-intent.md) 和 [词曲设计](../skills/tardis-music/references/composition-guide.md)。
+
+**特殊人声**：rap、旁白、念白、和声等先确定叙事功能，再明确内容授权、相对位置、表演、伴奏留白与衔接；不默认在中间加 rap，不往纯音乐加入人声，也不编造模型标签。见 [人声设计](../skills/tardis-music/references/vocal-performance.md)。
+
+**创作资料**：保存意图与成功标准、词曲蓝图、控制卡、段落表和情绪曲线。未指定模型时分别输出 MiniMax Music 3 与 YuE2 两版；指定模型仅交该版。每版包含完整描述、歌词、参数、导出建议与手动步骤；局部任务不强制完整双模型资料。
+
+**平台与学习**：面向公开传播时按需参考 [抖音/汽水音乐研究](../skills/tardis-music/references/platform-patterns.md)，保留日期、来源、指标口径和限制，将辨识点、情绪、使用场景转成创作假设，不承诺爆款。实际试听后按 [反馈学习](../skills/tardis-music/references/feedback-learning.md) 记录主问题、版本变化与结果；默认在项目 `output/music-prompts/_learning/` 保存，不写安装目录。只有明确未来适用的选择才进入长期偏好，单首作品选择不会自动推广，未试听不记成功。
 
 **模型区别**：MiniMax 的 Caption 分 Global Metadata、Vocal Details、Arrangement 三部分，Lyrics 独立；YuE2 使用自然 Style 与独立 Lyrics，建议 full 模式与开启 ABC 规划，不套 MiniMax 标识或完整标签表。纯音乐没有已核实的硬性无人声保证，生成后需要用户试听。
 

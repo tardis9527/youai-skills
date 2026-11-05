@@ -11,6 +11,8 @@
 
 ## 手动填写与节点映射
 
+词曲蓝图中的特殊表演按 [vocal-performance.md](vocal-performance.md) 写入自然 Style，明确相对段落、叙事目的、表演、伴奏与衔接；获授权台词才放 Lyrics。没有本模型依据时不添加 `[Rap]`、`[Spoken]`、`[Whisper]`，也不把 MiniMax 的 `[Bridge]` 等完整清单照搬。无法确定映射时保留计划并注明待试听，不保证精确时间或逐句切换。全局约束、局部事件和 Lyrics 结构保持一致。
+
 | 字段 | 工作流行为 |
 | --- | --- |
 | checkpoint | `CheckpointLoaderSimple.ckpt_name=yue2_3b_int8_convrot.safetensors`；由用户确认界面中已选对应 checkpoint；名称不符时标注待核对，不自动切换或下载 |
