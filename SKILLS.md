@@ -1,6 +1,6 @@
 ---
 name: youai-skills
-description: 面向独立开发者的 12 个 AI Skill，从产品想法到产品简报、PRD 和原型方案，并覆盖项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑、音乐创作与歌曲 MV 制作。
+description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品简报、PRD 和原型方案，并覆盖项目分析、市场调研、UI/UX、融资材料、内容写作、图片生成编辑与音乐创作。
 ---
 
 # YouAI Skills — 产品开发 AI 技能包
@@ -11,7 +11,7 @@ description: 面向独立开发者的 12 个 AI Skill，从产品想法到产品
 
 首次使用建议从 `product-discovery → prd-generation → prototype-design` 开始。查看 [TeamLog 体验教程](./examples/teamlog-walkthrough.md) 获取可复制的输入和人工检查点；现有 TeamLog 产物是虚构产品的精简结构样例。
 
-## 包含 12 个 Skill
+## 包含 11 个 Skill
 
 ### 1. 项目理解与分析（Project Analysis）
 系统性分析代码库，输出结构化项目理解报告，涵盖技术架构、代码质量、改进建议。
@@ -66,11 +66,6 @@ description: 面向独立开发者的 12 个 AI Skill，从产品想法到产品
 分步确定核心概念、情绪曲线、风格、人声、歌词与歌名，分别按 MiniMax Music 3 的 Caption/Lyrics 和 YuE2 的 Style/Lyrics 整理完整创作资料、参数与导出建议，由用户自行在 ComfyUI 中手动执行。指定模型时只整理对应版本；也可向 MV 流程提供带时间线计划的创作输入。本 Skill 不连接服务或生成音频。
 - 入口：`skills/comfyui-minimax-music/SKILL.md`；附带两套可手动导入的 UI 工作流、模型创作参考与填写说明
 - 整理提示词无需 Python、ffmpeg、服务地址或认证；用户自行准备 ComfyUI 模型与节点并执行
-
-### 12. 歌曲 MV 创作流水线（MV Creator）
-从一句想法制作 30–60 秒竖屏剧情 MV：起草创意简报 → 原创歌曲（作词作曲与 AI 演唱，经 comfyui-minimax-music 预填参数卡一次确认）→ 节拍分析与分镜 → Tardis 生成角色与关键帧（一次确认）→ ComfyUI Wan2.2 图生视频 → 剪映素材包与 ffmpeg 粗剪。提示词由 Skill 起草，用户确认或修改。
-- 入口：`skills/mv-creator/SKILL.md`；附带 `scripts/mv.py`（ComfyUI API 调用、节拍分析、关键帧裁切、打包与粗剪）、`workflows/` 参数映射和 `references/` 环境、工作流、分镜与交付说明
-- 依赖 imagegen-tardis 与 comfyui-minimax-music；需要 Python 3.10+（`openai`、`pillow`、`librosa`、`soundfile`）、可访问的 ComfyUI 和用户从官方模板导出的 API 工作流，粗剪需要 ffmpeg
 
 ## 使用方式
 

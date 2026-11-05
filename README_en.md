@@ -66,7 +66,7 @@ For other tools, CLI commands, or installation into a project directory, see the
 
 ## All skills
 
-The twelve skills work independently or use previous documents as input. Start with the three core skills above.
+The eleven skills work independently or use previous documents as input. Start with the three core skills above.
 
 | Skill | Use case | Main output |
 |---|---|---|
@@ -81,7 +81,6 @@ The twelve skills work independently or use previous documents as input. Start w
 | [moments-writer](./skills/09_moments-writer.md) | Write WeChat Moments captions | Caption candidates, image concepts, and local learning records |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image files, previews, and download links |
 | [comfyui-minimax-music](./skills/comfyui-minimax-music/SKILL.md) | Prepare song or instrumental inputs for MiniMax Music 3 and YuE2 | Model-specific prompts, complete lyrics, parameter and export recommendations, manual ComfyUI instructions, production cards, and MV timeline handoff |
-| [mv-creator](./skills/mv-creator/SKILL.md) | Make an original song MV from scratch: write and sing the song → beat-based storyboard → keyframes → ComfyUI image-to-video | Original song, storyboard, characters and keyframes, video clips, CapCut asset pack and rough cut |
 
 Other useful combinations:
 
@@ -89,7 +88,6 @@ Other useful combinations:
 - **Take over a project:** Project analysis → PRD; add UI/UX redesign when needed.
 - **Prepare a pitch:** Product brief + research / PRD → investor business plan.
 - **Create content:** Use the writing skills independently and add image generation as needed.
-- **Song MV:** mv-creator chains MiniMax music creation and Tardis image generation, then calls ComfyUI to generate video.
 
 ## Why use this workflow
 
