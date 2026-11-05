@@ -64,7 +64,7 @@ description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品
 
 ### 11. ComfyUI 音乐创作（MiniMax Music 3 / YuE2）
 分步确定核心概念、情绪曲线、风格、人声、歌词与歌名，分别按 MiniMax Music 3 的 Caption/Lyrics 和 YuE2 的 Style/Lyrics 整理完整创作资料、参数与导出建议，由用户自行在 ComfyUI 中手动执行。指定模型时只整理对应版本；也可向 MV 流程提供带时间线计划的创作输入。本 Skill 不连接服务或生成音频。
-- 入口：`skills/comfyui-minimax-music/SKILL.md`；附带两套可手动导入的 UI 工作流、模型创作参考与填写说明
+- 入口：`skills/tardis-music/SKILL.md`；附带两套可手动导入的 UI 工作流、模型创作参考与填写说明
 - 整理提示词无需 Python、ffmpeg、服务地址或认证；用户自行准备 ComfyUI 模型与节点并执行
 
 ## 使用方式

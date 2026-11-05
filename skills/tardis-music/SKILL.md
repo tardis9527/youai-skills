@@ -1,11 +1,11 @@
 ---
-name: comfyui-minimax-music
+name: tardis-music
 description: 按 MiniMax Music 3 和 YuE2 的模型要求整理音乐描述、歌词、生成参数与导出设置，交付可复制到 ComfyUI 手动执行的创作资料和 Markdown；也支持按时间线整理创作输入。不连接 ComfyUI、不提交生成任务，不负责安装、模型下载或发布。
 ---
 
 # ComfyUI 音乐创作提示词
 
-像音乐制作搭档一样，把灵感整理成可手动使用的创作资料。默认中文沟通，音乐描述正文默认中文，歌词保留用户选择的语言。沿用目录名 `comfyui-minimax-music`，支持 MiniMax Music 3 和 YuE2。
+像音乐制作搭档一样，把灵感整理成可手动使用的创作资料。默认中文沟通，音乐描述正文默认中文，歌词保留用户选择的语言。沿用目录名 `tardis-music`，支持 MiniMax Music 3 和 YuE2。
 
 ## 工作范围与交付方式
 

@@ -385,7 +385,7 @@ done
 
 ### 11 ComfyUI 音乐创作
 
-完整入口：[comfyui-minimax-music](../skills/comfyui-minimax-music/SKILL.md)。
+完整入口：[tardis-music](../skills/tardis-music/SKILL.md)。
 
 **创作资料**：沟通用途、风格、人声、时长、歌词与歌名后，整理创作简报、控制卡和情绪曲线。未指定模型时分别输出 MiniMax Music 3 与 YuE2 两版；指定模型时只输出该版本。每版包含完整描述、歌词、参数、导出建议与手动填写步骤。
 
@@ -393,7 +393,7 @@ done
 
 **手动执行**：用户自行打开 ComfyUI，按模型粘贴文本、设置 max_duration、seed 策略与保存选项，再手动点击运行。本 Skill 不索取服务地址/认证、不连接服务、不提交或轮询任务、不下载生成结果。整理资料无需 Python 或 ffmpeg；用户自行准备 ComfyUI 的模型和节点。
 
-**工作流与导出**：可选使用自带两份 UI 工作流手动导入，不提供 API 执行脚本与参数映射。默认导出建议为 MP3 320 kbps 固定码率、沿用源采样率、保留 FLAC 母版；用户已有选择优先。MP3 是有损分享格式，FLAC 是无损编码留存，不用提示词代替保存设置。步骤见 [手动填写说明](../skills/comfyui-minimax-music/references/manual-comfyui.md)。
+**工作流与导出**：可选使用自带两份 UI 工作流手动导入，不提供 API 执行脚本与参数映射。默认导出建议为 MP3 320 kbps 固定码率、沿用源采样率、保留 FLAC 母版；用户已有选择优先。MP3 是有损分享格式，FLAC 是无损编码留存，不用提示词代替保存设置。步骤见 [手动填写说明](../skills/tardis-music/references/manual-comfyui.md)。
 
 **落地与状态**：完整资料保存到 `output/music-prompts/日期-标题.md`，记录模型、参数来源与版本。回复给出可复制文本、填写说明与 Markdown 绝对路径；`ready` 只代表资料就绪，`execution=manual_by_user`、`audio_status=not_generated`，实际文件规格和试听保持 PENDING。用户后来返回音频或检测结果时再更新证据，不生成虚假的播放器或文件链接。
 
