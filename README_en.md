@@ -80,7 +80,7 @@ The eleven skills work independently or use previous documents as input. Start w
 | [wechat-writer](./skills/08_wechat-writer.md) | Write WeChat articles and develop a personal voice | Article, image prompts, and local learning records |
 | [moments-writer](./skills/09_moments-writer.md) | Write WeChat Moments captions | Caption candidates, image concepts, and local learning records |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | Generate or edit images through a custom provider | Image files, previews, and download links |
-| [tardis-music](./skills/tardis-music/SKILL.md) | Develop creative intent, lyrics, musical structure, and MiniMax Music 3 / YuE2 inputs | Complete prompts and lyrics, vocal-event design, platform research, project feedback learning, manual settings, and MV timeline handoff |
+| [tardis-music](./skills/tardis-music/SKILL.md) | Explore musical intent at three paces, with scoped artist-persona memory | Music Brief, lyrics and model prompts, platform excerpt design, quality review, work retrospectives, and a local experience library |
 
 Other useful combinations:
 

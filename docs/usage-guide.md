@@ -387,13 +387,19 @@ done
 
 完整入口：[tardis-music](../skills/tardis-music/SKILL.md)。
 
-**创作决策**：先提取用途与音乐角色、受众、表达目标、情绪起点/终点、歌词素材与修改权限，每轮只补 1–2 个关键缺口；需求充分跳过采访。按故事、歌词、旋律/律动、Hook 或场景选择路径，再设计核心句、旋律意图、主副歌关系、声部职责、段落变化与收尾。具体规则见 [意图采访](../skills/tardis-music/references/creative-intent.md) 和 [词曲设计](../skills/tardis-music/references/composition-guide.md)。
+**三档渐进引导**：自动选择 Express（快速/信息充分）、Standard（默认协作）或 Deep（IP/主打等深度探索），可随时说“加速/展开”。先明确“谁对谁说什么、希望听后发生什么”，每轮只补 1–2 个关键缺口；充分或已授权就直接创作。通过 Music Brief → 核心句/Hook 与听感 → 词曲与段落 → 模型交付逐步收敛，不按轮次凑问题。见 [渐进引导](../skills/tardis-music/references/discovery-flow.md)。
 
-**特殊人声**：rap、旁白、念白、和声等先确定叙事功能，再明确内容授权、相对位置、表演、伴奏留白与衔接；不默认在中间加 rap，不往纯音乐加入人声，也不编造模型标签。见 [人声设计](../skills/tardis-music/references/vocal-performance.md)。
+**词曲质量**：按故事、原词、旋律/律动、Hook 或场景选择入口，设计重音、气口、动机复现、主副歌关系、声部职责与收尾；明确人设、叙述者和听众的区别。交稿前按 [质量审查](../skills/tardis-music/references/quality-review.md) 检查表达、口吻、辨识、可唱性、全曲发展及场景适配；文本通过不能代替真实听感。
+
+**特殊人声**：完整有人声歌曲在展开前，合并到方向确认中问一次是否需要 Spoken Word（旁白念白）、Rap Verse（说唱段）、Ad-lib（即兴衬词），可多选或都不要；已明确、明确委托直接出稿、纯器乐和局部任务按规则跳过。选中后写清位置、表演、实际文本/即兴范围、伴奏变化和衔接；固定台词/衬词要实际进入 Lyrics，不能以选择元素代替改词授权。官方示例扩展标签可作实验，不等于通用且稳定的控制 token。见 [人声设计](../skills/tardis-music/references/vocal-performance.md)。
+
+**无歌词与无人声**：先区分纯器乐和允许无词人声。严格器乐明确主奏、声部、密度、动态、发展与结尾，排除歌唱/哼唱/念白/人声采样。MiniMax 纯标签或空词、YuE2 空词都需核对整图输入/导出兼容；自定义歌词导出器可能拒绝空词/纯标签，不能填假歌词绕过。YuE2 作者更明确的器乐路线涉及实际 Vocal→Ins 乐谱转换，开启 ABC 或 mode=melody 不等于去人声；仍需完整试听验收。见 [器乐设计](../skills/tardis-music/references/instrumental-design.md)。
 
 **创作资料**：保存意图与成功标准、词曲蓝图、控制卡、段落表和情绪曲线。未指定模型时分别输出 MiniMax Music 3 与 YuE2 两版；指定模型仅交该版。每版包含完整描述、歌词、参数、导出建议与手动步骤；局部任务不强制完整双模型资料。
 
-**平台与学习**：面向公开传播时按需参考 [抖音/汽水音乐研究](../skills/tardis-music/references/platform-patterns.md)，保留日期、来源、指标口径和限制，将辨识点、情绪、使用场景转成创作假设，不承诺爆款。实际试听后按 [反馈学习](../skills/tardis-music/references/feedback-learning.md) 记录主问题、版本变化与结果；默认在项目 `output/music-prompts/_learning/` 保存，不写安装目录。只有明确未来适用的选择才进入长期偏好，单首作品选择不会自动推广，未试听不记成功。
+**平台设计**：面向公开传播时按需参考 [抖音/汽水音乐研究](../skills/tardis-music/references/platform-patterns.md)，保留日期、来源、指标口径和限制。分开设计片段辨识/使用入口和全曲发展/重听理由；“爆款特征”是有待验证的创作假设，不承诺流量，也不将 TikTok 数据直接外推到国内平台。
+
+**人设与自进化**：开工读取相关人设/场景记录；每次完整交稿就保存作品决策、用户修正与待验证点，有试听或发布反馈再补结果。按 [记忆协议](../skills/tardis-music/references/feedback-learning.md) 分 persona、preference、work、lesson 四类，默认保存到项目 `output/music-prompts/_learning/knowledge.json`；单首选择不晋升长期偏好，候选经验需积累真实证据，失败和反例也保留。提供 Python 标准库工具做检索、原子写入、替代与遗忘；不写安装目录，旧 profile.yaml/experiences.md 继续兼容读取。用户要求不保存时只在对话内使用；无 Python 可用文件工具维护相同 JSON。
 
 **模型区别**：MiniMax 的 Caption 分 Global Metadata、Vocal Details、Arrangement 三部分，Lyrics 独立；YuE2 使用自然 Style 与独立 Lyrics，建议 full 模式与开启 ABC 规划，不套 MiniMax 标识或完整标签表。纯音乐没有已核实的硬性无人声保证，生成后需要用户试听。
 

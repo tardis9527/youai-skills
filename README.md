@@ -78,7 +78,7 @@ $product-discovery 我想做一个团队日报助手。请按 Express 模式梳�
 | [wechat-writer](./skills/08_wechat-writer.md) | 公众号写作与个人文风积累 | 定稿、配图提示词与本地学习记录 |
 | [moments-writer](./skills/09_moments-writer.md) | 朋友圈文案与风格积累 | 候选文案、配图方案与本地学习记录 |
 | [imagegen-tardis](./skills/imagegen-tardis/SKILL.md) | 通过自定义供应商生成或编辑图片 | 图片文件、预览与下载链接 |
-| [tardis-music](./skills/tardis-music/SKILL.md) | 从创作意图、词曲与段落设计到 MiniMax Music 3 / YuE2 输入 | 完整提示词与歌词、特殊人声设计、平台研究、项目反馈学习、手动参数与 MV 时间线交接 |
+| [tardis-music](./skills/tardis-music/SKILL.md) | 三档渐进探索创作意图，带着音乐人设记忆设计词曲 | Music Brief、完整歌词与双模型提示词、平台片段设计、质量审查、作品复盘与本地经验库 |
 
 其他常用组合：
 

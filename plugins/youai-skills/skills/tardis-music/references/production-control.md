@@ -38,7 +38,9 @@
 3. 节奏：预计 BPM、拍号感、底鼓/重拍作用、段落能量；
 4. 和声与结构：调性感受、和弦走向、升调或副歌打开方式、段落顺序。
 
-完整创作保存控制卡，含 `work_id`、`version`、`model`、目标/上限、`intent`、`blueprint`、四组控制、`structure`、`emotion_curve` 和 `timestamp_status`。记录主要 Hook 与段落功能；特殊人声使用 [vocal-performance.md](vocal-performance.md) 的 `vocal_events`，没有就留空。seed 策略记入参数表，实际 seed/工作流版本由用户执行后补充。两模型共用意图与原词，模型控制和上限分别记录；未指定字段可为空，不为了填表编造值。
+完整创作保存控制卡，含 `work_id`、`version`、`model`、目标/上限、`intent`、`blueprint`、四组控制、`structure`、`emotion_curve` 和 `timestamp_status`。记录主要 Hook 与段落功能；三类人声选择另存 `vocal_choice`，选中的事件使用 [vocal-performance.md](vocal-performance.md) 的 `vocal_events`，没有则留空，但空数组不代表用户已拒绝。固定文本与自由范围、表演位置和实际测量分开。seed 策略记入参数表，实际 seed/工作流版本由用户执行后补充。两模型共用意图与原词，模型控制和上限分别记录；未指定字段可为空，不为了填表编造值。
+
+无歌词与无人声分别记录 `lyrics_policy / vocal_policy`；严格器乐用主奏与声部事件代替歌手/歌词设计。纯器乐输入方案、每个模型的工作流兼容状态及 YuE2 ABC 转换是否实际完成，按 [instrumental-design.md](instrumental-design.md) 留存，不能把规划开关当移轨完成。
 
 `structure` 的事件至少说明稳定 `section_id`、叙事任务、表演/主奏、声部进入退出和转接；不等于成品秒表。平台研究与 [反馈学习](feedback-learning.md) 只关联相关来源 ID/项目路径，不把整份研究或个人档案塞进模型描述。
 

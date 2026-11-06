@@ -15,10 +15,11 @@
 
 ## 内容规范
 
-推荐顺序：元数据 → 作品名称 → 意图与成功标准 → 共用词曲蓝图/控制卡/情绪曲线/段落与歌词时间线 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ 平台策略/反馈记录/MV 交接（按需）→ 自查状态 → 版本记录。指定单模型只保留该章；局部任务不强加完整结构。
+推荐顺序：元数据 → 作品名称 → Music Brief（意图、成功标准、人设与假设）→ 共用词曲蓝图/控制卡/情绪曲线/段落与歌词时间线 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ 平台策略/反馈记录/MV 交接（按需）→ 自查状态 → 版本与结案记录。指定单模型只保留该章；局部任务不强加完整结构。
 
 - YAML front matter 至少包含 `title`、`type`（`song` 或 `instrumental`）、`model` 或 `models`、`execution`、`audio_status`、`status`、`version`、`created_at`、`updated_at`、`title_source`。日期按当前用户日期填写；修订保留创建日期，更新修改日期。字符串正确引用/转义，尤其标题中的冒号、引号、`#` 和换行；有 YAML 序列化工具时优先使用。
 - 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、两种文本语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词项记“不适用”。
+- 分开记录 `lyrics_policy`（none/provided/original）与 `vocal_policy`（none/wordless_only/with_words），未明确用 unknown；有无歌词不替代人声范围。保留一次特殊人声选择的 `vocal_choice.status/elements/source`，不用空事件数组冒充用户已明确拒绝。含无词人声的作品不能标为严格纯器乐；原 `type=song/instrumental` 分类保持，允许无词人声的作品在此归 song 并写清政策。
 - 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录 section_id、功能、前景/表演、声部事件、衔接与收尾；有特殊人声时另列 vocal_events 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
 - 创作控制卡记录 `work_id`、`version`、`take_id`、目标时长与生成上限，以及风格、人声、节奏、和声四组控制项。控制项和事件必须标明 `planned`、`measured`、`verified` 或 `pending`，不能用预期值冒充实际音频测量。
 - 短曲情绪曲线可按约 15 秒粒度记录时间、故事情绪、表演、能量（1–5）和叙事功能，长曲按段落与关键事件补点；目标变化后调整。注明 planned，不把曲线写成精确乐谱或成品切点。
@@ -28,7 +29,13 @@
 - 导出表区分目标、来源、实测结果与 `PASS` / `FAIL` / `PENDING`；沿用采样率时不编造 Hz。平台未指定时写“不适用”，不额外要求平台检查。只有实际完成的自查才能勾选。
 - 只保存创作所需内容，不复制 API Key、令牌、凭据、签名 URL 或不必要的个人信息。
 
-平台章按 [platform-patterns.md](platform-patterns.md) 记录来源/日期/窗口、观察、策略、适用限制和待验证结果，不把营销数据粘贴进模型描述。反馈章按 [feedback-learning.md](feedback-learning.md) 记录版本、证据、主维度、必要联动、结果与项目学习路径；没有真实反馈时省略，不初始化虚假档案。长期偏好只保存用户明确未来适用的选择。
+特殊人声按 [vocal-performance.md](vocal-performance.md) 附内容来源、固定文本/自由范围、相对位置、表演、伴奏变化和衔接。固定台词/衬词在 Lyrics 写全；自由即兴不伪造确定台词，记 `text=null` 与范围；制作说明不进 Lyrics。两模型分别完整返回，不用模块示例替代实际交付。
+
+纯器乐按 [instrumental-design.md](instrumental-design.md) 记录器乐主奏与声部、输入策略（纯标签/空歌词/已核对 ABC 路线）及每个模型的 `workflow_compatibility=compatible/pending/blocked`、检查依据和待处理节点。资料 ready 与工作流可运行分开；如被歌词导出封装阻塞，显式说明，不虚构已跑通。没有图不推定兼容，只有已核对的实际移轨才能写完成 ABC 器乐路线。
+
+Music Brief 复用 [discovery-flow.md](discovery-flow.md) 的精简模板，保留 `persona_id`、节奏、当前阶段、选择来源和关键假设，不另起重复采访；没有人设则不填虚构身份。质量检查按 [quality-review.md](quality-review.md) 区分文本 PASS 与音频 PENDING。
+
+平台章按 [platform-patterns.md](platform-patterns.md) 记录来源/日期/窗口、观察、策略、适用限制和待验证结果，不把营销数据粘贴进模型描述。真实试听/发布反馈没有则省略；每次完整交稿仍按 [feedback-learning.md](feedback-learning.md) 保存轻量结案和 `text_review`，注明项目学习路径及实际写入的记录 ID，不初始化虚假偏好。长期偏好只保存用户明确未来适用的选择。
 
 ## 创作控制卡与时间线计划模板
 
@@ -42,6 +49,13 @@ model: "MiniMax Music 3"
 target_duration_sec: 60
 max_duration_sec: 90
 metadata_status: planned
+lyrics_policy: unknown
+vocal_policy: unknown
+workflow_compatibility: pending
+vocal_choice:
+  status: not_asked
+  elements: []
+  source: unknown
 intent:
   use_case: ""
   music_role: ""
