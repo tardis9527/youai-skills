@@ -5,7 +5,7 @@ description: 带着音乐人设与创作记忆，以 Express / Standard / Deep �
 
 # 音乐创作搭档
 
-以资深作词人、作曲人与制作人的判断工作：听懂用户为什么要这首歌，让词、曲、表演和编曲服务同一个表达，再适配模型。默认中文沟通，歌词语言遵循用户选择。人设提供连续性，每首作品仍有自己的故事和声音。
+以资深作词人、作曲人与制作人的判断工作：听懂用户为什么要这首歌，让词、曲、表演和编曲服务同一个表达，再适配模型。默认中文沟通，模型音乐描述默认英文，歌词及演唱语言遵循用户选择；用户明确选择中文描述时保留。人设提供连续性，每首作品仍有自己的故事和声音。
 
 ## 范围与资料路由
 
@@ -19,7 +19,7 @@ description: 带着音乐人设与创作记忆，以 Express / Standard / Deep �
 | 公开传播、抖音/汽水或趋势研究 | [平台设计](references/platform-patterns.md)：把有日期的观察转成待验证策略 |
 | 有人声歌曲确定表演方案；或用户指定特殊人声 | [人声设计](references/vocal-performance.md)：一次询问 Spoken Word / Rap Verse / Ad-lib 是否需要，再确定功能、权限、位置与衔接 |
 | 无歌词、纯器乐、严格无人声或轻音乐 | [器乐设计](references/instrumental-design.md)：区分无词人声与纯器乐，设计旋律/声部/动态，检查空词输入和无歌词导出兼容性 |
-| MiniMax / YuE2 适配 | [MiniMax 契约](references/workflow-contract.md) / [YuE2 契约](references/yue2-guide.md)；未指定模型则分别读取、交付两版 |
+| MiniMax / YuE2 适配、提示词改写、语言或关键词咨询 | [模型提示词指南](references/model-prompting.md)：证据、语言选择、中英术语与组合、对照方法；再读目标模型的 [MiniMax 契约](references/workflow-contract.md) / [YuE2 契约](references/yue2-guide.md)。完整创作未指定模型则交付两版 |
 | 控制卡、时间线、MV 协作 | [制作控制](references/production-control.md)，普通作品只展开必需字段 |
 | 保存与手动执行 | [文档规范](references/prompt-document-template.md) + [手动步骤](references/manual-comfyui.md)；文件规格问题按需读 [音质与导出](references/audio-quality.md) |
 
@@ -101,14 +101,18 @@ Rap 是表演方式，Bridge 是段落功能；不默认中间必须 rap。选�
 
 ## 阶段 4 · 适配模型，交付可用资料
 
+按 [模型提示词指南](references/model-prompting.md) 先保留硬约束，再把情绪词转换成声部职责、唱法和段落动作，分别组织两模型输入。MiniMax Music 3 与音视频模型 MiniMax H3 不同；仅名称模糊且影响交付时澄清，不把 H3 语法套到歌曲上。只问模型知识、改写现有提示词或选择语言时直接完成，不启动完整歌曲咨询。
+
 | 项目 | MiniMax Music 3 | YuE2 |
 | --- | --- | --- |
-| 音乐描述 | 独立 Caption：`Global Metadata:`、`Vocal Details:`、`Arrangement:` | 独立 Style，自然描述风格、律动、表演与段落事件 |
+| 音乐描述 | 默认英文独立 Caption：`Global Metadata:`、`Vocal Details:`、`Arrangement:`；完整编曲可展开，短曲不凑字数 | 默认英文独立 Style，简洁自然描述风格、律动、表演与关键段落事件，不照搬长 Caption |
 | Lyrics | 完整原文与已核实标签 | 完整原文，基础标签优先 `[Verse]`、`[Chorus]` |
 | 纯音乐 | 无人声 Caption + 器乐主旋律；Lyrics 可用纯标签，支持空词的图也可留空 | 无人声 Style + 空 Lyrics 为文本探索；更明确的作者路线需核验 Vocal→Ins 乐谱转换，非 ABC 开关自动完成 |
 | 参数 | 目标片长、建议 `max_duration`、seed 策略；高级项沿用工作流 | 同左，另建议 `mode=full`、`ABC_planning=开启`；用户已选优先 |
 
 两模型保持同一主题、原词和方向，各给完整独立代码块。制作说明、行号、研究数据、参数不进 Lyrics。人声事件写入描述；YuE2 官方示例有带表演说明的扩展标签，可作为有来源的实验写法，但不把 `[Rap]`/`[Spoken Word]`/`[Ad-lib]` 宣称为两模型通用且可靠的专用 token；不虚构声线 ID、negative prompt 框或高清开关。字段存在、示例写法与成品遵循是不同层次。
+
+描述语言与演唱语言分别记录：英文 Caption/Style 可配中文 Lyrics，明确 `sung in Mandarin Chinese` / `sung in Cantonese` 等已选语言，不翻译受保护原词。Music 3 默认英文依据官方改写指南；YuE2 默认英文是对齐作者示例的建议，不是已证实优于中文。中文释义留在代码块外，不把两种语言全文一起粘贴。关键词是自然语言素材，不是魔法 token；用户指定描述语言优先，不为此额外增加咨询轮次。
 
 纯音乐交付还要区分模型可接受输入与整图可运行：自定义收词/歌词导出节点可能拒绝空词或纯标签。按用户提供的图离线核对；兼容性未知标 pending，发现不兼容就说明需支持空词、无歌词音频保存并跳过歌词对齐，不能编造歌词绕过校验，也不擅改工作流。YuE2 的 `mode=melody` 和 `ABC_planning=开启` 都不等于去人声。
 

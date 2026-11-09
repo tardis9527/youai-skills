@@ -4,9 +4,11 @@
 
 ## 创作输入
 
-- **Style**：描述主风格、律动、情绪、人声、乐器、制作听感和结构变化。正文默认中文，语言与歌词分别选择；不是已实测中文优于英文的承诺。无需套用 MiniMax 的三段英文标识。
+- **Style**：描述主风格、律动、情绪、人声、乐器、制作听感和关键结构变化。2026-11-09 复核后默认英文，依据作者请求/展示示例，是本 Skill 的起始建议，不是官方强制或已实测英文优于中文；用户指定中文则保留。无需套用 MiniMax 的三段英文标识。
 - **Lyrics**：完整发声原文。基础段落优先使用官方模板展示的 `[Verse]`、`[Chorus]`；官方演示也出现 Intro/Bridge/Outro 和附表演描述的扩展标签，见下方分级说明。不能把 MiniMax 的完整标签清单直接承诺给 YuE2，不把括号里的制作说明当成不会唱出的文字。
 - 用户原词完整保留，所有重复段展开。音乐描述与歌词结构一致，不用“同上”占位。
+- Style 的语言与 Lyrics/演唱语言分开：英文描述配中文歌词时写明已选的 Mandarin Chinese / Cantonese 等，不翻译原词、不用 Mandopop 替代演唱语言。中文解释放代码块外。普通短曲以紧凑自然描述为起点，先写主身份、主奏/人声与律动，再写少量关键变化；不要照搬 Music 3 的篇幅建议。长提示词会压缩生成时长预算，不能为风格词库堆叠牺牲有效内容。
+- 词库、原创组合与受控语言对照见 [model-prompting.md](model-prompting.md)。若已提供固定 ABC，先核对其中旋律/和声是否符合新意图；仅改 Style 不承诺改写谱面。区分重新规划的端到端对照和固定 ABC 的渲染对照。
 - 纯音乐的空 Lyrics + 无人声 Style 只作文本探索；作者更明确的器乐路线涉及实际 Vocal→Ins 乐谱转换，不是仅清空歌词或开启 ABC。谱面人声休止仍不能保证音频无人声，`mode=melody` 也不等于无歌唱。详见 [instrumental-design.md](instrumental-design.md)。
 
 ## 手动填写与节点映射
@@ -36,6 +38,7 @@ ABC 与 Music 两处必须同步本次 Style 和空 Lyrics，不能残留旧歌�
 
 ## 一手资料
 
+- 官方请求示例与英文 Style：https://github.com/multimodal-art-projection/YuE/blob/main/examples/song.json
 - 官方模板：https://github.com/Comfy-Org/workflow_templates/blob/main/templates/audio_yue2_text2music.json
 - 节点 schema 与 ABC 空值语义：https://github.com/Comfy-Org/ComfyUI/blob/master/comfy_extras/nodes_yue2.py
 - 时长匹配检查：https://github.com/Comfy-Org/ComfyUI/blob/master/comfy/ldm/yue2/model.py

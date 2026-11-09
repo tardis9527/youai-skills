@@ -18,13 +18,14 @@
 推荐顺序：元数据 → 作品名称 → Music Brief（意图、成功标准、人设与假设）→ 共用词曲蓝图/控制卡/情绪曲线/段落与歌词时间线 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ 平台策略/反馈记录/MV 交接（按需）→ 自查状态 → 版本与结案记录。指定单模型只保留该章；局部任务不强加完整结构。
 
 - YAML front matter 至少包含 `title`、`type`（`song` 或 `instrumental`）、`model` 或 `models`、`execution`、`audio_status`、`status`、`version`、`created_at`、`updated_at`、`title_source`。日期按当前用户日期填写；修订保留创建日期，更新修改日期。字符串正确引用/转义，尤其标题中的冒号、引号、`#` 和换行；有 YAML 序列化工具时优先使用。
-- 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、两种文本语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词项记“不适用”。
+- 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、模型描述/歌词/演唱语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词和演唱语言项记“不适用”。
 - 分开记录 `lyrics_policy`（none/provided/original）与 `vocal_policy`（none/wordless_only/with_words），未明确用 unknown；有无歌词不替代人声范围。保留一次特殊人声选择的 `vocal_choice.status/elements/source`，不用空事件数组冒充用户已明确拒绝。含无词人声的作品不能标为严格纯器乐；原 `type=song/instrumental` 分类保持，允许无词人声的作品在此归 song 并写清政策。
 - 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录 section_id、功能、前景/表演、声部事件、衔接与收尾；有特殊人声时另列 vocal_events 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
 - 创作控制卡记录 `work_id`、`version`、`take_id`、目标时长与生成上限，以及风格、人声、节奏、和声四组控制项。控制项和事件必须标明 `planned`、`measured`、`verified` 或 `pending`，不能用预期值冒充实际音频测量。
 - 短曲情绪曲线可按约 15 秒粒度记录时间、故事情绪、表演、能量（1–5）和叙事功能，长曲按段落与关键事件补点；目标变化后调整。注明 planned，不把曲线写成精确乐谱或成品切点。
 - 歌词时间线为每句设置稳定 section_id / line_id、原文与作用；预计位置放 planned_position，未测的实际 start_sec、end_sec、beat_anchor 为 null。纯音乐记录器乐事件；不为了编号改写原文或重排已经稳定的 ID。
 - MiniMax Caption/Lyrics、YuE2 Style/Lyrics 分别放完整 `text` 代码块，与本轮交付逐字一致。双模型即使歌词相同也各给完整歌词，不用“同上”“略”或省略号代替。MiniMax 保留三部分标识，YuE2 自然描述 Style，各用本模型的标签。YuE2 纯音乐 Lyrics 留空时在代码块外说明“保持为空”，不把说明粘贴进输入。
+- 两模型描述默认英文，用户明确选择优先；歌词及演唱语言独立保留。英文代码块外用中文概括关键听感与段落，不把双语全文一起输入。Music 3 的默认语言依据官方建议，YuE2 是对齐示例的工作约定；证据与词库见 [model-prompting.md](model-prompting.md)，不写成已做听感实测。
 - 生成参数记录所选策略/数值、来源与真实控件的映射状态，导出表单独记录格式、质量与采样率。每项说明用户已选、明确沿用、Skill 默认建议或委托后推荐；默认 MP3 320k + FLAC 母版、源采样率与沿用工作流 seed 不必逐项提问。关键创作选择尚未解决时为 `draft`；用户界面尚未核对可标“待映射”，实际音频值标“未生成/未检测”，不阻塞资料 ready。
 - 导出表区分目标、来源、实测结果与 `PASS` / `FAIL` / `PENDING`；沿用采样率时不编造 Hz。平台未指定时写“不适用”，不额外要求平台检查。只有实际完成的自查才能勾选。
 - 只保存创作所需内容，不复制 API Key、令牌、凭据、签名 URL 或不必要的个人信息。
@@ -49,6 +50,11 @@ model: "MiniMax Music 3"
 target_duration_sec: 60
 max_duration_sec: 90
 metadata_status: planned
+prompt_languages:
+  description: en
+  description_source: recommended
+  lyrics: null
+  singing: null
 lyrics_policy: unknown
 vocal_policy: unknown
 workflow_compatibility: pending
@@ -131,7 +137,7 @@ title_source: "用户从候选中选定"
 | --- | --- | --- |
 | 用途与目标时长 | 自己试听，约 60 秒 | 用户已选；非保证片长 |
 | 主题与情绪 | 下班回家，从疲惫转向放松与安定 | 用户已选主题；按主题组织情绪 |
-| 文本语言与歌词来源 | Caption 中文，Lyrics 中文，歌词从零创作 | 中文 Caption 为技能约定；中文歌词及代写为用户要求 |
+| 文本语言与歌词来源 | Caption 英文，Lyrics 中文，普通话演唱，歌词从零创作 | 英文描述为依据官方指南的推荐；普通话歌词及代写为本例假定用户要求 |
 | 听感、人声与乐器 | 温暖、自然贴近，轻柔女声，木吉他为主 | 用户已选；少量钢琴低音为编曲建议 |
 | 结构 | 前奏 → 主歌 → 副歌 → 尾奏 | 按用户目标长度组织 |
 | 必须保留 / 避免 | 保留短曲的完整收尾；全曲无鼓或打击乐 | 收尾为编曲建议；无鼓为用户要求 |
@@ -154,12 +160,14 @@ title_source: "用户从候选中选定"
 ## Caption
 
 ```text
-Global Metadata: 温暖的原声流行短歌，采用舒缓、轻轻流动的律动，情绪从疲惫逐步转向放松与安定。整体声音自然、贴近而克制，为每句演唱留出空间。保留木吉他的自然拨弦细节，低频均衡，主唱与伴奏层次清楚。全曲不使用鼓或打击乐。
+Global Metadata: A warm acoustic pop short song with a slow, gently flowing pulse, moving from weariness toward calm reassurance. Keep the sound natural, intimate and restrained, with room around each vocal phrase, audible acoustic guitar plucks and a balanced low end. No drums or percussion throughout.
 
-Vocal Details: 一位轻柔女声以普通话独唱，咬字清晰，音色自然贴近。主歌像轻声交谈，表达克制；副歌稍微展开，延长音更温暖。只保留少量自然空间感，不加入伴唱、念白或无词哼唱。
+Vocal Details: A gentle solo female lead sings in Mandarin Chinese with clear diction and a natural, close tone. The verse feels conversational and restrained; the chorus opens slightly with warmer sustained notes. Use only a little natural room ambience. No backing vocals, spoken passages or wordless humming.
 
-Arrangement: 前奏以简洁的木吉他指弹动机引入。主歌延续同一指弹型，在演唱乐句之间留白。副歌轻轻展开吉他和弦，加入少量钢琴低音增加温暖感，不增加节奏密度。尾奏回到开场的指弹动机，以安定的最终和弦和自然尾音结束。保持短曲结构连贯、过渡自然、收尾完整。
+Arrangement: Introduce a simple fingerpicked acoustic guitar motif. Carry the same picking pattern through the verse and leave space between vocal phrases. In the chorus, gently broaden the guitar chords and add a few low piano notes for warmth without increasing rhythmic density. Return to the opening guitar motif in the outro, finishing on a resolved chord with a natural decay. Keep the short form coherent, the transitions gentle and the ending complete.
 ```
+
+中文释义：温暖原声流行、普通话女声独唱、吉他主导；主歌贴近交谈，副歌略展开并加少量钢琴低音，全曲无鼓，尾奏回归动机。以上 Caption 是短曲的精简示例，未按完整歌的篇幅建议扩写。
 
 ## Lyrics
 
@@ -206,7 +214,7 @@ Arrangement: 前奏以简洁的木吉他指弹动机引入。主歌延续同一�
 
 - [x] 名称已选定，必需创作与导出方案已解决
 - [x] Caption 与 Lyrics 的段落、人声及编制一致
-- [x] 中文 Caption、完整歌词和无鼓要求已保留
+- [x] 英文 Caption 与中文歌词分开，普通话演唱、完整歌词和无鼓要求一致
 - [x] 已区分用户选择、编曲建议与未知节点/文件值
 - [ ] 实际工作流与音频文件检查：PENDING
 - 平台检查：不适用
@@ -225,8 +233,10 @@ Arrangement: 前奏以简洁的木吉他指弹动机引入。主歌延续同一�
 ### YuE2 Style
 
 ```text
-温暖的当代原声流行短歌，舒缓、轻轻流动的律动，情绪从下班后的疲惫逐步转向放松与安定。一位轻柔女声用普通话独唱，主歌贴近轻声交谈，副歌自然展开；咬字清晰，不加入伴唱、念白或无词哼唱。木吉他指弹贯穿歌曲，乐句之间保留空间，副歌以更舒展的吉他和弦及少量钢琴低音增加温暖感。全曲不使用鼓或打击乐，主唱与伴奏层次清楚，低频均衡。简短吉他引入后进入主歌与副歌，最后回到指弹动机，以安定的最终和弦和自然尾音收束。
+A warm acoustic pop short song sung in Mandarin Chinese by a gentle solo female lead with clear diction. A slow, gently flowing pulse supports an intimate, conversational verse and a slightly more open chorus, moving from weariness to calm reassurance. Fingerpicked acoustic guitar carries the recurring motif with space between phrases; broader guitar chords and a few low piano notes warm the chorus without increasing rhythmic density. Keep the mix natural, restrained and balanced, with a little room ambience and a clear lead vocal. No drums, percussion, backing vocals, spoken passages or wordless humming. A brief guitar intro leads into the verse and chorus; the outro returns to the opening motif and a resolved final chord with a natural decay.
 ```
+
+中文释义沿用上面的同曲说明；此处英文为本 Skill 对齐作者示例的推荐，不声称已经证明优于中文。实际选择其他描述语言时同步更新本章和简报，不改变中文原词。
 
 ### YuE2 Lyrics
 

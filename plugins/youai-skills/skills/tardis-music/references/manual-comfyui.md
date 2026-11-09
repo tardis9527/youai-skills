@@ -27,7 +27,7 @@
 粘贴前先对照资料中的意图与段落表：人声、禁鼓/无人声、原词与结尾要求要与输入一致。rap/旁白的表演和衔接位于描述中，事件卡、角色标题、行号和研究数据不一起复制；没有已核实标签时不自行补 `[Rap]` 等标记。
 
 1. 用户打开自己的 MiniMax Music 3 工作流，或手动导入上表模板，确认模型加载器已选对应模型。
-2. 将本次完整 Caption 粘贴到 Caption / caption 控件。保留 `Global Metadata:`、`Vocal Details:`、`Arrangement:` 三部分，不粘贴标题、参数表或控制卡。
+2. 将本次完整 Caption 粘贴到 Caption / caption 控件。默认英文，保留 `Global Metadata:`、`Vocal Details:`、`Arrangement:` 三部分；用户已选其他描述语言时保留选择。不粘贴中文释义、标题、参数表或控制卡，歌词保持已选原语言。
 3. 将 MiniMax 版本的完整 Lyrics 粘贴到 Lyrics / lyrics 控件。歌词行号只用于资料追踪，不粘贴进模型；纯音乐按已核对的 [纯标签或空词方案](workflow-contract.md) 填写，两种均需整条保存链路兼容。
 4. 将参数表的建议上限填入 `max_duration`，确认落在当前界面范围。它不是精确片长。seed 默认沿用现有控件和随机化方式；固定对照时同步文本编码与采样节点的 seed，并记录实际值。其他高级参数沿用现有工作流。
 5. 检查保存节点：MP3 选择 `format=mp3`、`quality=320k`；保留另一个 `format=flac` 节点。用户已有导出选择时按其选择设置，不额外强制添加分支。
@@ -36,7 +36,7 @@
 ## YuE2
 
 1. 用户打开自己的 YuE2 工作流，或手动导入上表模板，确认对应 checkpoint。
-2. 将本次完整 Style 粘贴到 Style / style 控件。使用自然音乐描述，不套 MiniMax 的三个段落标识。
+2. 将本次完整 Style 粘贴到 Style / style 控件。默认英文自然音乐描述，用户已选其他描述语言时保留选择；不套 MiniMax 的三个段落标识，不粘贴代码块外的中文释义，不翻译已选原词。
 3. 将 YuE2 版本的完整 Lyrics 粘贴到 Lyrics / lyrics 控件；基础标签优先 `[Verse]`、`[Chorus]`。纯音乐在兼容图中保持真正空白，“保持为空”不粘进输入。这只是文本探索；采用作者乐谱路线须另核对实际移轨及处理后的 ABC，不以清空 Lyrics 冒充已实现该路线。
 4. 常规图建议 `mode=full`、`ABC_planning=开启`，用户已选或已核对的器乐乐谱路线优先。若使用已展开的节点，ABC 与 Music 节点的 style、lyrics、mode 和固定 seed 应一致，清除两处旧歌残留；官方子图的统一控件通常维护这些关系。`mode=melody` 不是无人声开关，开启规划也不等于完成 Vocal→Ins 转换。
 5. 将参数表的建议上限填入音乐生成节点的 `max_duration`，保留由该节点 seconds 输出驱动 latent 的连接。seed 默认沿用工作流，固定对照时同步 ABC、Music 和 KSampler，其他高级采样参数沿用现有值。
