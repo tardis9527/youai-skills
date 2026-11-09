@@ -51,7 +51,7 @@
 [Outro]
 ```
 
-只用作品需要的标签。结构、编曲和演唱指令尽量在 Caption 中表达；避免未经核实的扩展标签、Suno 特定语法、图片权重语法或特殊 token。若原词含 `[Chorus: drums enter]` 等扩展指令，保留其音乐意图到 Arrangement，Lyrics 可规范为 `[Chorus]`，不改写演唱原文。
+只用作品需要的标签。结构、编曲和演唱指令尽量在 Caption 中表达；避免未经核实的扩展标签、Suno 特定语法、图片权重语法或特殊 token。若原词含 `[Chorus: drums enter]` 等扩展指令，导演版可保留其意图，但可粘贴的 Lyrics 应规范为 `[Chorus]`，并把“鼓进入”写入 Arrangement，不改写演唱原文。
 
 严格纯音乐默认给出仅含必要段落标签的 Lyrics，例如：
 

@@ -25,7 +25,7 @@ description: 音乐创作搭档。默认分步询问创作用途、主题情绪�
 | --- | --- |
 | 每次开始完整创作或复盘 | [反馈与记忆](references/feedback-learning.md)：确定当前项目、适用人设、读取相关记录；不存在则按首次使用 |
 | 完整创作或意图仍模糊 | [渐进引导](references/discovery-flow.md) + [意图采访](references/creative-intent.md)：选择节奏、补高影响缺口、形成 Music Brief |
-| 写词、设计旋律意图与编曲 | [词曲设计](references/composition-guide.md)；交付前按 [质量审查](references/quality-review.md) 自查 |
+| 写词、设计旋律意图与编曲 | [词曲设计](references/composition-guide.md) + [歌词段落导演标注](references/lyric-annotations.md)；交付前按 [质量审查](references/quality-review.md) 自查 |
 | 公开传播、抖音/汽水或趋势研究 | [平台设计](references/platform-patterns.md)：把有日期的观察转成待验证策略 |
 | 有人声歌曲确定表演方案；或用户指定特殊人声 | [人声设计](references/vocal-performance.md)：一次询问 Spoken Word / Rap Verse / Ad-lib 是否需要，再确定功能、权限、位置与衔接 |
 | 无歌词、纯器乐、严格无人声或轻音乐 | [器乐设计](references/instrumental-design.md)：区分无词人声与纯器乐，设计旋律/声部/动态，检查空词输入和无歌词导出兼容性 |
@@ -101,6 +101,8 @@ consultation_status: required | in_progress | awaiting_confirmation | confirmed 
 
 歌词检查具体动作、视角/时间线、自然口语、重音、气口、密度与押韵；原词逐字保留，段落适配不是重写授权。展开需要演唱的重复段，不写“副歌同上”。旋律设计说明动机如何复现、哪里变化、哪个词承载情绪；不能把文字蓝图冒充已听到的旋律或乐谱。
 
+完整有人声歌曲默认同时维护“导演版歌词”和“模型版 Lyrics”。导演版可在每个主要段落标题使用方括号写情绪弧线、演唱姿态、声部进入/退出、动态和衔接，例如 `[Chorus｜全乐队进入，弦乐向外推；男声直接有力，不嘶吼]`。这类标注对创作、复盘和局部修订有用，但不是模型可靠的歌词指令；模型版只保留已核实的段落标签与实际要唱的字，导演意图映射到 Caption/Style。按 [歌词段落导演标注](references/lyric-annotations.md) 执行，不把括号说明直接粘进 Lyrics，也不把标注写成已试听结果。
+
 Rap 是表演方式，Bridge 是段落功能；不默认中间必须 rap。选中的特殊人声逐项按“相对位置→谁表演→怎么说/唱→获授权的实际文本或即兴范围→伴奏变化→衔接”写入事件卡与描述。固定念白/衬词须在 Lyrics 写出实际内容，自由即兴须明确范围；选了元素不等于允许改写受保护原词。
 
 严格无人声时指定器乐主旋律、声部职责、旋律存在感、密度、动态、段落发展和收尾，明确无歌唱/哼唱/念白/合唱/人声采样，不加入特殊人声。不把轻音乐等同无鼓、钢琴或没有发展；不要只靠堆禁用词控制输出。
@@ -116,11 +118,11 @@ Rap 是表演方式，Bridge 是段落功能；不默认中间必须 rap。选�
 | 项目 | MiniMax Music 3 | YuE2 |
 | --- | --- | --- |
 | 音乐描述 | 默认英文独立 Caption：`Global Metadata:`、`Vocal Details:`、`Arrangement:`；完整编曲可展开，短曲不凑字数 | 默认英文独立 Style，简洁自然描述风格、律动、表演与关键段落事件，不照搬长 Caption |
-| Lyrics | 完整原文与已核实标签 | 完整原文，基础标签优先 `[Verse]`、`[Chorus]` |
+| Lyrics | 模型版完整原文与已核实标签；导演版歌词另列段落标注 | 模型版完整原文，基础标签优先 `[Verse]`、`[Chorus]`；导演标注放在 Style 外部资料 |
 | 纯音乐 | 无人声 Caption + 器乐主旋律；Lyrics 可用纯标签，支持空词的图也可留空 | 无人声 Style + 空 Lyrics 为文本探索；更明确的作者路线需核验 Vocal→Ins 乐谱转换，非 ABC 开关自动完成 |
 | 参数 | 目标片长、建议 `max_duration`、seed 策略；高级项沿用工作流 | 同左，另建议 `mode=full`、`ABC_planning=开启`；用户已选优先 |
 
-两模型保持同一主题、原词和方向，各给完整独立代码块。制作说明、行号、研究数据、参数不进 Lyrics。人声事件写入描述；YuE2 官方示例有带表演说明的扩展标签，可作为有来源的实验写法，但不把 `[Rap]`/`[Spoken Word]`/`[Ad-lib]` 宣称为两模型通用且可靠的专用 token；不虚构声线 ID、negative prompt 框或高清开关。字段存在、示例写法与成品遵循是不同层次。
+两模型保持同一主题、原词和方向，各给完整独立代码块。制作说明、行号、研究数据、参数和导演版方括号标注不进 Lyrics。人声事件写入描述；YuE2 官方示例有带表演说明的扩展标签，可作为有来源的实验写法，但不把 `[Rap]`/`[Spoken Word]`/`[Ad-lib]` 宣称为两模型通用且可靠的专用 token；不虚构声线 ID、negative prompt 框或高清开关。字段存在、示例写法与成品遵循是不同层次。
 
 描述语言与演唱语言分别记录：英文 Caption/Style 可配中文 Lyrics，明确 `sung in Mandarin Chinese` / `sung in Cantonese` 等已选语言，不翻译受保护原词。Music 3 默认英文依据官方改写指南；YuE2 默认英文是对齐作者示例的建议，不是已证实优于中文。中文释义留在代码块外，不把两种语言全文一起粘贴。关键词是自然语言素材，不是魔法 token；用户指定描述语言优先，不为此额外增加咨询轮次。
 
