@@ -4,6 +4,8 @@
 
 完整创作默认落地一份 UTF-8 Markdown 文档，便于复制、复用与修订。它记录创作输入，不代替 ComfyUI workflow JSON，也不表示已经生成或检测音频。
 
+本模板只在用户已确认整合 Music Brief，或明确要求跳过咨询并完整直出后用于生成交付。咨询中只维护必要的阶段/维度和当前待答项，不因模板存在就提前填完歌词、模型描述或标记 ready。确认某一维度不等于确认整合 Brief；按 [discovery-flow.md](discovery-flow.md) 判断是否可交稿。
+
 ## 路径与版本规则
 
 - 优先使用用户指定的目录；否则以当前项目或工作目录为根，保存到 `output/music-prompts/`。目录不存在时创建，不写入技能安装目录。
@@ -18,6 +20,7 @@
 推荐顺序：元数据 → 作品名称 → Music Brief（意图、成功标准、人设与假设）→ 共用词曲蓝图/控制卡/情绪曲线/段落与歌词时间线 → MiniMax Music 3（Caption、Lyrics、参数、导出、手动填写步骤）→ YuE2（Style、Lyrics、参数、导出、手动填写步骤）→ 平台策略/反馈记录/MV 交接（按需）→ 自查状态 → 版本与结案记录。指定单模型只保留该章；局部任务不强加完整结构。
 
 - YAML front matter 至少包含 `title`、`type`（`song` 或 `instrumental`）、`model` 或 `models`、`execution`、`audio_status`、`status`、`version`、`created_at`、`updated_at`、`title_source`。日期按当前用户日期填写；修订保留创建日期，更新修改日期。字符串正确引用/转义，尤其标题中的冒号、引号、`#` 和换行；有 YAML 序列化工具时优先使用。
+- Music Brief 保留阶段状态、相关维度的值与来源，以及整合 Brief 的交稿确认证据；Express 记录明确直出原话和范围。技术节点待映射/音频未试听可以不阻塞文本 ready，创作维度未决或交稿确认缺失则不能标 ready 或输出完整创作稿。
 - 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、模型描述/歌词/演唱语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词和演唱语言项记“不适用”。
 - 分开记录 `lyrics_policy`（none/provided/original）与 `vocal_policy`（none/wordless_only/with_words），未明确用 unknown；有无歌词不替代人声范围。保留一次特殊人声选择的 `vocal_choice.status/elements/source`，不用空事件数组冒充用户已明确拒绝。含无词人声的作品不能标为严格纯器乐；原 `type=song/instrumental` 分类保持，允许无词人声的作品在此归 song 并写清政策。
 - 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录 section_id、功能、前景/表演、声部事件、衔接与收尾；有特殊人声时另列 vocal_events 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
