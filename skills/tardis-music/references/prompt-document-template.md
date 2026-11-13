@@ -23,11 +23,11 @@
 - Music Brief 保留阶段状态、相关维度的值与来源，以及整合 Brief 的交稿确认证据；Express 记录明确直出原话和范围。技术节点待映射/音频未试听可以不阻塞文本 ready，创作维度未决或交稿确认缺失则不能标 ready 或输出完整创作稿。
 - 创作简报记录用途与音乐角色、受众、希望感到/记住/行动的结果、创作命题与成功标准；以及目标时长、情绪弧线、模型描述/歌词/演唱语言、歌词来源与权限、人声/主旋律、保留/避免项。区分 user_explicit、inferred、recommended、unknown，不能把推荐写成用户已选；纯音乐歌词和演唱语言项记“不适用”。
 - 分开记录 `lyrics_policy`（none/provided/original）与 `vocal_policy`（none/wordless_only/with_words），未明确用 unknown；有无歌词不替代人声范围。保留一次特殊人声选择的 `vocal_choice.status/elements/source`，不用空事件数组冒充用户已明确拒绝。含无词人声的作品不能标为严格纯器乐；原 `type=song/instrumental` 分类保持，允许无词人声的作品在此归 song 并写清政策。
-- 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录 section_id、功能、前景/表演、声部事件、衔接与收尾；有人声歌曲可另列带方括号导演标注的“导演版歌词”，每段标注情绪动作、演唱姿态或编曲进入退出；有特殊人声时另列 vocal_events 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
+- 词曲蓝图记录所选路径、叙述视角、具体素材、主要 Hook、旋律/节奏/和声意图、声部职责。段落表记录稳定的 `section_id`、模型标签、叙事功能、情绪、相对能量、演唱、节奏/密度、声部事件、衔接与收尾；有人声歌曲默认按“Section Plan → Director Lyrics → Model Lyrics”三层输出。导演版每段保留 2–4 个可听动作，模型版只保留基础标签和实际发声文本；有特殊人声时另列 `vocal_events` 的目的、内容授权、相对位置与映射限制。普通作品保持简短，不为填表编造专业参数。
 - 创作控制卡记录 `work_id`、`version`、`take_id`、目标时长与生成上限，以及风格、人声、节奏、和声四组控制项。控制项和事件必须标明 `planned`、`measured`、`verified` 或 `pending`，不能用预期值冒充实际音频测量。
 - 短曲情绪曲线可按约 15 秒粒度记录时间、故事情绪、表演、能量（1–5）和叙事功能，长曲按段落与关键事件补点；目标变化后调整。注明 planned，不把曲线写成精确乐谱或成品切点。
 - 歌词时间线为每句设置稳定 section_id / line_id、原文与作用；预计位置放 planned_position，未测的实际 start_sec、end_sec、beat_anchor 为 null。纯音乐记录器乐事件；不为了编号改写原文或重排已经稳定的 ID。
-- 导演版歌词与模型版 Lyrics 分开。MiniMax Caption/Lyrics、YuE2 Style/Lyrics 分别放完整 `text` 代码块，与本轮交付逐字一致；可复制的 Lyrics 不含情绪解释、角色标题、行号、制作指令或导演方括号标注。双模型即使歌词相同也各给完整歌词，不用“同上”“略”或省略号代替。MiniMax 保留三部分标识，YuE2 自然描述 Style，各用本模型的标签。YuE2 纯音乐 Lyrics 留空时在代码块外说明“保持为空”，不把说明粘贴进输入。
+- Section Plan、导演版歌词与模型版 Lyrics 分开。MiniMax Caption/Lyrics、YuE2 Style/Lyrics 分别放完整 `text` 代码块，与本轮交付逐字一致；可复制的 Lyrics 不含情绪解释、角色标题、行号、制作指令或导演方括号标注。每行按自然语义/换气断句，副歌核心句可辨，第二主歌有信息增量或明确逐字重复授权。双模型即使歌词相同也各给完整歌词，不用“同上”“略”或省略号代替。MiniMax 保留三部分标识，YuE2 自然描述 Style，各用本模型的标签。YuE2 纯音乐 Lyrics 留空时在代码块外说明“保持为空”，不把说明粘贴进输入。
 - 两模型描述默认英文，用户明确选择优先；歌词及演唱语言独立保留。英文代码块外用中文概括关键听感与段落，不把双语全文一起输入。Music 3 的默认语言依据官方建议，YuE2 是对齐示例的工作约定；证据与词库见 [model-prompting.md](model-prompting.md)，不写成已做听感实测。
 - 生成参数记录所选策略/数值、来源与真实控件的映射状态，导出表单独记录格式、质量与采样率。每项说明用户已选、明确沿用、Skill 默认建议或委托后推荐；默认 MP3 320k + FLAC 母版、源采样率与沿用工作流 seed 不必逐项提问。关键创作选择尚未解决时为 `draft`；用户界面尚未核对可标“待映射”，实际音频值标“未生成/未检测”，不阻塞资料 ready。
 - 导出表区分目标、来源、实测结果与 `PASS` / `FAIL` / `PENDING`；沿用采样率时不编造 Hz。平台未指定时写“不适用”，不额外要求平台检查。只有实际完成的自查才能勾选。
@@ -96,7 +96,7 @@ harmony:
   progression: ""
   lift_point: null
 structure:
-  - {section_id: "V1", function: "", foreground: "", events: [], transition: ""}
+  - {section_id: "V1", tag: "Verse", function: "", emotion: "", energy: 2, vocal: "", rhythm: "", lyric_density: "medium", foreground: "", events: [], transition: "", status: "planned"}
 vocal_events: []
 timestamp_status: planned
 emotion_curve:
@@ -105,6 +105,10 @@ lyrics_timeline:
   status: planned
   lines:
     - {line_id: "V1-01", section_id: "V1", section: "Verse", text: "", planned_position: "第一主歌", start_sec: null, end_sec: null, beat_anchor: null}
+lyric_layers:
+  section_plan: planned
+  director_lyrics: planned
+  model_lyrics: planned
 visual_dna:
   status: mv_pending
   palette: []
@@ -160,6 +164,35 @@ title_source: "用户从候选中选定"
 
 所有段落位置均 planned，实际时间为空；完整控制卡采用上方模板，时间线行号不粘贴到 Lyrics。
 
+## Section Plan
+
+| section_id | tag | function | emotion / energy | vocal | rhythm / density | arrangement | transition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| I1 | Intro | 建立回家后的安静空间 | 疲惫、安定 / 1 | 无词，留白 | 自由、稀疏 | 木吉他指弹动机 | 保留动机进入 V1 |
+| V1 | Verse | 交代疲惫与进门动作 | 克制 / 2 | 近麦、自然叙述 | 松弛四拍、句间留白 | 吉他单独托底 | 最后一句留悬念 |
+| C1 | Chorus | 说出被接纳的核心态度 | 温暖、展开 / 3 | 旋律更舒展 | 稍加长音，不增密度 | 加少量钢琴低音 | 减层回到 O1 |
+| O1 | Outro | 完成安定收束 | 平静 / 1 | 最后一句近麦 | 自然衰减 | 回到开场指弹 | 最终和弦完整落定 |
+
+## Director Lyrics
+
+```text
+[Intro｜木吉他指弹动机，空间安静；不加入鼓，留出进入主歌的呼吸]
+
+[Verse 1｜疲惫但不抱怨；女声近麦、自然叙述；句间留白，吉他单独托底]
+把今天轻轻放在门外
+一盏灯正等着我回来
+钥匙转过最后一圈
+世界终于慢了下来
+
+[Chorus｜情绪向外打开但保持温暖；主唱拉开句尾，加入少量钢琴低音；不增加节奏密度]
+回家啦 风也停下来
+热汤把沉默慢慢化开
+不用急着变得很厉害
+今晚有人等我回来
+
+[Outro｜回到开场指弹动机；声部逐层退出；最后一句近麦，完整落在终止和弦]
+```
+
 ## Caption
 
 ```text
@@ -177,7 +210,7 @@ Arrangement: Introduce a simple fingerpicked acoustic guitar motif. Carry the sa
 ```text
 [Intro]
 
-[Verse]
+[Verse 1]
 把今天轻轻放在门外
 一盏灯正等着我回来
 钥匙转过最后一圈
