@@ -18,7 +18,8 @@ from urllib.request import urlopen
 
 
 DEFAULT_BASE_URL = "https://sub-tardis.ai-you.top/v1"
-DEFAULT_MODEL = "gpt-image-2"
+DEFAULT_MODEL = "gpt-image-2.6-sunburst"
+DRAFT_MODEL = "gpt-image-2.6-flare"
 DEFAULT_CREDENTIAL_FILE = Path.home() / ".tardis-skill" / "imagegen-tardis" / "credentials.json"
 IMAGE_SUFFIXES = {"png": ".png", "jpeg": ".jpg", "webp": ".webp"}
 
@@ -32,7 +33,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--image", type=Path, action="append", default=[])
     parser.add_argument("--mask", type=Path)
     parser.add_argument("--out", type=Path)
-    parser.add_argument("--model", default=DEFAULT_MODEL)
+    model = parser.add_mutually_exclusive_group()
+    model.add_argument("--model", default=DEFAULT_MODEL,
+                       help="Image model (default: %(default)s)")
+    model.add_argument("--draft", dest="model", action="store_const", const=DRAFT_MODEL,
+                       help=f"Use {DRAFT_MODEL} for a quick draft")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--credential-file", type=Path, default=DEFAULT_CREDENTIAL_FILE)
     parser.add_argument("--auth-file", type=Path, help=argparse.SUPPRESS)

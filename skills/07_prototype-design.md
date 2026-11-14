@@ -279,7 +279,7 @@ Style Anchor 必须同时输出结构化 Design Tokens（颜色、字体、字�
 ```markdown
 ### P02 仪表盘 — AI 出图提示词
 
-**适用模型**：Tardis 默认 `gpt-image-2` / Nano Banana（自然语言）；Midjourney 见末尾参数。实际调用以用户确认的模型为准。
+**适用模型**：Tardis 默认 `gpt-image-2.6-sunburst`，快速试稿可选 `gpt-image-2.6-flare` / Nano Banana（自然语言）；Midjourney 见末尾参数。实际调用以用户确认的模型为准。
 **画面比例**：16:10（Web 桌面）
 
 #### 中文提示词

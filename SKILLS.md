@@ -59,7 +59,7 @@ description: 面向独立开发者的 11 个 AI Skill，从产品想法到产品
 - 产出：3-5 条通过轻量检查表自审的候选文案 + 资深设计师视角的配图方案（2-3 套细分风格供选择）与可直接使用的中文出图提示词 + 沉淀到本地知识库的学习记录
 
 ### 10. Tardis 生图（Image Generation）
-通过自定义供应商生成或编辑图片，默认 `gpt-image-2`，可指定其他模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
+通过自定义供应商生成或编辑图片，默认 `gpt-image-2.6-sunburst`；用户选择快速试稿时使用 `gpt-image-2.6-flare`（`--draft`），也可用 `--model` 指定模型。输出保存到本地，在 Codex 聊天中直接预览并提供下载链接。
 - 入口：`skills/imagegen-tardis/SKILL.md`；首次使用时向用户索取密钥并保存到当前用户主目录下的 `~/.tardis-skill/imagegen-tardis/credentials.json`，后续直接读取该文件，并需要 Python `openai` 包
 
 ### 11. ComfyUI 音乐创作（MiniMax Music 3 / YuE2）

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sys
@@ -50,6 +51,61 @@ class FakeOpenAI:
 
 
 class ImageGenTests(unittest.TestCase):
+    def test_default_and_draft_models_are_sent_for_generate_and_edit(self):
+        for command in ("generate", "edit"):
+            for flags, expected_model in (
+                ([], "gpt-image-2.6-sunburst"),
+                (["--draft"], "gpt-image-2.6-flare"),
+            ):
+                with self.subTest(command=command, model=expected_model):
+                    with TemporaryDirectory() as temp_dir:
+                        root = Path(temp_dir)
+                        credentials = root / "credentials.json"
+                        credentials.write_text(json.dumps({"api_key": "test-key"}), encoding="utf-8")
+                        source = root / "source.png"
+                        source.write_bytes(PNG)
+                        out = root / "image.png"
+                        args = module._parser().parse_args([
+                            command, "--prompt", "preserve layout and text", *flags,
+                            "--credential-file", str(credentials), "--out", str(out),
+                            "--size", "1536x1024", "--quality", "high",
+                            *(["--image", str(source)] if command == "edit" else []),
+                        ])
+                        with patch.dict(sys.modules, {"openai": SimpleNamespace(OpenAI=FakeOpenAI)}):
+                            module.run(args)
+                        self.assertEqual(out.read_bytes(), PNG)
+                        self.assertEqual(FakeOpenAI.last_client.images.method, command)
+                        options = FakeOpenAI.last_client.images.options
+                        self.assertEqual(options["model"], expected_model)
+                        self.assertEqual(options["prompt"], "preserve layout and text")
+                        self.assertEqual(options["size"], "1536x1024")
+                        self.assertEqual(options["quality"], "high")
+                        self.assertEqual(options["n"], 1)
+
+    def test_draft_and_explicit_model_are_mutually_exclusive(self):
+        for flags in (
+            ["--draft", "--model", "custom-model"],
+            ["--model", "custom-model", "--draft"],
+        ):
+            with self.subTest(flags=flags):
+                with patch("sys.stderr", new_callable=io.StringIO):
+                    with self.assertRaises(SystemExit) as context:
+                        module._parser().parse_args(["generate", *flags])
+                self.assertEqual(context.exception.code, 2)
+
+    def test_draft_dry_run_needs_no_credentials_or_provider(self):
+        with TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            out = root / "draft.png"
+            args = module._parser().parse_args([
+                "generate", "--draft", "--prompt", "test", "--dry-run",
+                "--credential-file", str(root / "missing.json"), "--out", str(out),
+            ])
+            with patch.object(module, "_api_key", side_effect=AssertionError("must not read credentials")):
+                with patch.dict(sys.modules, {"openai": None}):
+                    self.assertEqual(module.run(args), [out])
+            self.assertFalse(out.exists())
+
     def test_generate_uses_auth_model_and_writes_image(self):
         with TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
